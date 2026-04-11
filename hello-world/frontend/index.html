@@ -5,14 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hello World App</title>
     <script type="module" src="/src/main.jsx"></script>
+    <style>
+      /* Sticky footer layout: body is a grid with a flexible first row
+         (where React mounts) and an auto-sized second row (the footer).
+         Guarantees the footer sits at the bottom of the viewport even on
+         short pages without React having to know anything about it. */
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: 1fr auto;
+      }
+
+      .site-footer {
+        background: #111827;
+        color: white;
+        padding: 1.5rem 2rem;
+      }
+
+      .site-footer-inner {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .site-footer-nav {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+
+      .site-footer-nav a {
+        color: white;
+        text-decoration: none;
+      }
+
+      .site-footer-nav a:hover {
+        text-decoration: underline;
+      }
+
+      .site-footer-copyright {
+        margin: 0;
+        font-size: 0.85rem;
+        opacity: 0.7;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
 
-    <div style="background-color: lightgrey; padding: 20px;">
-  <p>This paragraph is inside a styled block container contained completely inside the html, not dynamic through sql.</p>
-</div>
-
-
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <nav class="site-footer-nav">
+          <a href="/">Home</a>
+          <a href="https://github.com/penpro/Resume-CV" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="tel:+13608507876">(360) 850-7876</a>
+          <a href="mailto:wesleyaweaverjr@gmail.com">wesleyaweaverjr@gmail.com</a>
+        </nav>
+        <p class="site-footer-copyright">&copy; 2026 Wesley Weaver Jr. All rights reserved.</p>
+      </div>
+    </footer>
   </body>
 </html>
