@@ -31,6 +31,12 @@ export default function Home() {
               <Link to="/moodboard">MoodBoard</Link> — make boards from image
               URLs and share them via a public link.
             </li>
+            {user.role === 'admin' && (
+              <li>
+                <Link to="/customer-service">Customer Service</Link> — admin
+                tool to search users and manually send password reset emails.
+              </li>
+            )}
           </ul>
           <p>
             <a href="/apps/apps.html">See the full Mini Apps Showcase</a>

@@ -8,6 +8,7 @@ const pool = require('./db');
 const { router: authRouter } = require('./auth');
 const notesRouter = require('./notes');
 const boardsRouter = require('./boards');
+const adminRouter = require('./admin');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -59,6 +60,7 @@ app.use(
 app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/boards', boardsRouter);
+app.use('/api/admin', adminRouter);
 
 app.get('/api/messages', async (req, res) => {
   try {

@@ -31,7 +31,25 @@ export default function App() {
         <nav style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {loading ? null : user ? (
             <>
-              <span style={{ opacity: 0.8 }}>Signed in as {user.email}</span>
+              <span style={{ opacity: 0.8, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                Signed in as {user.email}
+                {user.role === 'admin' && (
+                  <span
+                    style={{
+                      fontSize: '0.65rem',
+                      padding: '0.1rem 0.45rem',
+                      borderRadius: 999,
+                      background: 'white',
+                      color: '#111827',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    admin
+                  </span>
+                )}
+              </span>
               <button
                 type="button"
                 onClick={handleLogout}

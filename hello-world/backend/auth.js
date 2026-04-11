@@ -9,9 +9,12 @@
 //   POST /forgot-password  start a reset flow by emailing a token
 //   POST /reset-password   consume a token and set a new password
 //
-// Also exports a requireAuth middleware for use by future mini apps that
-// need a logged-in user. Attach it in front of any route:
-//   app.get('/api/protected', requireAuth, handler)
+// Also exports:
+//   requireAuth                - middleware requiring any logged-in user
+//   requireAdmin               - middleware requiring users.role = 'admin'
+//   sendPasswordResetForUser   - shared helper used by both the self-service
+//                                /forgot-password flow and the admin-triggered
+//                                send-password-reset endpoint
 
 const crypto = require('crypto');
 const express = require('express');
@@ -46,7 +49,11 @@ function isValidEmail(value) {
 
 function sanitizeUser(user) {
   if (!user) return null;
-  return { id: user.id, email: user.email };
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role || 'user'
+  };
 }
 
 function regenerateSession(req) {
@@ -67,6 +74,39 @@ function destroySession(req) {
   });
 }
 
+// Create a password reset token for a user, persist its hash, and send
+// the reset email. Shared between the self-service /forgot-password flow
+// (in this file) and the admin-triggered /api/admin/users/:id/send-password-reset
+// flow (in admin.js), so both paths produce identical tokens and emails.
+async function sendPasswordResetForUser(user) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const token_hash = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  const expires_at = new Date(
+    Date.now() + RESET_TOKEN_TTL_HOURS * 60 * 60 * 1000
+  );
+
+  await pool.query(
+    'INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
+    [user.id, token_hash, expires_at]
+  );
+
+  const base = process.env.APP_BASE_URL || 'http://localhost';
+  const resetUrl = `${base}/reset-password?token=${token}`;
+
+  await sendMail({
+    to: user.email,
+    subject: 'Reset your password',
+    text:
+      'A password reset was requested for your account.\n\n' +
+      `Open the link below to choose a new password. The link expires in ${RESET_TOKEN_TTL_HOURS} hour(s).\n\n` +
+      `${resetUrl}\n\n` +
+      "If you did not request this, you can ignore this email and your password will stay the same."
+  });
+}
+
 // --- middleware -----------------------------------------------------------
 
 function requireAuth(req, res, next) {
@@ -74,6 +114,29 @@ function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   next();
+}
+
+// requireAdmin is a superset of requireAuth: it checks that the caller is
+// logged in AND that the user row currently has role='admin'. The role is
+// re-read from the DB on every admin-guarded request so a demotion takes
+// effect on the next admin action without waiting for the session to end.
+async function requireAdmin(req, res, next) {
+  try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    const [rows] = await pool.query(
+      'SELECT role FROM users WHERE id = ?',
+      [req.session.userId]
+    );
+    if (rows.length === 0 || rows[0].role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+  } catch (error) {
+    console.error('Admin check failed:', error);
+    res.status(500).json({ error: 'Authorization check failed' });
+  }
 }
 
 // --- routes ---------------------------------------------------------------
@@ -127,7 +190,7 @@ router.post('/login', async (req, res) => {
     const password = String(req.body.password || '');
 
     const [rows] = await pool.query(
-      'SELECT id, email, password_hash FROM users WHERE email = ?',
+      'SELECT id, email, role, password_hash FROM users WHERE email = ?',
       [email]
     );
     const user = rows[0];
@@ -176,7 +239,7 @@ router.get('/me', async (req, res) => {
       return res.json({ user: null });
     }
     const [rows] = await pool.query(
-      'SELECT id, email FROM users WHERE id = ?',
+      'SELECT id, email, role FROM users WHERE id = ?',
       [req.session.userId]
     );
     res.json({ user: sanitizeUser(rows[0]) });
@@ -220,32 +283,7 @@ router.post('/forgot-password', async (req, res) => {
     const user = rows[0];
 
     if (user) {
-      const token = crypto.randomBytes(32).toString('hex');
-      const token_hash = crypto
-        .createHash('sha256')
-        .update(token)
-        .digest('hex');
-      const expires_at = new Date(
-        Date.now() + RESET_TOKEN_TTL_HOURS * 60 * 60 * 1000
-      );
-
-      await pool.query(
-        'INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
-        [user.id, token_hash, expires_at]
-      );
-
-      const base = process.env.APP_BASE_URL || 'http://localhost';
-      const resetUrl = `${base}/reset-password?token=${token}`;
-
-      await sendMail({
-        to: user.email,
-        subject: 'Reset your password',
-        text:
-          'A password reset was requested for your account.\n\n' +
-          `Open the link below to choose a new password. The link expires in ${RESET_TOKEN_TTL_HOURS} hour(s).\n\n` +
-          `${resetUrl}\n\n` +
-          "If you did not request this, you can ignore this email and your password will stay the same."
-      });
+      await sendPasswordResetForUser(user);
     }
 
     res.json(genericResponse);
@@ -319,4 +357,9 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-module.exports = { router, requireAuth };
+module.exports = {
+  router,
+  requireAuth,
+  requireAdmin,
+  sendPasswordResetForUser
+};

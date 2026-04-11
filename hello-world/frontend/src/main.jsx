@@ -12,6 +12,7 @@ import ResetPassword from './pages/ResetPassword.jsx'
 import QuickNotes from './pages/QuickNotes.jsx'
 import MoodBoards from './pages/MoodBoards.jsx'
 import MoodBoard from './pages/MoodBoard.jsx'
+import CustomerService from './pages/CustomerService.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="quicknotes" element={<QuickNotes />} />
             <Route path="moodboard" element={<MoodBoards />} />
             <Route path="moodboard/:token" element={<MoodBoard />} />
+            <Route path="customer-service" element={<CustomerService />} />
           </Route>
         </Routes>
       </AuthProvider>
