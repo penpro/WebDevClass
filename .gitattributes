@@ -1,0 +1,4 @@
+# Keep shell scripts and SQL files as LF so they run correctly on the EC2
+# Ubuntu server even when edited or committed from a Windows machine.
+*.sh    text eol=lf
+*.sql   text eol=lf

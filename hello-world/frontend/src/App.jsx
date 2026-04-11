@@ -1,30 +1,68 @@
-import { useEffect, useState } from 'react'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { useAuth } from './AuthContext.jsx'
 
 export default function App() {
-  const [messages, setMessages] = useState([])
+  const { user, loading, logout } = useAuth()
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    fetch('/api/messages')
-      .then((response) => response.json())
-      .then((data) => setMessages(data))
-      .catch((error) => console.error('Failed to fetch messages:', error))
-  }, [])
+  async function handleLogout() {
+    await logout()
+    navigate('/')
+  }
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '2rem', lineHeight: '1.6' }}>
-      <h1>Hello, World!</h1>
-      <p>This site is being used as a showcase for web development projects.</p>
+    <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: 1.6 }}>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 2rem',
+          background: '#111827',
+          color: 'white'
+        }}
+      >
+        <Link
+          to="/"
+          style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold' }}
+        >
+          Mini Apps
+        </Link>
+        <nav style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {loading ? null : user ? (
+            <>
+              <span style={{ opacity: 0.8 }}>Signed in as {user.email}</span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                style={{
+                  background: 'transparent',
+                  color: 'white',
+                  border: '1px solid white',
+                  borderRadius: 4,
+                  padding: '0.25rem 0.75rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" style={{ color: 'white' }}>
+                Log in
+              </Link>
+              <Link to="/register" style={{ color: 'white' }}>
+                Sign up
+              </Link>
+            </>
+          )}
+        </nav>
+      </header>
 
-      <p>
-        <a href="/apps/apps.html">View Mini Apps Showcase</a>
-      </p>
-
-      <h2>Messages from MySQL through Node</h2>
-      <ul>
-        {messages.map((message) => (
-          <li key={message.id}>{message.text}</li>
-        ))}
-      </ul>
+      <main style={{ padding: '2rem' }}>
+        <Outlet />
+      </main>
     </div>
   )
 }
