@@ -19,12 +19,27 @@ export default function Home() {
       <h1>Hello, World!</h1>
       <p>This site is being used as a showcase for web development projects.</p>
 
-      <p>
-        {user
-          ? `You are signed in as ${user.email}.`
-          : 'You are not signed in yet.'}{' '}
-        <Link to="/apps/apps.html">View Mini Apps Showcase</Link>
-      </p>
+      {user ? (
+        <section style={{ marginBottom: '2rem' }}>
+          <h2>Your apps</h2>
+          <ul>
+            <li>
+              <Link to="/quicknotes">QuickNotes</Link> — jot notes, saved to
+              your account.
+            </li>
+          </ul>
+          <p>
+            <Link to="/apps/apps.html">See the full Mini Apps Showcase</Link>
+          </p>
+        </section>
+      ) : (
+        <p>
+          You are not signed in yet.{' '}
+          <Link to="/login">Log in</Link> or{' '}
+          <Link to="/register">create an account</Link> to use the apps.{' '}
+          <Link to="/apps/apps.html">Browse the showcase</Link>.
+        </p>
+      )}
 
       <h2>Messages from MySQL through Node</h2>
       {error && <p style={{ color: 'crimson' }}>Failed to load: {error}</p>}

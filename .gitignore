@@ -2,4 +2,6 @@ hello-world/backend/node_modules/
 hello-world/frontend/node_modules/
 hello-world/frontend/dist/
 hello-world/backend/.env
+cookies.txt
+*.bak
 .DS_Store
