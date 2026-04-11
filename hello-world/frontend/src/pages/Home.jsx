@@ -27,6 +27,10 @@ export default function Home() {
               <Link to="/quicknotes">QuickNotes</Link> — jot notes, saved to
               your account.
             </li>
+            <li>
+              <Link to="/moodboard">MoodBoard</Link> — make boards from image
+              URLs and share them via a public link.
+            </li>
           </ul>
           <p>
             <a href="/apps/apps.html">See the full Mini Apps Showcase</a>

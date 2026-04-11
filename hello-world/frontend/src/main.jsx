@@ -10,6 +10,8 @@ import Register from './pages/Register.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword.jsx'
 import QuickNotes from './pages/QuickNotes.jsx'
+import MoodBoards from './pages/MoodBoards.jsx'
+import MoodBoard from './pages/MoodBoard.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -23,6 +25,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
             <Route path="quicknotes" element={<QuickNotes />} />
+            <Route path="moodboard" element={<MoodBoards />} />
+            <Route path="moodboard/:token" element={<MoodBoard />} />
           </Route>
         </Routes>
       </AuthProvider>
