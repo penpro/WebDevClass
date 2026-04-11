@@ -98,6 +98,7 @@ At first, outbound traffic was too restricted. That caused several commands to h
 The rules that ended up being needed:
 
 - **HTTPS (443)** outbound — for npm, apt, curl, and Node's outbound HTTPS calls
+- **SMTP (TCP/587)** outbound — for the backend to submit password-reset emails to Gmail's SMTP server
 - **DNS (UDP/53)** outbound — for direct DNS queries from the server (e.g. `dig @8.8.8.8`) during diagnostics
 - **DNS (TCP/53)** outbound — DNS responses sometimes fall back to TCP
 
@@ -606,7 +607,76 @@ Then in a browser, test the full login / QuickNotes / password-reset flow over H
 
 - **CAA query timeouts from Let's Encrypt.** On the first certbot run it may fail with `DNS problem: query timed out looking up CAA for YOURNAME.duckdns.org`. This is not a config problem — Let's Encrypt's own DNS resolvers are slow to reach DuckDNS sometimes. Retry after a minute or two and it almost always succeeds. This is *not* affected by the EC2 security group (the CAA check happens from Let's Encrypt's infrastructure, not yours).
 - **Raw-IP URLs stop working for HTTPS.** The cert is issued to the domain name, so `https://<raw-ip>` throws a certificate-mismatch warning. Plain `http://<raw-ip>` also doesn't redirect because there is no nginx server block matching the IP. Always use the domain URL. Optionally you can add a `listen 80 default_server; server_name _; return 301 https://YOURNAME.duckdns.org$request_uri;` catch-all server block in nginx to bounce any unknown host to the canonical domain.
-- **IP changes.** Stopping and starting the EC2 instance releases its public IP; the DuckDNS record then points at nothing. Either update the IP on duckdns.org after the restart, or allocate an **Elastic IP** and associate it with the instance so the public IP stays fixed.
+- **IP changes.** Stopping and starting the EC2 instance releases its public IP; the DuckDNS record then points at nothing. Either update the IP on duckdns.org after the restart, or allocate an **Elastic IP** and associate it with the instance so the public IP stays fixed. This project uses an Elastic IP.
+
+---
+
+## Email Delivery (Gmail SMTP)
+
+Password-reset emails are sent through Gmail's SMTP server using an **app password** tied to a regular Google account. No SendGrid / SES / Mailgun account is required. This is appropriate for class-project scale (Gmail allows ~500 outgoing messages per day per account).
+
+`hello-world/backend/mailer.js` is a thin wrapper around `nodemailer`: when `SMTP_HOST` is set in `.env`, it sends real email; when `SMTP_HOST` is blank, it prints the message body to `pm2 logs hello-backend` instead. That means the password-reset flow is testable end-to-end without any SMTP configuration at all — useful for local development and for verifying the flow works before wiring up real delivery.
+
+### 1. Generate a Gmail app password
+
+In a browser, signed into the Google account you want to send from:
+
+1. Make sure **2-Step Verification** is enabled at https://myaccount.google.com/security (Google requires it before letting you create app passwords)
+2. Go to https://myaccount.google.com/apppasswords
+3. Enter an app name like `WebDev class SMTP` and click **Create**
+4. Copy the 16-character password that appears in the dialog. Google will not show it again — if it's lost, generate a new one and replace it in `.env`
+
+The app password is a bearer credential for that account's SMTP. Treat it as sensitive. It can be revoked from the same page at any time without affecting the main account password.
+
+### 2. Fill in `.env` on the server
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your.email@gmail.com
+SMTP_PASS=abcdefghijklmnop
+SMTP_FROM=WebDev Class <your.email@gmail.com>
+```
+
+Notes:
+- Strip the spaces out of the app password. `abcd efgh ijkl mnop` becomes `abcdefghijklmnop`.
+- `SMTP_FROM`'s email address **must match** `SMTP_USER`. Gmail's SMTP server will silently rewrite mismatched from-addresses, or reject the send. The `Name <address>` format for `SMTP_FROM` is fine and shows up nicely in the recipient's inbox.
+- Port **587** (STARTTLS) is what `mailer.js` is wired for; port 465 (implicit TLS) also works but the current code expects 587 unless you explicitly use 465.
+
+Then restart the backend:
+
+```bash
+cd ~/WebDevClass
+./deploy_backend.sh
+```
+
+### 3. Outbound port 587
+
+The backend's SMTP submission goes out on **TCP 587**, so the EC2 security group needs an outbound rule allowing that port. Add it in the AWS console: EC2 → Security Groups → yours → Outbound rules → Edit → Add rule → Custom TCP, port 587, destination `0.0.0.0/0` → Save.
+
+Without this rule the first send attempt hangs or fails with `ETIMEDOUT` / `ECONNREFUSED` against `smtp.gmail.com:587`.
+
+### 4. Verify
+
+From the server:
+
+```bash
+curl -sX POST https://penumbrapro.duckdns.org/api/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{"email":"your.email@gmail.com"}'
+pm2 logs hello-backend --lines 20 --nostream
+```
+
+When real SMTP is in play, the PM2 log should show **no** `--- email (no SMTP configured, logging to console) ---` block — that only appears in the fallback path. The real path is silent on success. Check your inbox (and the spam folder on first send — Gmail sometimes routes the very first self-send to spam until reputation is established).
+
+### Common failures
+
+| Error | Cause | Fix |
+|---|---|---|
+| `535-5.7.8 Username and Password not accepted` | Wrong app password, or a real account password was pasted | Regenerate the app password and re-paste (spaces removed) |
+| `535-5.7.14 Please log in via your web browser` | Google's anti-abuse block on first SMTP auth from a new IP | Sign into the Google account from a browser once to clear the block |
+| `ECONNREFUSED` or `ETIMEDOUT` on `smtp.gmail.com:587` | Outbound TCP 587 blocked by the security group | Add the outbound rule described in step 3 |
+| Email arrives but from a different address than `SMTP_FROM` | `SMTP_FROM`'s email didn't match `SMTP_USER` | Make them match |
 
 ---
 
@@ -752,4 +822,6 @@ The project is live at **https://penumbrapro.duckdns.org**, with:
 - shared auth (register / login / logout / password reset / account deletion) via session cookies
 - **QuickNotes** as the first live mini app — user-scoped CRUD against `/api/notes`
 - Let's Encrypt cert via DuckDNS, auto-renewing
+- Gmail SMTP wired up for real password-reset email delivery
+- Elastic IP attached so the public address is stable
 - push → pull → `./deploy_all.sh` as the repeatable deploy loop
