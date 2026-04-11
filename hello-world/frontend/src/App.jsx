@@ -11,9 +11,15 @@ export default function App() {
   }, [])
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: '2rem' }}>
+    <div style={{ fontFamily: 'Arial, sans-serif', padding: '2rem', lineHeight: '1.6' }}>
       <h1>Hello, World!</h1>
-      <p>Messages coming from MySQL through Node:</p>
+      <p>This site is being used as a showcase for web development projects.</p>
+
+      <p>
+        <a href="/apps/apps.html">View Mini Apps Showcase</a>
+      </p>
+
+      <h2>Messages from MySQL through Node</h2>
       <ul>
         {messages.map((message) => (
           <li key={message.id}>{message.text}</li>
