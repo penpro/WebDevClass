@@ -29,7 +29,7 @@ export default function Home() {
             </li>
           </ul>
           <p>
-            <Link to="/apps/apps.html">See the full Mini Apps Showcase</Link>
+            <a href="/apps/apps.html">See the full Mini Apps Showcase</a>
           </p>
         </section>
       ) : (
@@ -37,7 +37,7 @@ export default function Home() {
           You are not signed in yet.{' '}
           <Link to="/login">Log in</Link> or{' '}
           <Link to="/register">create an account</Link> to use the apps.{' '}
-          <Link to="/apps/apps.html">Browse the showcase</Link>.
+          <a href="/apps/apps.html">Browse the showcase</a>.
         </p>
       )}
 
