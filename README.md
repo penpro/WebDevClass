@@ -23,12 +23,14 @@ Nginx :443 (Let's Encrypt cert, auto-redirects :80 -> :443)
   |
   +-- static files (React SPA) ---> /var/www/hello-app
   |
-  +-- /api/auth/*    \
-  +-- /api/notes/*    >-- Node/Express :3000 ---> MySQL
-  +-- /api/messages  /
+  +-- /api/messages    \
+  +-- /api/auth/*       \
+  +-- /api/notes/*       >-- Node/Express :3000 ---> MySQL
+  +-- /api/boards/*     /
+  +-- /api/admin/*     /  (requireAdmin middleware)
 ```
 
-The site is live at **https://penumbrapro.duckdns.org**. Unauthenticated visitors see the seeded hello-world messages; logged-in users can use the QuickNotes mini app. More mini apps are planned on top of the same shared account.
+The site is live at **https://penumbrapro.duckdns.org**. Unauthenticated visitors see the seeded hello-world messages; logged-in users have access to **QuickNotes** (user-scoped note list) and **MoodBoard** (image-URL boards with a public share link). Administrators additionally have access to a **Customer Service** tool that lets them search users by email and trigger password-reset emails on behalf of a user. Every route in the site sits underneath a shared session login, and a persistent site footer (home, GitHub, phone, email, copyright) lives in `index.html` so it shows on every page regardless of which React route is active.
 
 ---
 
@@ -316,15 +318,36 @@ Everything added after that lives in numbered migration files under `hello-world
 ### Current tables in `hello_app`
 
 - `messages` — the original seeded rows (hello world demo, unauthenticated)
-- `users` — one row per account: `id`, `email` (unique, lowercased), `password_hash` (bcrypt), `created_at`, `last_login_at`
+- `users` — one row per account: `id`, `email` (unique, lowercased), `role` (`'user'` or `'admin'`, default `'user'`), `password_hash` (bcrypt), `created_at`, `last_login_at`
 - `sessions` — backing store for `express-mysql-session`; shape dictated by the library (`session_id`, `expires`, `data`)
 - `password_resets` — hashed reset tokens with expiry; the plaintext token is never stored, only `sha256(token)`
 - `notes` — QuickNotes rows, scoped by `user_id` with `ON DELETE CASCADE`
+- `boards` — MoodBoard boards, one per user, with a random `share_token` that doubles as the public URL identifier (`ON DELETE CASCADE` from users)
+- `board_images` — image URLs belonging to a board (`ON DELETE CASCADE` from boards). Only URLs are stored; no image binaries are uploaded or hosted by this server
 - `schema_migrations` — filenames of applied migrations, with timestamps
+
+### Migrations applied
+
+Numbered migrations live in `hello-world/db/migrations/`:
+
+- `001_add_auth_tables.sql` — creates `users`, `sessions`, `password_resets`
+- `002_reconcile_users_and_add_notes.sql` — renames `hashed_password` → `password_hash`, adds `last_login_at`, declares `notes` (conditional ALTERs so it is safe on both existing and fresh databases)
+- `003_add_moodboards.sql` — creates `boards` and `board_images`
+- `004_add_user_roles.sql` — adds the `role` column to `users`
 
 ### Adding a new migration
 
-Any schema change goes in as `hello-world/db/migrations/NNN_description.sql`. On the server, running `./hello-world/db/migrate.sh` (or `./deploy_all.sh`) picks it up and applies it exactly once. See `hello-world/db/migrations/002_reconcile_users_and_add_notes.sql` for an example that uses conditional ALTER statements so it is safe on both an existing database and a fresh one.
+Any schema change goes in as `hello-world/db/migrations/NNN_description.sql`. On the server, running `./hello-world/db/migrate.sh` (or `./deploy_all.sh`) picks it up and applies it exactly once. See `002_reconcile_users_and_add_notes.sql` or `004_add_user_roles.sql` for an example that uses conditional ALTER statements so the same migration is safe on both an existing database and a fresh one.
+
+### Promoting yourself to admin
+
+Migration 004 adds the `role` column but does not promote anyone. After running migrations on a fresh environment, the first admin has to be set by hand:
+
+```bash
+sudo mysql hello_app -e "UPDATE users SET role='admin' WHERE email='your.email@example.com';"
+```
+
+Log out and back in (or hard-refresh the browser) and the admin-only UI will appear.
 
 ---
 
@@ -362,7 +385,7 @@ The backend reads config from `hello-world/backend/.env` on the server (which is
 | POST | `/api/auth/register` | public | Create account and log in |
 | POST | `/api/auth/login` | public | Log in |
 | POST | `/api/auth/logout` | public | Destroy session |
-| GET | `/api/auth/me` | public | Current user (or `null`) |
+| GET | `/api/auth/me` | public | Current user with role (or `null`) |
 | DELETE | `/api/auth/me` | required | Delete the current user's account |
 | POST | `/api/auth/forgot-password` | public | Send a reset email (console fallback if no SMTP) |
 | POST | `/api/auth/reset-password` | public | Consume a reset token and set a new password |
@@ -371,8 +394,17 @@ The backend reads config from `hello-world/backend/.env` on the server (which is
 | POST | `/api/notes` | required | Create a note |
 | PUT | `/api/notes/:id` | required | Update a note |
 | DELETE | `/api/notes/:id` | required | Delete a note |
+| GET | `/api/boards` | required | List the current user's moodboards |
+| POST | `/api/boards` | required | Create a new moodboard |
+| GET | `/api/boards/:token` | public | Fetch one board + its images; `can_edit: true` when the caller is the owner |
+| PUT | `/api/boards/:token` | required | Rename a board (owner only) |
+| DELETE | `/api/boards/:token` | required | Delete a board (owner only) |
+| POST | `/api/boards/:token/images` | required | Add an image URL (owner only) |
+| DELETE | `/api/boards/:token/images/:imageId` | required | Remove an image (owner only) |
+| GET | `/api/admin/users/search?q=...` | admin | Search users by email substring (max 50 results) |
+| POST | `/api/admin/users/:id/send-password-reset` | admin | Manually trigger a reset email for a target user |
 
-Sessions are cookie-based: a cookie called `hello.sid` (HttpOnly, SameSite=Lax, Secure when HTTPS is live) references a row in the `sessions` table. Every mini app can protect its routes with the shared `requireAuth` middleware exported from `hello-world/backend/auth.js`.
+Sessions are cookie-based: a cookie called `hello.sid` (HttpOnly, SameSite=Lax, Secure when HTTPS is live) references a row in the `sessions` table. Every mini app can protect its routes with the shared `requireAuth` middleware exported from `hello-world/backend/auth.js`, or with `requireAdmin` for admin-only endpoints.
 
 A handful of defensive touches are already in place:
 
@@ -380,6 +412,18 @@ A handful of defensive touches are already in place:
 - `req.session.regenerate()` is called on login and register so old session IDs can't be reused.
 - `/api/auth/forgot-password` always returns the same `{ok: true}` regardless of whether the email exists.
 - Reset tokens are stored as `sha256(token)`; the plaintext only exists in the email the user receives.
+- `requireAdmin` re-reads the current user's role from the database on every admin-guarded request, so demoting an account takes effect on the next admin action without waiting for the session to end.
+- Both the self-service `/api/auth/forgot-password` flow and the admin-triggered `/api/admin/users/:id/send-password-reset` flow go through the same `sendPasswordResetForUser` helper, so token generation, hashing, expiry, and email delivery are guaranteed identical across both paths.
+
+### Backend files
+
+- `hello-world/backend/server.js` — Express app, session middleware, mounts each feature router
+- `hello-world/backend/db.js` — MySQL connection pool
+- `hello-world/backend/auth.js` — auth routes + `requireAuth`, `requireAdmin`, `sendPasswordResetForUser`
+- `hello-world/backend/notes.js` — QuickNotes CRUD routes
+- `hello-world/backend/boards.js` — MoodBoard CRUD routes (mixed public/authed)
+- `hello-world/backend/admin.js` — customer service (admin-only) routes
+- `hello-world/backend/mailer.js` — nodemailer wrapper with console fallback
 
 ### Running the backend
 
@@ -410,23 +454,30 @@ The frontend is **React + Vite** with `react-router-dom` for client-side routing
 
 | Route | Page | Auth required? |
 |---|---|---|
-| `/` | Home — hello world text, the seeded messages, and links to your apps | No |
+| `/` | Home — hello world text, seeded messages, links to your apps | No |
 | `/login` | Login form | No |
 | `/register` | Create account | No |
 | `/forgot-password` | Request reset email | No |
 | `/reset-password?token=...` | Set a new password from a reset token | No |
 | `/quicknotes` | QuickNotes mini app (list / create / edit / delete) | Yes — redirects to `/login` |
+| `/moodboard` | Your MoodBoard boards | Yes — redirects to `/login` |
+| `/moodboard/:token` | One moodboard; edit controls if you own it, read-only view otherwise | No (public share link) |
+| `/customer-service` | Admin user search + manual password reset | Yes, admin only |
 | `/apps/apps.html` | Static mini-apps showcase | No |
 
 The static showcase at `/apps/apps.html` lives under `hello-world/frontend/public/apps/`, which Vite copies into `dist/apps/` on build. Nginx serves it directly from `/var/www/hello-app/apps/apps.html` — the React SPA never sees the request.
 
+`index.html` also hosts a persistent site footer (home, GitHub, phone, email, copyright) as a sibling of `<div id="root">`. That is outside React's control on purpose: the body uses a CSS grid (`grid-template-rows: 1fr auto`) so the footer always sits at the bottom of the viewport regardless of which React route is active and without React needing to know anything about the footer.
+
 ### Linking out of the SPA
 
-One thing worth calling out because it bit this project twice: **inside React pages, link to the static showcase with a plain `<a href="/apps/apps.html">`, not a react-router `<Link to="/apps/apps.html">`.** `<Link>` triggers client-side navigation, so React Router tries to match the URL against its `<Routes>`, finds no match, and renders an empty layout. The user then sees just the grey static paragraph from `index.html`'s body and thinks the app is broken. The rule of thumb:
+One thing worth calling out because it bit this project twice: **inside React pages, link to the static showcase with a plain `<a href="/apps/apps.html">`, not a react-router `<Link to="/apps/apps.html">`.** `<Link>` triggers client-side navigation, so React Router tries to match the URL against its `<Routes>`, finds no match, and renders an empty layout. The user then sees just the site footer (which lives outside the React root in `index.html`) and thinks the React app is gone. The rule of thumb:
 
-- **React route** (`/`, `/login`, `/quicknotes`, …) → `<Link to="...">` (client-side)
+- **React route** (`/`, `/login`, `/quicknotes`, `/moodboard`, `/customer-service`, …) → `<Link to="...">` (client-side)
 - **Static HTML file** under `/apps/` or anything else served directly by nginx → plain `<a href="...">` (full page load)
 - **External URL** → plain `<a href="...">`
+
+If you ever see a page rendering "just the header and the footer, no content between them," suspect this first — it almost always means React Router got handed a URL that doesn't match any `<Route>`.
 
 ### Dependencies
 
@@ -763,10 +814,12 @@ cd ~/WebDevClass
 That's it for the common case. Use the narrower scripts when you want to skip the parts you didn't change:
 
 ```bash
-./deploy_backend.sh    # backend-only change
-./deploy_frontend.sh   # frontend-only change
-./hello-world/db/migrate.sh   # schema-only change
+git pull && ./deploy_backend.sh    # backend-only change
+git pull && ./deploy_frontend.sh   # frontend-only change
+git pull && ./hello-world/db/migrate.sh   # schema-only change
 ```
+
+**Important:** only `deploy_all.sh` runs `git pull` for you. The three narrower scripts all operate on whatever source is currently in the working tree, so running `./deploy_frontend.sh` without a prior `git pull` silently rebuilds from stale code — it looks successful but nothing changes in production. The `git pull && ...` idiom above is the safe form. This separation is intentional (you may want to review what changed before applying it), but the trade-off is that you have to remember the pull step.
 
 ### Schema changes
 
@@ -798,17 +851,21 @@ For one-off ad-hoc data fixes on the server (seeding a row, patching a value), `
 - GitHub password authentication is gone — use SSH keys, and SSH over port 443 when normal SSH hangs
 - Nginx is a clean way to serve the frontend and hide the backend behind `/api`
 
-### From the shared-auth + HTTPS + QuickNotes work
+### From the shared-auth + HTTPS + mini-apps work
 
 - **Don't run scripts on the local machine.** This repo's workflow is strictly push-pull-run: commit locally, pull on the server, run a `.sh` script there. Anything that needs to happen on the server must live in a committed script, not in your memory.
+- **Only `deploy_all.sh` pulls.** `deploy_backend.sh`, `deploy_frontend.sh`, and `migrate.sh` all run against whatever source is in the working tree. Running one of them without `git pull` first silently rebuilds from stale code and looks successful. Always `git pull && ./deploy_frontend.sh` (etc.) when using the narrower scripts.
 - **Use numbered migration files for every schema change**, even one-line ALTERs. The migration runner tracks what's been applied, so "what state is prod in?" stays answerable over time. Conditional dynamic SQL (`information_schema` + `PREPARE` / `EXECUTE`) lets one migration be safe on both existing and fresh databases.
-- **In a React SPA living alongside static HTML pages, use `<Link>` for React routes and plain `<a>` for static files under `/apps/`.** `<Link to="/apps/apps.html">` tries to match against React Router's routes, fails, and renders a blank layout. The symptom is "the React app is gone, only the grey static paragraph shows" — if you see that, suspect routing first.
+- **In a React SPA living alongside static HTML pages, use `<Link>` for React routes and plain `<a>` for anything served directly by nginx (`/apps/*`, external URLs).** `<Link to="/apps/apps.html">` tries to match against React Router's routes, fails, and renders a blank layout. The symptom is "React is gone, only the header and footer show" — if you see that, suspect routing first.
 - **`APP_BASE_URL` must not have a trailing slash.** The auth code concatenates `${APP_BASE_URL}/reset-password`, so a stray slash produces `//` and that URL doesn't match any React route. Same blank-layout symptom as above.
 - **Let's Encrypt only issues certs for domain names, not raw IPs.** DuckDNS gives you a free subdomain that satisfies this at zero cost. Certbot's `--nginx` plugin handles nearly all of the nginx editing for you.
 - **Let's Encrypt's CAA lookup happens from their servers, not yours.** A `CAA query timed out` error during certbot is a transient issue between Let's Encrypt and the DNS provider, not a problem with your EC2 firewall. Retry; it usually clears within a few minutes.
 - **The AWS VPC DNS resolver hides outbound-53 firewall restrictions from the system resolver.** Ordinary DNS works through link-local regardless; only direct queries to external DNS servers (`dig @8.8.8.8`) need outbound UDP/53 in the security group.
 - **`pm2 restart --update-env` usually picks up `.env` changes, but `pm2 delete` + `pm2 start` is bulletproof.** If a running process seems to cling to stale env values, go for the delete-and-start path.
 - **When merging parallel work built on the same server, don't just trust the first pull.** If the server had its own uncommitted experiments, stash them, pull, read the stash carefully, and integrate what's valuable by hand. That's how the QuickNotes prototype ended up in the repo.
+- **For admin / role checks, re-read the role from the database on every admin-guarded request.** Caching the role in the session is faster but goes stale on demotion. A per-request query is cheap on the low volume of admin calls and guarantees a demoted admin immediately loses access.
+- **Extract shared side-effect helpers instead of duplicating them between endpoints.** The password reset flow was originally inlined in `/api/auth/forgot-password`; once the admin-triggered version arrived, the logic was pulled into `sendPasswordResetForUser` so both callers are guaranteed to produce identical tokens, storage, and emails.
+- **Store only URLs for user-supplied images; never host their binaries.** MoodBoard leans on this hard — the server never downloads the images, which means no storage footprint, no upload UI, no bandwidth cost for serving them, and no responsibility for image content moderation. Broken URLs are handled with a client-side `onError` → local placeholder fallback.
 
 ---
 
@@ -818,10 +875,14 @@ The project is live at **https://penumbrapro.duckdns.org**, with:
 
 - a React + react-router SPA served by nginx (built frontend in `/var/www/hello-app`)
 - a Node/Express backend managed by PM2 (process `hello-backend`) behind nginx at `127.0.0.1:3000`
-- a MySQL 8 database (`hello_app`) with numbered migrations
-- shared auth (register / login / logout / password reset / account deletion) via session cookies
-- **QuickNotes** as the first live mini app — user-scoped CRUD against `/api/notes`
+- a MySQL 8 database (`hello_app`) with numbered migrations (`001` through `004`)
+- shared session auth (register / login / logout / password reset / account deletion)
+- role-based access with a `requireAdmin` middleware gating `/api/admin/*`
+- **QuickNotes** — user-scoped notes with full CRUD
+- **MoodBoard** — image-URL boards with public share links, broken-image fallback, and inline rename
+- **Customer Service** — admin-only user search + manual password reset trigger
+- a persistent site footer in `index.html` (home, GitHub, phone, email, copyright) that sits below every React route via a body grid layout
 - Let's Encrypt cert via DuckDNS, auto-renewing
-- Gmail SMTP wired up for real password-reset email delivery
-- Elastic IP attached so the public address is stable
+- Gmail SMTP wired up for real password-reset email delivery, with a console-log fallback when `SMTP_HOST` is blank
+- Elastic IP attached so the public address is stable across reboots
 - push → pull → `./deploy_all.sh` as the repeatable deploy loop
