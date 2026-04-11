@@ -136,6 +136,38 @@ router.get('/:token', async (req, res) => {
   }
 });
 
+// PUT /api/boards/:token - rename a board (owner only)
+router.put('/:token', requireAuth, async (req, res) => {
+  try {
+    const board = await getBoardByToken(req.params.token);
+    if (!board) {
+      return res.status(404).json({ error: 'Board not found' });
+    }
+    if (board.user_id !== req.session.userId) {
+      return res.status(403).json({ error: 'You do not own this board' });
+    }
+
+    const name = String(req.body.name || '').trim().slice(0, MAX_NAME_LENGTH);
+    if (!name) {
+      return res.status(400).json({ error: 'Board name is required' });
+    }
+
+    await pool.query(
+      'UPDATE boards SET name = ? WHERE id = ?',
+      [name, board.id]
+    );
+
+    const [rows] = await pool.query(
+      'SELECT id, name, share_token, created_at, updated_at FROM boards WHERE id = ?',
+      [board.id]
+    );
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('Update board failed:', error);
+    res.status(500).json({ error: 'Failed to update board' });
+  }
+});
+
 // DELETE /api/boards/:token - delete a board (owner only). ON DELETE CASCADE
 // on board_images takes care of the child rows.
 router.delete('/:token', requireAuth, async (req, res) => {
