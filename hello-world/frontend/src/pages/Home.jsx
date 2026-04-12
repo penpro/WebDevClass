@@ -18,6 +18,7 @@ export default function Home() {
     <div>
       <h1>Hello, World!</h1>
       <p>This site is being used as a showcase for web development projects.</p>
+      <p style={{ fontStyle: 'italic', color: '#6b7280' }}>Hello Professor Foster!</p>
 
       {user ? (
         <section style={{ marginBottom: '2rem' }}>
