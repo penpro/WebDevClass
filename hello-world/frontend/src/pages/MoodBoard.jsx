@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
+import { generateCollage } from '../lib/collage.js'
 
 // Shown in place of any image tile whose URL fails to load.
 // The file lives in public/ and is served as a static asset by nginx.
@@ -25,6 +26,12 @@ export default function MoodBoard() {
   // placeholder. A Set lets multiple failures coexist without re-renders
   // stepping on each other.
   const [brokenImageIds, setBrokenImageIds] = useState(() => new Set())
+
+  // Collage generation state:
+  //   null        — idle (no overlay)
+  //   'generating' — loading images + drawing canvas
+  //   { previewUrl, canvas, included, skipped } — ready for download
+  const [collageState, setCollageState] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -140,6 +147,62 @@ export default function MoodBoard() {
       next.add(imageId)
       return next
     })
+  }
+
+  // --- collage ---
+
+  const cleanupCollage = useCallback(() => {
+    setCollageState((prev) => {
+      if (prev && typeof prev === 'object' && prev.previewUrl) {
+        URL.revokeObjectURL(prev.previewUrl)
+      }
+      return null
+    })
+  }, [])
+
+  // Revoke any blob URL on unmount (navigating away without closing)
+  useEffect(() => cleanupCollage, [cleanupCollage])
+
+  async function handleCreateCollage() {
+    if (!boardData || boardData.images.length === 0) return
+    setCollageState('generating')
+    try {
+      const urls = boardData.images.map((img) => img.url)
+      const result = await generateCollage(urls, token)
+      // Low-quality data URL for the preview (small transfer to <img>);
+      // the full-quality blob is created on demand at download time.
+      const previewUrl = result.canvas.toDataURL('image/jpeg', 0.5)
+      setCollageState({
+        canvas: result.canvas,
+        previewUrl,
+        included: result.included,
+        skipped: result.skipped
+      })
+    } catch (err) {
+      setCollageState(null)
+      setError(err.message)
+    }
+  }
+
+  function handleDownloadCollage() {
+    if (!collageState || !collageState.canvas) return
+    collageState.canvas.toBlob(
+      (blob) => {
+        if (!blob) return
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `moodboard-collage-${token.slice(0, 8)}.jpg`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        // Small delay before revoking so the browser has time to start
+        // the download; the blob stays alive until the save completes.
+        setTimeout(() => URL.revokeObjectURL(url), 5000)
+      },
+      'image/jpeg',
+      0.92
+    )
   }
 
   if (loading) {
@@ -411,6 +474,151 @@ export default function MoodBoard() {
             </div>
             )
           })}
+        </div>
+      )}
+
+      {/* --- Create Collage button --- */}
+      {images.length > 0 && !collageState && (
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <button
+            type="button"
+            onClick={handleCreateCollage}
+            style={{
+              padding: '0.6rem 1.5rem',
+              fontSize: '1rem',
+              cursor: 'pointer'
+            }}
+          >
+            Create Collage
+          </button>
+        </div>
+      )}
+
+      {/* --- Collage generating spinner --- */}
+      {collageState === 'generating' && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.65)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: 12,
+              padding: '2rem',
+              textAlign: 'center',
+              maxWidth: 400
+            }}
+          >
+            <p style={{ fontSize: '1.1rem', margin: 0 }}>
+              Generating collage…
+            </p>
+            <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
+              Loading and arranging images
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* --- Collage ready overlay --- */}
+      {collageState && typeof collageState === 'object' && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.75)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem',
+            overflowY: 'auto'
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: 12,
+              padding: '1.5rem',
+              maxWidth: 500,
+              width: '100%',
+              textAlign: 'center'
+            }}
+          >
+            <img
+              src={collageState.previewUrl}
+              alt="Collage preview"
+              style={{
+                width: '100%',
+                borderRadius: 8,
+                border: '1px solid #d1d5db',
+                marginBottom: '1rem'
+              }}
+            />
+            <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+              {collageState.included} of{' '}
+              {collageState.included + collageState.skipped} images included
+              {collageState.skipped > 0 && (
+                <span>
+                  {' '}
+                  ({collageState.skipped} could not be loaded due to
+                  cross-origin restrictions)
+                </span>
+              )}
+            </p>
+            <p
+              style={{
+                fontSize: '0.85rem',
+                color: '#b45309',
+                fontStyle: 'italic',
+                margin: '0.75rem 0'
+              }}
+            >
+              Collage ready for download — do not refresh before downloading
+              or collage will need to be regenerated
+            </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.75rem',
+                justifyContent: 'center',
+                marginTop: '1rem'
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleDownloadCollage}
+                style={{
+                  padding: '0.5rem 1.5rem',
+                  background: '#111827',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                Download
+              </button>
+              <button
+                type="button"
+                onClick={cleanupCollage}
+                style={{
+                  padding: '0.5rem 1.5rem',
+                  cursor: 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
