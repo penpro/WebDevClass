@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const session = require('express-session');
+const rateLimit = require('express-rate-limit');
 const MySQLStore = require('express-mysql-session')(session);
 
 const pool = require('./db');
@@ -18,10 +19,63 @@ app.set('trust proxy', 1);
 
 app.use(express.json());
 
-// Session store backed by MySQL. Uses its own small connection pool so it
-// is not affected by churn in the application pool. The sessions table is
-// also pre-created by the auth migration, so createDatabaseTable is a
-// no-op in production.
+// ---------------------------------------------------------------------------
+// Rate limiting
+// ---------------------------------------------------------------------------
+// Three tiers keyed by the client's IP (which nginx passes via
+// X-Forwarded-For, interpreted by trust proxy above).
+
+// Global safety net: 100 requests per minute per IP across all API routes.
+// Generous enough to never bother a real user; tight enough to slow a
+// naive brute-force or scraping attempt.
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests — please wait a moment' }
+});
+app.use('/api', globalLimiter);
+
+// Auth mutation endpoints get a much stricter limiter because every
+// request either does a bcrypt comparison (login), creates a user
+// (register), or sends an email (forgot-password). These are expensive
+// and abusable.
+const authMutationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15-minute window
+  max: 10,                   // 10 attempts per 15 min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts — please try again later' }
+});
+
+// Forgot-password is even tighter to limit email spam potential.
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1-hour window
+  max: 5,                   // 5 requests per hour per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many password reset requests — please try again later' }
+});
+
+// Admin routes: moderate limiter. Admins are trusted but the endpoints
+// send emails and query the user table, so a runaway script should still
+// be capped.
+const adminLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Admin rate limit exceeded' }
+});
+
+// ---------------------------------------------------------------------------
+// Session store
+// ---------------------------------------------------------------------------
+// Backed by MySQL. Uses its own small connection pool so it is not
+// affected by churn in the application pool. The sessions table is also
+// pre-created by the auth migration, so createDatabaseTable is a no-op
+// in production.
 const sessionStore = new MySQLStore({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT) || 3306,
@@ -57,10 +111,20 @@ app.use(
   })
 );
 
+// ---------------------------------------------------------------------------
+// Route mounting with per-group rate limiters
+// ---------------------------------------------------------------------------
+
+// Apply the tight auth limiter to specific mutation routes only, not
+// to GET /me or POST /logout (which are cheap and should not be gated).
+app.use('/api/auth/login', authMutationLimiter);
+app.use('/api/auth/register', authMutationLimiter);
+app.use('/api/auth/forgot-password', forgotPasswordLimiter);
+
 app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/boards', boardsRouter);
-app.use('/api/admin', adminRouter);
+app.use('/api/admin', adminLimiter, adminRouter);
 
 app.get('/api/messages', async (req, res) => {
   try {

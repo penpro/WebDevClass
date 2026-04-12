@@ -4,6 +4,10 @@
 // reference a user whose role is 'admin'; see requireAdmin in auth.js. The
 // role is re-read on every request so a demotion takes effect on the next
 // admin action, and we never trust cached role state in the session.
+//
+// Every state-changing action is logged to the admin_actions table (in
+// addition to console.log) so there is a durable audit trail independent
+// of PM2 log rotation.
 
 const express = require('express');
 
@@ -14,12 +18,35 @@ const router = express.Router();
 
 const MAX_SEARCH_RESULTS = 50;
 
+// --- audit helper ---------------------------------------------------------
+
+// Writes a row to admin_actions so every admin action has a permanent
+// database record. detail is an optional plain object that gets stored as
+// JSON.  Failures are logged to stderr but do not block the response — the
+// action itself already succeeded, and losing the audit row is better than
+// returning a 500 for the admin action.
+async function logAdminAction(adminId, action, targetId, detail) {
+  try {
+    await pool.query(
+      'INSERT INTO admin_actions (admin_id, action, target_id, detail) VALUES (?, ?, ?, ?)',
+      [adminId, action, targetId || null, detail ? JSON.stringify(detail) : null]
+    );
+  } catch (error) {
+    console.error('Failed to write admin audit log:', error);
+  }
+}
+
+// --- routes ---------------------------------------------------------------
+
 // GET /api/admin/users/search?q=substring
 //
 // Returns up to 50 users whose email contains the given substring,
 // case-insensitively (MySQL utf8mb4_unicode_ci collation handles this).
 // Empty or missing query returns an empty array - we explicitly do NOT
 // list all users for an empty search, to avoid accidental table dumps.
+//
+// Searches are logged to the audit table so there is a record of what
+// an admin looked for and when.
 router.get('/users/search', requireAdmin, async (req, res) => {
   try {
     const q = String(req.query.q || '').trim();
@@ -41,6 +68,12 @@ router.get('/users/search', requireAdmin, async (req, res) => {
         LIMIT ?`,
       [pattern, MAX_SEARCH_RESULTS]
     );
+
+    await logAdminAction(req.session.userId, 'user_search', null, {
+      query: q,
+      results_count: rows.length
+    });
+
     res.json(rows);
   } catch (error) {
     console.error('Admin user search failed:', error);
@@ -52,8 +85,6 @@ router.get('/users/search', requireAdmin, async (req, res) => {
 //
 // Triggers the same reset token + email machinery that self-service
 // /api/auth/forgot-password uses, but targeted at a specific user id.
-// Logs the acting admin and the target user for a simple audit trail in
-// the PM2 logs.
 router.post(
   '/users/:id/send-password-reset',
   requireAdmin,
@@ -78,6 +109,14 @@ router.post(
       );
 
       await sendPasswordResetForUser(targetUser);
+
+      await logAdminAction(
+        req.session.userId,
+        'send_password_reset',
+        targetUser.id,
+        { email: targetUser.email }
+      );
+
       res.json({ ok: true });
     } catch (error) {
       console.error('Admin send-password-reset failed:', error);
