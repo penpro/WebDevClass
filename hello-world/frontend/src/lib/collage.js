@@ -172,6 +172,24 @@ function pastelComplement({ r, g, b }) {
 }
 
 // ---------------------------------------------------------------------------
+// Diagonal fill scoring
+// ---------------------------------------------------------------------------
+
+// Computes how far a slot's center is from the "start" corner along
+// the diagonal axis.  Lower score = closer to the start corner = gets
+// a real image first.  Higher score = further away = gets accent fill.
+//
+// Two directions:
+//   'tl-br'  top-left → bottom-right  (score = cx + cy)
+//   'bl-tr'  bottom-left → top-right  (score = cx + (1 - cy))
+function diagonalScore(slot, direction) {
+  const cx = slot.x + slot.w / 2
+  const cy = slot.y + slot.h / 2
+  if (direction === 'tl-br') return cx + cy
+  return cx + (1 - cy)
+}
+
+// ---------------------------------------------------------------------------
 // Cover-crop drawing  (object-fit: cover on Canvas)
 // ---------------------------------------------------------------------------
 
@@ -202,13 +220,18 @@ function drawCover(ctx, img, dx, dy, dw, dh) {
 // ---------------------------------------------------------------------------
 
 export async function generateCollage(imageUrls, seed) {
-  const rng = mulberry32(hashSeed(seed))
+  // Mix the board's share_token with the current time so each click
+  // produces a different collage.  Still Mulberry32 — local PRNG math,
+  // no cloud dependencies, no system CSPRNG.
+  const rng = mulberry32(hashSeed(seed + '-' + Date.now()))
 
   // ---- load images -------------------------------------------------------
   const { loaded, skipped } = await loadAllImages(imageUrls)
 
   if (loaded.length === 0) {
-    throw new Error('No images could be loaded (all failed due to CORS or network errors)')
+    throw new Error(
+      'No images could be loaded (all failed due to CORS or network errors)'
+    )
   }
 
   // ---- pick how many slots and which layout variant ----------------------
@@ -217,22 +240,28 @@ export async function generateCollage(imageUrls, seed) {
   const variants = LAYOUTS[slotCount]
   const layout = variants[Math.floor(rng() * variants.length)]
 
-  // ---- select images (seeded shuffle, take first `slotCount`) ------------
+  // ---- select images (seeded shuffle, take first N) ----------------------
   const shuffled = seededShuffle(loaded, rng)
   const selected = shuffled.slice(0, Math.min(slotCount, loaded.length))
 
-  // ---- sort slots by area descending; assign real images to largest ------
-  const slotsWithIndex = layout.map((s, i) => ({ ...s, idx: i }))
-  slotsWithIndex.sort((a, b) => b.w * b.h - a.w * a.h)
+  // ---- assign images diagonally from a corner ----------------------------
+  // Images fill from one corner and cascade toward the opposite corner;
+  // accent fills (if any) end up in the far corner, keeping the real
+  // images as the dominant visual element.
+  const direction = rng() > 0.5 ? 'tl-br' : 'bl-tr'
 
-  // Real images go to the biggest slots; smallest get accent fills
+  const slotsWithIndex = layout.map((s, i) => ({ ...s, idx: i }))
+  slotsWithIndex.sort(
+    (a, b) => diagonalScore(a, direction) - diagonalScore(b, direction)
+  )
+
   const assignments = new Array(layout.length).fill(null)
   for (let i = 0; i < slotsWithIndex.length; i++) {
     const slot = slotsWithIndex[i]
     if (i < selected.length) {
       assignments[slot.idx] = { type: 'image', img: selected[i] }
     } else {
-      // Pick a nearby real image for accent color
+      // Pick a nearby real image for the accent color
       const sourceImg = selected[i % selected.length]
       const color = pastelComplement(centerThirdColor(sourceImg))
       assignments[slot.idx] = { type: 'accent', color }
@@ -245,7 +274,7 @@ export async function generateCollage(imageUrls, seed) {
   canvas.height = CANVAS_H
   const ctx = canvas.getContext('2d')
 
-  // Background (visible only in the gaps)
+  // Background (visible only in the gaps between slots)
   ctx.fillStyle = '#111827'
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
