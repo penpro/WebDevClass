@@ -47,13 +47,63 @@ function seededShuffle(arr, rng) {
 }
 
 // ---------------------------------------------------------------------------
-// Layout templates
+// Layout templates  (1–7 slots)
 // ---------------------------------------------------------------------------
 // Each template is an array of slot objects: { x, y, w, h } expressed as
 // fractions of the canvas.  Gap is applied at render time by insetting
 // each slot by half-gap on every side.
+//
+// Slot count is set to exactly the number of CORS-loadable images
+// (capped at 7), so every slot gets a real image and images always fill
+// the full canvas.  No accent fills, no wasted space.
 
 const LAYOUTS = {
+  1: [
+    // Full canvas — single hero image
+    [{ x: 0, y: 0, w: 1, h: 1 }]
+  ],
+  2: [
+    // A: top / bottom split
+    [
+      { x: 0, y: 0, w: 1, h: 0.5 },
+      { x: 0, y: 0.5, w: 1, h: 0.5 }
+    ],
+    // B: side by side
+    [
+      { x: 0, y: 0, w: 0.5, h: 1 },
+      { x: 0.5, y: 0, w: 0.5, h: 1 }
+    ]
+  ],
+  3: [
+    // A: 1 big on top (55%), 2 below
+    [
+      { x: 0, y: 0, w: 1, h: 0.55 },
+      { x: 0, y: 0.55, w: 0.5, h: 0.45 },
+      { x: 0.5, y: 0.55, w: 0.5, h: 0.45 }
+    ],
+    // B: 1 big left (55%), 2 stacked right
+    [
+      { x: 0, y: 0, w: 0.55, h: 1 },
+      { x: 0.55, y: 0, w: 0.45, h: 0.5 },
+      { x: 0.55, y: 0.5, w: 0.45, h: 0.5 }
+    ]
+  ],
+  4: [
+    // A: 2×2 grid
+    [
+      { x: 0, y: 0, w: 0.5, h: 0.5 },
+      { x: 0.5, y: 0, w: 0.5, h: 0.5 },
+      { x: 0, y: 0.5, w: 0.5, h: 0.5 },
+      { x: 0.5, y: 0.5, w: 0.5, h: 0.5 }
+    ],
+    // B: 1 big on top (55%), 3 below
+    [
+      { x: 0, y: 0, w: 1, h: 0.55 },
+      { x: 0, y: 0.55, w: 1 / 3, h: 0.45 },
+      { x: 1 / 3, y: 0.55, w: 1 / 3, h: 0.45 },
+      { x: 2 / 3, y: 0.55, w: 1 / 3, h: 0.45 }
+    ]
+  ],
   5: [
     // A: 2 on top (40%), 3 on bottom (60%)
     [
@@ -139,10 +189,9 @@ async function loadAllImages(urls) {
 // ---------------------------------------------------------------------------
 // Accent color  (the "1x1 canvas" trick)
 // ---------------------------------------------------------------------------
+// Kept for potential future use.  Currently unused because slot count is
+// matched to loaded image count, so every slot gets a real image.
 
-// Draws the center third of an image onto a 1x1 canvas and reads the
-// single averaged pixel.  The browser's bilinear scaling does all the
-// heavy lifting — no pixel iteration, O(1).
 function centerThirdColor(img) {
   const c = document.createElement('canvas')
   c.width = 1
@@ -155,8 +204,6 @@ function centerThirdColor(img) {
   return { r, g, b }
 }
 
-// Complement → pastel: complement the color, push 60% toward white,
-// then subtract 20 from each channel for a slightly muted finish.
 function pastelComplement({ r, g, b }) {
   let cr = 255 - r
   let cg = 255 - g
@@ -175,13 +222,6 @@ function pastelComplement({ r, g, b }) {
 // Diagonal fill scoring
 // ---------------------------------------------------------------------------
 
-// Computes how far a slot's center is from the "start" corner along
-// the diagonal axis.  Lower score = closer to the start corner = gets
-// a real image first.  Higher score = further away = gets accent fill.
-//
-// Two directions:
-//   'tl-br'  top-left → bottom-right  (score = cx + cy)
-//   'bl-tr'  bottom-left → top-right  (score = cx + (1 - cy))
 function diagonalScore(slot, direction) {
   const cx = slot.x + slot.w / 2
   const cy = slot.y + slot.h / 2
@@ -225,7 +265,11 @@ export async function generateCollage(imageUrls, seed) {
   // no cloud dependencies, no system CSPRNG.
   const rng = mulberry32(hashSeed(seed + '-' + Date.now()))
 
-  // ---- load images -------------------------------------------------------
+  // ---- load images FIRST (pre-check CORS) --------------------------------
+  // This runs before we pick a layout so the slot count matches the
+  // number of images that actually survived CORS / network loading.
+  // No more "5 slots with 2 images and 3 accent swaths" — if 2 images
+  // loaded, we use a 2-slot layout and both images fill the canvas.
   const { loaded, skipped } = await loadAllImages(imageUrls)
 
   if (loaded.length === 0) {
@@ -234,20 +278,18 @@ export async function generateCollage(imageUrls, seed) {
     )
   }
 
-  // ---- pick how many slots and which layout variant ----------------------
-  const usable = Math.min(loaded.length, 7)
-  const slotCount = usable >= 7 ? 7 : usable >= 6 ? 6 : 5
+  // ---- pick layout based on how many actually loaded ---------------------
+  const slotCount = Math.min(loaded.length, 7)
   const variants = LAYOUTS[slotCount]
   const layout = variants[Math.floor(rng() * variants.length)]
 
-  // ---- select images (seeded shuffle, take first N) ----------------------
+  // ---- select images (seeded shuffle, take first slotCount) --------------
   const shuffled = seededShuffle(loaded, rng)
-  const selected = shuffled.slice(0, Math.min(slotCount, loaded.length))
+  const selected = shuffled.slice(0, slotCount)
 
   // ---- assign images diagonally from a corner ----------------------------
-  // Images fill from one corner and cascade toward the opposite corner;
-  // accent fills (if any) end up in the far corner, keeping the real
-  // images as the dominant visual element.
+  // Determines which image lands in which slot — a visual cascade from
+  // one corner to the opposite.
   const direction = rng() > 0.5 ? 'tl-br' : 'bl-tr'
 
   const slotsWithIndex = layout.map((s, i) => ({ ...s, idx: i }))
@@ -261,7 +303,9 @@ export async function generateCollage(imageUrls, seed) {
     if (i < selected.length) {
       assignments[slot.idx] = { type: 'image', img: selected[i] }
     } else {
-      // Pick a nearby real image for the accent color
+      // Fallback accent fill — only reachable if loaded < slotCount,
+      // which shouldn't happen now that slotCount = min(loaded, 7).
+      // Kept as a safety net.
       const sourceImg = selected[i % selected.length]
       const color = pastelComplement(centerThirdColor(sourceImg))
       assignments[slot.idx] = { type: 'accent', color }
@@ -274,7 +318,7 @@ export async function generateCollage(imageUrls, seed) {
   canvas.height = CANVAS_H
   const ctx = canvas.getContext('2d')
 
-  // Background (visible only in the gaps between slots)
+  // Background (visible only in the thin gaps between slots)
   ctx.fillStyle = '#111827'
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
