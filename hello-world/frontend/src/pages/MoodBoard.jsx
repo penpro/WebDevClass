@@ -33,6 +33,11 @@ export default function MoodBoard() {
   //   { previewUrl, canvas, included, skipped } — ready for download
   const [collageState, setCollageState] = useState(null)
 
+  // Collage style options (persisted in component state between generates)
+  const [collageGap, setCollageGap] = useState('12')
+  const [collageCorners, setCollageCorners] = useState('12')
+  const [collageTheme, setCollageTheme] = useState('dark')
+
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -168,7 +173,11 @@ export default function MoodBoard() {
     setCollageState('generating')
     try {
       const urls = boardData.images.map((img) => img.url)
-      const result = await generateCollage(urls, token)
+      const result = await generateCollage(urls, token, {
+        gap: Number(collageGap),
+        cornerRadius: Number(collageCorners),
+        theme: collageTheme
+      })
       // Low-quality data URL for the preview (small transfer to <img>);
       // the full-quality blob is created on demand at download time.
       const previewUrl = result.canvas.toDataURL('image/jpeg', 0.5)
@@ -477,20 +486,81 @@ export default function MoodBoard() {
         </div>
       )}
 
-      {/* --- Create Collage button --- */}
+      {/* --- Collage options + button --- */}
       {images.length > 0 && !collageState && (
-        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          <button
-            type="button"
-            onClick={handleCreateCollage}
+        <div
+          style={{
+            marginTop: '1.5rem',
+            border: '1px solid #d1d5db',
+            borderRadius: 8,
+            padding: '1rem',
+            background: '#f9fafb'
+          }}
+        >
+          <div
             style={{
-              padding: '0.6rem 1.5rem',
-              fontSize: '1rem',
-              cursor: 'pointer'
+              display: 'flex',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              marginBottom: '0.75rem'
             }}
           >
-            Create Collage
-          </button>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+              Padding
+              <select
+                value={collageGap}
+                onChange={(e) => setCollageGap(e.target.value)}
+                style={{ padding: '0.3rem' }}
+              >
+                <option value="0">None</option>
+                <option value="6">Thin</option>
+                <option value="12">Medium</option>
+                <option value="24">Thick</option>
+                <option value="36">Extra thick</option>
+              </select>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+              Corners
+              <select
+                value={collageCorners}
+                onChange={(e) => setCollageCorners(e.target.value)}
+                style={{ padding: '0.3rem' }}
+              >
+                <option value="0">Sharp</option>
+                <option value="8">Slight</option>
+                <option value="16">Rounded</option>
+                <option value="28">Very rounded</option>
+              </select>
+            </label>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
+              Theme
+              <select
+                value={collageTheme}
+                onChange={(e) => setCollageTheme(e.target.value)}
+                style={{ padding: '0.3rem' }}
+              >
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </label>
+          </div>
+
+          <div style={{ textAlign: 'center' }}>
+            <button
+              type="button"
+              onClick={handleCreateCollage}
+              style={{
+                padding: '0.6rem 1.5rem',
+                fontSize: '1rem',
+                cursor: 'pointer'
+              }}
+            >
+              Create Collage
+            </button>
+          </div>
         </div>
       )}
 
