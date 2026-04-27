@@ -192,7 +192,17 @@ export default function TaskTrackr() {
   }
 
   async function handleToggleCompleted(task) {
-    // Immediate save — no debounce for discrete toggles.
+    // Confirm only on the "going-to-completed" direction, since that
+    // moves the task out of the All-open list and the user might wonder
+    // where it went. Un-completing doesn't need a confirmation.
+    if (!task.completed) {
+      const ok = window.confirm(
+        `Mark "${task.title}" as complete?\n\n` +
+          'It will move out of the open task list and into the ' +
+          '"Completed" filter in the sidebar.'
+      )
+      if (!ok) return
+    }
     await applyUpdate(task.id, { completed: !task.completed })
   }
 
@@ -493,66 +503,106 @@ function TaskRow({
           gap: '0.75rem'
         }}
       >
-        <input
-          type="checkbox"
-          checked={!!task.completed}
-          onChange={(e) => {
-            e.stopPropagation()
-            onToggleCompleted()
-          }}
+        {/* Checkbox + label as a single click target. stopPropagation so
+            clicking the label doesn't also expand the row. */}
+        <label
           onClick={(e) => e.stopPropagation()}
-          style={{ flex: '0 0 auto', cursor: 'pointer' }}
-        />
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            flex: '0 0 auto',
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={!!task.completed}
+            onChange={() => onToggleCompleted()}
+            style={{ cursor: 'pointer' }}
+          />
+          <span
+            style={{
+              fontSize: '0.75rem',
+              color: task.completed ? '#15803d' : '#6b7280',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {task.completed ? 'Completed' : 'Mark complete'}
+          </span>
+        </label>
+
+        {/* Title + meta row + click-to-expand hint, all one click target. */}
         <div
-          style={{ flex: 1, cursor: 'pointer', minWidth: 0 }}
+          style={{
+            flex: 1,
+            cursor: 'pointer',
+            minWidth: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
           onClick={onClickRow}
         >
-          <div
-            style={{
-              fontWeight: 'bold',
-              textDecoration: task.completed ? 'line-through' : 'none',
-              color: task.completed ? '#6b7280' : '#111827',
-              wordBreak: 'break-word'
-            }}
-          >
-            {task.title}
-          </div>
-          <div
-            style={{
-              fontSize: '0.8rem',
-              color: '#6b7280',
-              marginTop: '0.15rem',
-              display: 'flex',
-              gap: '0.5rem',
-              flexWrap: 'wrap'
-            }}
-          >
-            {dueLabel && (
-              <span
-                style={{
-                  color:
-                    dueLabel.startsWith('Overdue')
-                      ? '#b91c1c'
-                      : dueLabel === 'Due today'
-                      ? '#b45309'
-                      : '#6b7280'
-                }}
-              >
-                {dueLabel}
-              </span>
-            )}
-            <span
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
               style={{
-                background: '#e5e7eb',
-                color: '#374151',
-                padding: '0.05rem 0.45rem',
-                borderRadius: 999,
-                fontSize: '0.75rem'
+                fontWeight: 'bold',
+                textDecoration: task.completed ? 'line-through' : 'none',
+                color: task.completed ? '#6b7280' : '#111827',
+                wordBreak: 'break-word'
               }}
             >
-              {task.category}
-            </span>
+              {task.title}
+            </div>
+            <div
+              style={{
+                fontSize: '0.8rem',
+                color: '#6b7280',
+                marginTop: '0.15rem',
+                display: 'flex',
+                gap: '0.5rem',
+                flexWrap: 'wrap'
+              }}
+            >
+              {dueLabel && (
+                <span
+                  style={{
+                    color:
+                      dueLabel.startsWith('Overdue')
+                        ? '#b91c1c'
+                        : dueLabel === 'Due today'
+                        ? '#b45309'
+                        : '#6b7280'
+                  }}
+                >
+                  {dueLabel}
+                </span>
+              )}
+              <span
+                style={{
+                  background: '#e5e7eb',
+                  color: '#374151',
+                  padding: '0.05rem 0.45rem',
+                  borderRadius: 999,
+                  fontSize: '0.75rem'
+                }}
+              >
+                {task.category}
+              </span>
+            </div>
           </div>
+          <span
+            style={{
+              fontSize: '0.75rem',
+              color: '#9ca3af',
+              flex: '0 0 auto',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {isEditing ? '▴ click to close' : '▾ click to expand'}
+          </span>
         </div>
       </div>
 
