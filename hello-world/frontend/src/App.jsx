@@ -33,22 +33,7 @@ export default function App() {
             <>
               <span style={{ opacity: 0.8, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 Signed in as {user.email}
-                {user.role === 'admin' && (
-                  <span
-                    style={{
-                      fontSize: '0.65rem',
-                      padding: '0.1rem 0.45rem',
-                      borderRadius: 999,
-                      background: 'white',
-                      color: '#111827',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    admin
-                  </span>
-                )}
+                <RoleBadge role={user.role} />
               </span>
               <button
                 type="button"
@@ -82,5 +67,33 @@ export default function App() {
         <Outlet />
       </main>
     </div>
+  )
+}
+
+// Small visual indicator next to the email in the header so people know
+// at a glance what tier they're signed in as. Plain users get no badge.
+function RoleBadge({ role }) {
+  const tiers = {
+    super_admin: { label: 'super admin', bg: '#fbbf24', color: '#111827' },
+    admin: { label: 'admin', bg: 'white', color: '#111827' },
+    premium: { label: 'premium', bg: '#a78bfa', color: '#111827' }
+  }
+  const tier = tiers[role]
+  if (!tier) return null
+  return (
+    <span
+      style={{
+        fontSize: '0.65rem',
+        padding: '0.1rem 0.45rem',
+        borderRadius: 999,
+        background: tier.bg,
+        color: tier.color,
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        fontWeight: 'bold'
+      }}
+    >
+      {tier.label}
+    </span>
   )
 }

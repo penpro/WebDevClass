@@ -52,6 +52,11 @@ const FILTER_ALL = 'all'
 const FILTER_DUE_SOON = 'due-soon'
 const FILTER_COMPLETED = 'completed'
 
+// Premium tier and above can upload video to task updates. Free users
+// are restricted to images. Source of truth lives in the backend; this
+// is just used to scope what the file picker advertises.
+const CAN_UPLOAD_VIDEO_ROLES = new Set(['premium', 'admin', 'super_admin'])
+
 export default function TaskTrackr() {
   const { user, loading } = useAuth()
 
@@ -294,7 +299,7 @@ export default function TaskTrackr() {
       // Multipart upload — bypass apiFetch since it forces JSON.
       const form = new FormData()
       if (body) form.append('body', body)
-      if (updateImage) form.append('image', updateImage)
+      if (updateImage) form.append('media', updateImage)
       const response = await fetch(`/api/tasks/${editingId}/updates`, {
         method: 'POST',
         credentials: 'include',
@@ -523,6 +528,7 @@ export default function TaskTrackr() {
                   postingUpdate={postingUpdate}
                   onPostUpdate={handlePostUpdate}
                   onDeleteUpdate={handleDeleteUpdate}
+                  canUploadVideo={CAN_UPLOAD_VIDEO_ROLES.has(user.role)}
                 />
               ))}
             </ul>
@@ -577,8 +583,13 @@ function TaskRow({
   setUpdateImage,
   postingUpdate,
   onPostUpdate,
-  onDeleteUpdate
+  onDeleteUpdate,
+  canUploadVideo
 }) {
+  const acceptedTypes = canUploadVideo
+    ? 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/quicktime,video/webm'
+    : 'image/jpeg,image/png,image/webp,image/gif'
+  const sizeLimitLabel = canUploadVideo ? '100 MB' : '10 MB'
   // The displayed value for an edited field is the pending edit if it
   // exists, otherwise the underlying task field.
   const fieldValue = (key, fallback) =>
@@ -911,7 +922,10 @@ function TaskRow({
               >
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  accept={acceptedTypes}
+                  title={`Max ${sizeLimitLabel}${
+                    canUploadVideo ? ' — image or video' : ' — image only'
+                  }`}
                   onChange={(e) =>
                     setUpdateImage(e.target.files?.[0] || null)
                   }
@@ -1003,25 +1017,39 @@ function TaskRow({
                         {u.body}
                       </p>
                     )}
-                    {u.has_image && (
-                      <a
-                        href={`/api/tasks/${task.id}/updates/${u.id}/image`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <img
-                          src={`/api/tasks/${task.id}/updates/${u.id}/image`}
-                          alt=""
-                          loading="lazy"
+                    {u.has_media &&
+                      (u.media_mime?.startsWith('video/') ? (
+                        <video
+                          controls
+                          preload="metadata"
+                          src={`/api/tasks/${task.id}/updates/${u.id}/media`}
                           style={{
                             maxWidth: '100%',
-                            maxHeight: 300,
+                            maxHeight: 360,
                             borderRadius: 4,
-                            display: 'block'
+                            display: 'block',
+                            background: '#000'
                           }}
                         />
-                      </a>
-                    )}
+                      ) : (
+                        <a
+                          href={`/api/tasks/${task.id}/updates/${u.id}/media`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <img
+                            src={`/api/tasks/${task.id}/updates/${u.id}/media`}
+                            alt=""
+                            loading="lazy"
+                            style={{
+                              maxWidth: '100%',
+                              maxHeight: 300,
+                              borderRadius: 4,
+                              display: 'block'
+                            }}
+                          />
+                        </a>
+                      ))}
                   </li>
                 ))}
               </ul>

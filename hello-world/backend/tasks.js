@@ -163,12 +163,12 @@ router.put('/:id', async (req, res) => {
 // DELETE, then clean up the files.
 router.delete('/:id', async (req, res) => {
   try {
-    // Verify ownership and grab any image filenames in one query.
+    // Verify ownership and grab any media filenames in one query.
     const [updateRows] = await pool.query(
-      `SELECT u.image_filename
+      `SELECT u.media_filename
          FROM task_updates u
          JOIN tasks t ON t.id = u.task_id
-        WHERE t.id = ? AND t.user_id = ? AND u.image_filename IS NOT NULL`,
+        WHERE t.id = ? AND t.user_id = ? AND u.media_filename IS NOT NULL`,
       [req.params.id, req.session.userId]
     );
 
@@ -182,7 +182,7 @@ router.delete('/:id', async (req, res) => {
 
     // Clean up files. safeUnlinkUpdateImage swallows missing-file errors.
     for (const row of updateRows) {
-      safeUnlinkUpdateImage(row.image_filename);
+      safeUnlinkUpdateImage(row.media_filename);
     }
 
     res.json({ ok: true });

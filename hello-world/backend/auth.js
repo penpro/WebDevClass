@@ -116,25 +116,56 @@ function requireAuth(req, res, next) {
   next();
 }
 
-// requireAdmin is a superset of requireAuth: it checks that the caller is
-// logged in AND that the user row currently has role='admin'. The role is
-// re-read from the DB on every admin-guarded request so a demotion takes
-// effect on the next admin action without waiting for the session to end.
+// Role hierarchy used across the auth checks below. Higher roles inherit
+// every permission of lower roles. The DB column is just VARCHAR(32);
+// these constants are the source of truth for what's a valid value.
+const VALID_ROLES = ['user', 'premium', 'admin', 'super_admin'];
+const ADMIN_ROLES = new Set(['admin', 'super_admin']);
+const SUPER_ADMIN_ROLES = new Set(['super_admin']);
+
+async function loadCurrentUserRole(userId) {
+  const [rows] = await pool.query(
+    'SELECT role FROM users WHERE id = ?',
+    [userId]
+  );
+  return rows[0] ? rows[0].role : null;
+}
+
+// requireAdmin: caller must be logged in AND have role admin OR
+// super_admin. Re-reads the DB on every admin-guarded request so a
+// demotion takes effect on the next admin action without waiting for
+// the session to end.
 async function requireAdmin(req, res, next) {
   try {
     if (!req.session || !req.session.userId) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    const [rows] = await pool.query(
-      'SELECT role FROM users WHERE id = ?',
-      [req.session.userId]
-    );
-    if (rows.length === 0 || rows[0].role !== 'admin') {
+    const role = await loadCurrentUserRole(req.session.userId);
+    if (!role || !ADMIN_ROLES.has(role)) {
       return res.status(403).json({ error: 'Admin access required' });
     }
     next();
   } catch (error) {
     console.error('Admin check failed:', error);
+    res.status(500).json({ error: 'Authorization check failed' });
+  }
+}
+
+// requireSuperAdmin: caller must have role super_admin specifically.
+// Used to gate role-changing endpoints — only super admins can promote
+// other users.
+async function requireSuperAdmin(req, res, next) {
+  try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    const role = await loadCurrentUserRole(req.session.userId);
+    if (!role || !SUPER_ADMIN_ROLES.has(role)) {
+      return res.status(403).json({ error: 'Super admin access required' });
+    }
+    next();
+  } catch (error) {
+    console.error('Super admin check failed:', error);
     res.status(500).json({ error: 'Authorization check failed' });
   }
 }
@@ -361,5 +392,10 @@ module.exports = {
   router,
   requireAuth,
   requireAdmin,
-  sendPasswordResetForUser
+  requireSuperAdmin,
+  sendPasswordResetForUser,
+  loadCurrentUserRole,
+  VALID_ROLES,
+  ADMIN_ROLES,
+  SUPER_ADMIN_ROLES
 };

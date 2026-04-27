@@ -36,10 +36,11 @@ export default function Home() {
               <Link to="/tasktrackr">TaskTrackr</Link> — manage tasks by
               category with due dates and auto-saving edits.
             </li>
-            {user.role === 'admin' && (
+            {(user.role === 'admin' || user.role === 'super_admin') && (
               <li>
                 <Link to="/customer-service">Customer Service</Link> — admin
-                tool to search users and manually send password reset emails.
+                tool to search users and manually send password reset emails
+                {user.role === 'super_admin' && ' (and assign roles)'}.
               </li>
             )}
           </ul>

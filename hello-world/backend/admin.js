@@ -12,11 +12,17 @@
 const express = require('express');
 
 const pool = require('./db');
-const { requireAdmin, sendPasswordResetForUser } = require('./auth');
+const {
+  requireAdmin,
+  requireSuperAdmin,
+  sendPasswordResetForUser,
+  VALID_ROLES
+} = require('./auth');
 
 const router = express.Router();
 
 const MAX_SEARCH_RESULTS = 50;
+const VALID_ROLES_SET = new Set(VALID_ROLES);
 
 // --- audit helper ---------------------------------------------------------
 
@@ -124,5 +130,65 @@ router.post(
     }
   }
 );
+
+// PUT /api/admin/users/:id/role
+//
+// Super-admin-only. Changes a user's role to one of the four valid
+// values. Self-modification is blocked so a super_admin can't
+// accidentally demote themselves and lock everyone out of the role-
+// management UI. Every successful change is recorded in admin_actions.
+router.put('/users/:id/role', requireSuperAdmin, async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
+    if (!Number.isInteger(userId) || userId <= 0) {
+      return res.status(400).json({ error: 'Invalid user id' });
+    }
+
+    if (userId === req.session.userId) {
+      return res.status(400).json({
+        error: "You can't change your own role"
+      });
+    }
+
+    const newRole = String(req.body.role || '');
+    if (!VALID_ROLES_SET.has(newRole)) {
+      return res.status(400).json({
+        error: `Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`
+      });
+    }
+
+    const [rows] = await pool.query(
+      'SELECT id, email, role FROM users WHERE id = ?',
+      [userId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const target = rows[0];
+
+    if (target.role === newRole) {
+      // Nothing to do — return the existing record so the client can
+      // update its UI consistently.
+      return res.json({ id: target.id, email: target.email, role: target.role });
+    }
+
+    await pool.query('UPDATE users SET role = ? WHERE id = ?', [newRole, userId]);
+
+    console.log(
+      `[admin] user ${req.session.userId} changed role of user ${target.id} (${target.email}) from ${target.role} to ${newRole}`
+    );
+
+    await logAdminAction(req.session.userId, 'change_role', target.id, {
+      email: target.email,
+      from: target.role,
+      to: newRole
+    });
+
+    res.json({ id: target.id, email: target.email, role: newRole });
+  } catch (error) {
+    console.error('Change role failed:', error);
+    res.status(500).json({ error: 'Failed to change role' });
+  }
+});
 
 module.exports = router;
