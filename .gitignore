@@ -1,4 +1,5 @@
 hello-world/backend/node_modules/
+hello-world/backend/uploads/
 hello-world/frontend/node_modules/
 hello-world/frontend/dist/
 hello-world/backend/.env

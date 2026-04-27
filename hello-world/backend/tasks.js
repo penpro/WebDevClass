@@ -12,9 +12,17 @@
 const express = require('express');
 const pool = require('./db');
 const { requireAuth } = require('./auth');
+const {
+  router: taskUpdatesRouter,
+  safeUnlink: safeUnlinkUpdateImage
+} = require('./task-updates');
 
 const router = express.Router();
 router.use(requireAuth);
+
+// Sub-router for /api/tasks/:taskId/updates/* — must be declared BEFORE
+// the /:id routes below so Express matches the longer prefix first.
+router.use('/:taskId/updates', taskUpdatesRouter);
 
 const SELECT_COLUMNS =
   'id, title, description, due_date, completed, category, created_at, updated_at';
@@ -148,8 +156,22 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/tasks/:id
+//
+// FK ON DELETE CASCADE removes the task's task_updates rows from the
+// database, but the on-disk image files those rows pointed at still
+// need to be unlinked. We collect the filenames first, then run the
+// DELETE, then clean up the files.
 router.delete('/:id', async (req, res) => {
   try {
+    // Verify ownership and grab any image filenames in one query.
+    const [updateRows] = await pool.query(
+      `SELECT u.image_filename
+         FROM task_updates u
+         JOIN tasks t ON t.id = u.task_id
+        WHERE t.id = ? AND t.user_id = ? AND u.image_filename IS NOT NULL`,
+      [req.params.id, req.session.userId]
+    );
+
     const [result] = await pool.query(
       'DELETE FROM tasks WHERE id = ? AND user_id = ?',
       [req.params.id, req.session.userId]
@@ -157,6 +179,12 @@ router.delete('/:id', async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Task not found' });
     }
+
+    // Clean up files. safeUnlinkUpdateImage swallows missing-file errors.
+    for (const row of updateRows) {
+      safeUnlinkUpdateImage(row.image_filename);
+    }
+
     res.json({ ok: true });
   } catch (error) {
     console.error('Delete task failed:', error);

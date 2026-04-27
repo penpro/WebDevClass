@@ -72,6 +72,14 @@ export default function TaskTrackr() {
   const [saveStatus, setSaveStatus] = useState('idle') // idle | saving | saved
   const saveTimerRef = useRef(null)
 
+  // Task-update ("progress post") state, scoped to whichever task is
+  // currently expanded. Re-fetched whenever editingId changes.
+  const [updates, setUpdates] = useState([])
+  const [updatesLoading, setUpdatesLoading] = useState(false)
+  const [updateBody, setUpdateBody] = useState('')
+  const [updateImage, setUpdateImage] = useState(null)
+  const [postingUpdate, setPostingUpdate] = useState(false)
+
   // ---------- load tasks once authed ----------
   useEffect(() => {
     if (loading || !user) return
@@ -91,6 +99,33 @@ export default function TaskTrackr() {
       cancelled = true
     }
   }, [loading, user])
+
+  // Fetch progress updates whenever the user expands a different task.
+  // Reset the new-update form too so a leftover draft from one task
+  // doesn't bleed into another.
+  useEffect(() => {
+    if (!editingId) {
+      setUpdates([])
+      setUpdateBody('')
+      setUpdateImage(null)
+      return
+    }
+    let cancelled = false
+    setUpdatesLoading(true)
+    apiFetch(`/tasks/${editingId}/updates`)
+      .then((data) => {
+        if (!cancelled) setUpdates(data || [])
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message)
+      })
+      .finally(() => {
+        if (!cancelled) setUpdatesLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [editingId])
 
   // ---------- derived data ----------
   // Memos must be declared BEFORE any early return, otherwise React's
@@ -246,6 +281,54 @@ export default function TaskTrackr() {
   // Update a single field of the currently-edited task.  Text fields
   // (title, description) get an 800ms debounced save; date and category
   // save immediately because they are discrete commits.
+  // ---------- task update mutations ----------
+
+  async function handlePostUpdate(event) {
+    event.preventDefault()
+    if (!editingId) return
+    const body = updateBody.trim()
+    if (!body && !updateImage) return
+    setError(null)
+    setPostingUpdate(true)
+    try {
+      // Multipart upload — bypass apiFetch since it forces JSON.
+      const form = new FormData()
+      if (body) form.append('body', body)
+      if (updateImage) form.append('image', updateImage)
+      const response = await fetch(`/api/tasks/${editingId}/updates`, {
+        method: 'POST',
+        credentials: 'include',
+        body: form
+      })
+      const text = await response.text()
+      const data = text ? JSON.parse(text) : null
+      if (!response.ok) {
+        throw new Error(data?.error || `Upload failed (${response.status})`)
+      }
+      setUpdates((prev) => [data, ...prev])
+      setUpdateBody('')
+      setUpdateImage(null)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setPostingUpdate(false)
+    }
+  }
+
+  async function handleDeleteUpdate(updateId) {
+    if (!editingId) return
+    if (!window.confirm('Delete this update?')) return
+    setError(null)
+    try {
+      await apiFetch(`/tasks/${editingId}/updates/${updateId}`, {
+        method: 'DELETE'
+      })
+      setUpdates((prev) => prev.filter((u) => u.id !== updateId))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   function setEditField(field, value, immediate = false) {
     setEdits((prev) => ({ ...prev, [field]: value }))
 
@@ -431,6 +514,15 @@ export default function TaskTrackr() {
                   }}
                   onChangeField={setEditField}
                   onDelete={() => handleDelete(task)}
+                  updates={updates}
+                  updatesLoading={updatesLoading}
+                  updateBody={updateBody}
+                  setUpdateBody={setUpdateBody}
+                  updateImage={updateImage}
+                  setUpdateImage={setUpdateImage}
+                  postingUpdate={postingUpdate}
+                  onPostUpdate={handlePostUpdate}
+                  onDeleteUpdate={handleDeleteUpdate}
                 />
               ))}
             </ul>
@@ -476,7 +568,16 @@ function TaskRow({
   onToggleCompleted,
   onClickRow,
   onChangeField,
-  onDelete
+  onDelete,
+  updates,
+  updatesLoading,
+  updateBody,
+  setUpdateBody,
+  updateImage,
+  setUpdateImage,
+  postingUpdate,
+  onPostUpdate,
+  onDeleteUpdate
 }) {
   // The displayed value for an edited field is the pending edit if it
   // exists, otherwise the underlying task field.
@@ -753,6 +854,178 @@ function TaskRow({
             >
               Delete task
             </button>
+          </div>
+
+          {/* ---- progress updates ---- */}
+          <div
+            style={{
+              marginTop: '1rem',
+              paddingTop: '1rem',
+              borderTop: '1px dashed #d1d5db'
+            }}
+          >
+            <div
+              style={{
+                fontSize: '0.75rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#6b7280',
+                marginBottom: '0.5rem'
+              }}
+            >
+              Progress updates
+            </div>
+
+            <form
+              onSubmit={onPostUpdate}
+              style={{
+                background: '#f9fafb',
+                border: '1px solid #d1d5db',
+                borderRadius: 6,
+                padding: '0.5rem',
+                marginBottom: '0.75rem'
+              }}
+            >
+              <textarea
+                placeholder="What's the latest? (text, an image, or both)"
+                value={updateBody}
+                onChange={(e) => setUpdateBody(e.target.value)}
+                rows={2}
+                style={{
+                  width: '100%',
+                  padding: '0.4rem',
+                  boxSizing: 'border-box',
+                  fontFamily: 'inherit',
+                  border: '1px solid #d1d5db',
+                  borderRadius: 4,
+                  marginBottom: '0.5rem'
+                }}
+              />
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  alignItems: 'center',
+                  flexWrap: 'wrap'
+                }}
+              >
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={(e) =>
+                    setUpdateImage(e.target.files?.[0] || null)
+                  }
+                  style={{ flex: 1, fontSize: '0.85rem' }}
+                />
+                {updateImage && (
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      color: '#6b7280',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {(updateImage.size / 1024 / 1024).toFixed(1)} MB
+                  </span>
+                )}
+                <button
+                  type="submit"
+                  disabled={
+                    postingUpdate ||
+                    (!updateBody.trim() && !updateImage)
+                  }
+                >
+                  {postingUpdate ? 'Posting…' : 'Post update'}
+                </button>
+              </div>
+            </form>
+
+            {updatesLoading ? (
+              <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                Loading updates…
+              </p>
+            ) : updates.length === 0 ? (
+              <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                No updates yet. Post the first one above.
+              </p>
+            ) : (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {updates.map((u) => (
+                  <li
+                    key={u.id}
+                    style={{
+                      border: '1px solid #e5e7eb',
+                      borderRadius: 6,
+                      padding: '0.6rem',
+                      marginBottom: '0.5rem',
+                      background: 'white'
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '0.35rem'
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '0.75rem',
+                          color: '#6b7280'
+                        }}
+                      >
+                        {new Date(u.created_at).toLocaleString()}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => onDeleteUpdate(u.id)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#9ca3af',
+                          cursor: 'pointer',
+                          fontSize: '0.85rem'
+                        }}
+                        aria-label="Delete update"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    {u.body && (
+                      <p
+                        style={{
+                          margin: '0 0 0.5rem 0',
+                          whiteSpace: 'pre-wrap',
+                          fontSize: '0.95rem'
+                        }}
+                      >
+                        {u.body}
+                      </p>
+                    )}
+                    {u.has_image && (
+                      <a
+                        href={`/api/tasks/${task.id}/updates/${u.id}/image`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={`/api/tasks/${task.id}/updates/${u.id}/image`}
+                          alt=""
+                          loading="lazy"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: 300,
+                            borderRadius: 4,
+                            display: 'block'
+                          }}
+                        />
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       )}
