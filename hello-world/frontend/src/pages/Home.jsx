@@ -32,6 +32,10 @@ export default function Home() {
               <Link to="/moodboard">MoodBoard</Link> — make boards from image
               URLs and share them via a public link.
             </li>
+            <li>
+              <Link to="/tasktrackr">TaskTrackr</Link> — manage tasks by
+              category with due dates and auto-saving edits.
+            </li>
             {user.role === 'admin' && (
               <li>
                 <Link to="/customer-service">Customer Service</Link> — admin
