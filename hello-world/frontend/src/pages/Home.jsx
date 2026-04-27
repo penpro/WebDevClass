@@ -42,6 +42,25 @@ export default function Home() {
               <Link to="/tasktrackr">TaskTrackr</Link> — manage tasks by
               category with due dates and auto-saving edits.
             </li>
+            <li>
+              {user.role === 'premium' ? (
+                <>
+                  <Link to="/subscribe">Manage subscription</Link> — your
+                  Premium plan, billing date, cancel option.
+                </>
+              ) : user.role === 'user' ? (
+                <>
+                  <Link to="/subscribe">Upgrade to Premium</Link> — unlock
+                  video uploads on task progress posts (100 MB cap, vs 10 MB
+                  images-only for free).
+                </>
+              ) : (
+                <>
+                  <Link to="/subscribe">Subscription</Link> — Premium tier
+                  signup or management.
+                </>
+              )}
+            </li>
             {(user.role === 'admin' || user.role === 'super_admin') && (
               <li>
                 <Link to="/customer-service">Customer Service</Link> — admin

@@ -15,6 +15,7 @@ import MoodBoard from './pages/MoodBoard.jsx'
 import TaskTrackr from './pages/TaskTrackr.jsx'
 import CustomerService from './pages/CustomerService.jsx'
 import ApiGuide from './pages/ApiGuide.jsx'
+import Subscribe from './pages/Subscribe.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="tasktrackr" element={<TaskTrackr />} />
             <Route path="customer-service" element={<CustomerService />} />
             <Route path="api-guide" element={<ApiGuide />} />
+            <Route path="subscribe" element={<Subscribe />} />
           </Route>
         </Routes>
       </AuthProvider>

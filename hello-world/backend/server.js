@@ -11,12 +11,30 @@ const notesRouter = require('./notes');
 const boardsRouter = require('./boards');
 const tasksRouter = require('./tasks');
 const adminRouter = require('./admin');
+const {
+  router: paymentsRouter,
+  webhookHandler: paymentsWebhookHandler
+} = require('./payments');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
 // We sit behind nginx, so honor its X-Forwarded-* headers.
 app.set('trust proxy', 1);
+
+// ---------------------------------------------------------------------------
+// Stripe webhook — MUST be registered BEFORE express.json()
+// ---------------------------------------------------------------------------
+// Stripe signs webhook payloads with HMAC over the RAW request bytes.
+// If express.json() parses the body first, the bytes change (whitespace,
+// key order) and signature verification fails. The webhook route is
+// the one place in the API that needs the raw Buffer; everywhere else
+// uses parsed JSON via the express.json() middleware below.
+app.post(
+  '/api/payments/webhook',
+  express.raw({ type: 'application/json' }),
+  paymentsWebhookHandler
+);
 
 app.use(express.json());
 
@@ -126,6 +144,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/boards', boardsRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/payments', paymentsRouter);
 app.use('/api/admin', adminLimiter, adminRouter);
 
 app.get('/api/messages', async (req, res) => {

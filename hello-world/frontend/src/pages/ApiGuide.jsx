@@ -128,6 +128,7 @@ export default function ApiGuide() {
               <li><a href="#endpoints-boards">Boards (MoodBoard)</a></li>
               <li><a href="#endpoints-tasks">Tasks (TaskTrackr)</a></li>
               <li><a href="#endpoints-task-updates">Task updates (progress posts)</a></li>
+              <li><a href="#endpoints-payments">Payments (Stripe subscriptions)</a></li>
               <li><a href="#endpoints-admin">Admin (Customer Service)</a></li>
             </ul>
           </li>
@@ -391,6 +392,36 @@ export default function ApiGuide() {
           { method: 'GET', path: '/api/tasks/:taskId/updates/:id/media', auth: 'owner', desc: 'Stream the uploaded media bytes. Auth-checked on every request, so URLs are not capabilities.' }
         ]}
       />
+
+      {/* payments */}
+      <h3 id="endpoints-payments">Payments — Stripe subscriptions</h3>
+      <p style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+        Subscription billing for the Premium tier, integrated with Stripe.
+        The frontend uses Stripe Elements (Payment Element) so card details
+        are sent directly from the browser to Stripe — they never touch this
+        server, which keeps PCI compliance scope at SAQ-A. The role flip
+        from <code style={codeStyle}>user</code> to{' '}
+        <code style={codeStyle}>premium</code> happens in the webhook
+        handler, not in the frontend, because the webhook is the only
+        trustworthy "did the payment actually clear" signal.
+      </p>
+      <EndpointTable
+        rows={[
+          { method: 'GET', path: '/api/payments/config', auth: 'required', desc: 'Returns the Stripe publishable key (safe to expose) and a configured flag the UI uses to detect missing env vars.' },
+          { method: 'GET', path: '/api/payments/status', auth: 'required', desc: 'Returns { status, current_period_end, cancel_at_period_end, is_active } for the caller. status="none" if they have no record.' },
+          { method: 'POST', path: '/api/payments/subscribe', auth: 'required', desc: 'Creates a Stripe customer (if needed) and a subscription with payment_behavior=default_incomplete. Returns { client_secret } for the frontend Payment Element to confirm. 400 if you already have an active subscription.' },
+          { method: 'POST', path: '/api/payments/cancel', auth: 'required', desc: 'Sets cancel_at_period_end on the subscription. Premium access continues until the period ends; the webhook flips the role back to user when Stripe finally terminates.' },
+          { method: 'POST', path: '/api/payments/webhook', auth: 'Stripe-signed', desc: 'Stripe-only endpoint. Verifies the signature against STRIPE_WEBHOOK_SECRET, dedupes by event id (stripe_events table), and updates user role on customer.subscription.* events. Returns 5xx on processing failure so Stripe retries.' }
+        ]}
+      />
+      <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+        The webhook endpoint is registered with{' '}
+        <code style={codeStyle}>express.raw()</code> in{' '}
+        <code style={codeStyle}>server.js</code> BEFORE the global{' '}
+        <code style={codeStyle}>express.json()</code> middleware, because
+        Stripe signs the raw request bytes — pre-parsed JSON would fail
+        signature verification.
+      </p>
 
       {/* admin */}
       <h3 id="endpoints-admin">Admin — Customer Service</h3>
