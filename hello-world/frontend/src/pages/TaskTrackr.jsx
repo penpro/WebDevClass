@@ -60,6 +60,7 @@ export default function TaskTrackr() {
   const [error, setError] = useState(null)
 
   const [newTitle, setNewTitle] = useState('')
+  const [newDueDate, setNewDueDate] = useState('')
   const [newCategory, setNewCategory] = useState('General')
   const [creating, setCreating] = useState(false)
 
@@ -105,14 +106,17 @@ export default function TaskTrackr() {
       .sort((a, b) => a.name.localeCompare(b.name))
   }, [tasks])
 
+  // "Due soon" = not completed + has a due date + due date <= 7 days from
+  // now. Naturally includes overdue (date in the past is also <= cutoff)
+  // because overdue tasks need attention even more than "due soon" ones.
+  // Same predicate is used in the filteredTasks logic below — keep them
+  // in sync so the badge count and the visible list match.
   const dueSoonCount = useMemo(() => {
-    const today = todayStr()
     const cutoff = daysFromNow(7)
     return tasks.filter(
       (t) =>
         !t.completed &&
         t.due_date &&
-        dateForInput(t.due_date) >= today &&
         dateForInput(t.due_date) <= cutoff
     ).length
   }, [tasks])
@@ -123,7 +127,6 @@ export default function TaskTrackr() {
   )
 
   const filteredTasks = useMemo(() => {
-    const today = todayStr()
     const cutoff = daysFromNow(7)
     return tasks.filter((t) => {
       // top-tab filter
@@ -131,8 +134,7 @@ export default function TaskTrackr() {
       if (filter === FILTER_DUE_SOON) {
         if (t.completed) return false
         if (!t.due_date) return false
-        const d = dateForInput(t.due_date)
-        if (d > cutoff) return false
+        if (dateForInput(t.due_date) > cutoff) return false
       }
       if (filter === FILTER_COMPLETED && !t.completed) return false
       // sidebar category
@@ -154,14 +156,18 @@ export default function TaskTrackr() {
     const title = newTitle.trim()
     if (!title) return
     const category = (newCategory || 'General').trim() || 'General'
+    const due_date = newDueDate || null
     setCreating(true)
     try {
       const created = await apiFetch('/tasks', {
         method: 'POST',
-        body: JSON.stringify({ title, category })
+        body: JSON.stringify({ title, category, due_date })
       })
       setTasks((prev) => [created, ...prev])
       setNewTitle('')
+      setNewDueDate('')
+      // Keep the category as-is so the user can rapid-add several into
+      // the same category without having to retype it every time.
     } catch (err) {
       setError(err.message)
     } finally {
@@ -350,6 +356,17 @@ export default function TaskTrackr() {
                 maxLength={255}
                 style={{
                   flex: '1 1 200px',
+                  padding: '0.5rem',
+                  boxSizing: 'border-box'
+                }}
+              />
+              <input
+                type="date"
+                value={newDueDate}
+                onChange={(e) => setNewDueDate(e.target.value)}
+                title="Due date (optional)"
+                style={{
+                  flex: '0 0 150px',
                   padding: '0.5rem',
                   boxSizing: 'border-box'
                 }}
