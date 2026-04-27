@@ -91,12 +91,10 @@ export default function TaskTrackr() {
     }
   }, [loading, user])
 
-  if (loading) return <p>Loading…</p>
-  if (!user) {
-    return <Navigate to="/login" state={{ from: '/tasktrackr' }} replace />
-  }
-
   // ---------- derived data ----------
+  // Memos must be declared BEFORE any early return, otherwise React's
+  // Rules of Hooks fire on the renders where the early return happens
+  // (loading state, unauthenticated state) and the component crashes.
   const categories = useMemo(() => {
     const counts = new Map()
     for (const t of tasks) {
@@ -142,6 +140,11 @@ export default function TaskTrackr() {
       return true
     })
   }, [tasks, filter, categoryFilter])
+
+  if (loading) return <p>Loading…</p>
+  if (!user) {
+    return <Navigate to="/login" state={{ from: '/tasktrackr' }} replace />
+  }
 
   // ---------- mutations ----------
 
