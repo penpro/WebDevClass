@@ -20,6 +20,12 @@ export default function Home() {
       <p>This site is being used as a showcase for web development projects.</p>
       <p style={{ fontStyle: 'italic', color: '#6b7280' }}>Hello Professor Foster!</p>
 
+      <p style={{ marginBottom: '1.5rem' }}>
+        <Link to="/api-guide">📘 API Guide</Link> — full reference for every
+        endpoint this site exposes, with REST conventions, status codes,
+        roles, and rate limits.
+      </p>
+
       {user ? (
         <section style={{ marginBottom: '2rem' }}>
           <h2>Your apps</h2>
