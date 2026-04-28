@@ -11,6 +11,7 @@ const notesRouter = require('./notes');
 const boardsRouter = require('./boards');
 const tasksRouter = require('./tasks');
 const adminRouter = require('./admin');
+const diagnosticsRouter = require('./diagnostics');
 const {
   router: paymentsRouter,
   webhookHandler: paymentsWebhookHandler
@@ -163,6 +164,12 @@ app.use('/api/notes', notesRouter);
 app.use('/api/boards', boardsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/payments', paymentsRouter);
+// Diagnostics is mounted BEFORE the broader /api/admin prefix so its more
+// specific path wins. We deliberately skip the adminLimiter here: SSE
+// streams hold a single request open for the whole test, and the global
+// limiter is still applied via app.use('/api', globalLimiter) above. Each
+// route inside also calls requireSuperAdmin individually.
+app.use('/api/admin/diagnostics', diagnosticsRouter);
 app.use('/api/admin', adminLimiter, adminRouter);
 
 app.get('/api/messages', async (req, res) => {

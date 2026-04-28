@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import App from './App.jsx'
 import { AuthProvider } from './AuthContext.jsx'
@@ -13,7 +13,8 @@ import QuickNotes from './pages/QuickNotes.jsx'
 import MoodBoards from './pages/MoodBoards.jsx'
 import MoodBoard from './pages/MoodBoard.jsx'
 import TaskTrackr from './pages/TaskTrackr.jsx'
-import CustomerService from './pages/CustomerService.jsx'
+import AdminPortal from './pages/AdminPortal.jsx'
+import Diagnostics from './pages/Diagnostics.jsx'
 import ApiGuide from './pages/ApiGuide.jsx'
 import Subscribe from './pages/Subscribe.jsx'
 
@@ -32,7 +33,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="moodboard" element={<MoodBoards />} />
             <Route path="moodboard/:token" element={<MoodBoard />} />
             <Route path="tasktrackr" element={<TaskTrackr />} />
-            <Route path="customer-service" element={<CustomerService />} />
+            <Route path="admin-portal" element={<AdminPortal />} />
+            <Route path="admin-portal/diagnostics" element={<Diagnostics />} />
+            {/* Backwards-compat: the page used to live at /customer-service.
+                Old bookmarks redirect into the renamed route. */}
+            <Route
+              path="customer-service"
+              element={<Navigate to="/admin-portal" replace />}
+            />
             <Route path="api-guide" element={<ApiGuide />} />
             <Route path="subscribe" element={<Subscribe />} />
           </Route>

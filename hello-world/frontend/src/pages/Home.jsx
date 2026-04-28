@@ -63,9 +63,10 @@ export default function Home() {
             </li>
             {(user.role === 'admin' || user.role === 'super_admin') && (
               <li>
-                <Link to="/customer-service">Customer Service</Link> — admin
-                tool to search users and manually send password reset emails
-                {user.role === 'super_admin' && ' (and assign roles)'}.
+                <Link to="/admin-portal">Admin Portal</Link> — search users
+                and manually send password reset emails
+                {user.role === 'super_admin' &&
+                  ', assign roles, and run diagnostics & load tests'}.
               </li>
             )}
           </ul>

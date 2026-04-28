@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
 
@@ -14,7 +14,7 @@ const ROLE_LABELS = Object.fromEntries(
   ROLE_OPTIONS.map((o) => [o.value, o.label])
 )
 
-export default function CustomerService() {
+export default function AdminPortal() {
   const { user, loading } = useAuth()
 
   const [query, setQuery] = useState('')
@@ -34,7 +34,7 @@ export default function CustomerService() {
     return (
       <Navigate
         to="/login"
-        state={{ from: '/customer-service' }}
+        state={{ from: '/admin-portal' }}
         replace
       />
     )
@@ -42,7 +42,7 @@ export default function CustomerService() {
   if (!ADMIN_ROLES.has(user.role)) {
     return (
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h1>Customer Service</h1>
+        <h1>Admin Portal</h1>
         <p>You do not have access to this tool.</p>
       </div>
     )
@@ -139,14 +139,61 @@ export default function CustomerService() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1>Customer Service</h1>
+      <h1>Admin Portal</h1>
       <p style={{ color: '#6b7280' }}>
-        Search by email, then trigger a password reset email for the found
-        account.
-        {isSuperAdmin && ' As a super admin you can also assign roles.'}
-        {' '}The reset email is sent through the same flow as a user's own
-        forgot-password request — a one-hour, single-use token.
+        Admin tools for the site. Search users below to send password
+        resets{isSuperAdmin && ' or change roles'}.
+        {isSuperAdmin && (
+          <>
+            {' '}As a super admin you also have access to{' '}
+            <Link to="/admin-portal/diagnostics">
+              Diagnostics &amp; Tests
+            </Link>
+            .
+          </>
+        )}
       </p>
+
+      {isSuperAdmin && (
+        <section
+          style={{
+            border: '1px solid #c7d2fe',
+            background: '#eef2ff',
+            borderRadius: 8,
+            padding: '0.75rem 1rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.5rem'
+          }}
+        >
+          <div>
+            <strong style={{ display: 'block' }}>Diagnostics &amp; Tests</strong>
+            <span style={{ fontSize: '0.85rem', color: '#374151' }}>
+              Run k6 load tests against this server with live charts and
+              CPU/memory readouts.
+            </span>
+          </div>
+          <Link
+            to="/admin-portal/diagnostics"
+            style={{
+              background: '#4f46e5',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: 6,
+              textDecoration: 'none',
+              fontSize: '0.9rem',
+              fontWeight: 'bold'
+            }}
+          >
+            Open Diagnostics →
+          </Link>
+        </section>
+      )}
+
+      <h2 style={{ marginTop: '1.5rem' }}>User search</h2>
 
       <section
         style={{
