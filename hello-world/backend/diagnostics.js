@@ -356,7 +356,13 @@ router.post('/run', requireSuperAdmin, (req, res) => {
     }
   }
 
-  const runId = crypto.randomBytes(8).toString('hex');
+  // 128 bits of entropy (32 hex chars). The runId doubles as a bearer token
+  // that lets test traffic bypass maintenance mode (see server.js maintenance
+  // middleware). Even a sustained 1M guess/sec brute force across the whole
+  // ~4-minute window of an active test is ~ 1 in 2^96 chance of a hit, so
+  // the token is effectively unguessable. 64 bits would already be safe;
+  // 128 is defence in depth at zero cost.
+  const runId = crypto.randomBytes(16).toString('hex');
   const run = {
     runId,
     scriptName,
