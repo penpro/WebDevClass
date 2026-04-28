@@ -12,6 +12,7 @@ const boardsRouter = require('./boards');
 const tasksRouter = require('./tasks');
 const adminRouter = require('./admin');
 const diagnosticsRouter = require('./diagnostics');
+const loadtestEndpoints = require('./loadtestEndpoints');
 const rateLimiterState = require('./rateLimiterState');
 const maintenanceState = require('./maintenanceState');
 const {
@@ -234,6 +235,9 @@ app.use('/api/payments', paymentsRouter);
 // route inside also calls requireSuperAdmin individually.
 app.use('/api/admin/diagnostics', diagnosticsRouter);
 app.use('/api/admin', adminLimiter, adminRouter);
+// Synthetic load-test endpoints. Header-gated; invisible to anyone who
+// isn't currently running a test through the diagnostics page.
+app.use('/api/loadtest', loadtestEndpoints);
 
 app.get('/api/messages', async (req, res) => {
   try {

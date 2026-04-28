@@ -36,7 +36,10 @@ const maintenanceState = require('./maintenanceState');
 // the site unusable for ordinary visitors. Maintenance auto-clears on
 // run end / stop / spawn error so a forgotten flag can't outlive the
 // test that set it.
-const SCRIPTS_THAT_TRIGGER_MAINTENANCE = new Set(['api-overload']);
+const SCRIPTS_THAT_TRIGGER_MAINTENANCE = new Set([
+  'api-overload',
+  'api-block'
+]);
 
 const router = express.Router();
 
@@ -87,6 +90,19 @@ const SCRIPTS = {
       'just measuring how fast the limiter returns 429s under siege. ' +
       'Watch the CPU chart pin to 100% and the latency curve inflect.',
     expectedDurationSeconds: 240
+  },
+  'api-block': {
+    file: path.join(LOADTESTS_DIR, 'api-block.js'),
+    label: 'API event-loop block — HARD FAILURE',
+    description:
+      'Hits a synthetic /api/loadtest/block endpoint that synchronously ' +
+      'busy-waits 100ms per request. Node is single-threaded, so concurrent ' +
+      'requests pile up in the queue and latency climbs without bound until ' +
+      'nginx times out at 60s and starts returning 504 Gateway Timeout. ' +
+      'The diagnostics page itself may briefly go unresponsive — that IS ' +
+      'the failure mode. Auto-enables maintenance so real users see a ' +
+      'clean banner rather than timeouts.',
+    expectedDurationSeconds: 165
   }
 };
 
