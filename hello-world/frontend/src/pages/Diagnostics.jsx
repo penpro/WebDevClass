@@ -50,6 +50,12 @@ export default function Diagnostics() {
   const [limiterDisabled, setLimiterDisabled] = useState(false)
   const [limiterLoading, setLimiterLoading] = useState(false)
 
+  // Live mirror of the backend's maintenance flag. The api-overload test
+  // also auto-toggles this, so we refresh it on mount and after every
+  // run start/end so the UI stays accurate.
+  const [maintenanceEnabled, setMaintenanceEnabled] = useState(false)
+  const [maintenanceLoading, setMaintenanceLoading] = useState(false)
+
   const eventSourceRef = useRef(null)
   const logBoxRef = useRef(null)
 
@@ -70,6 +76,13 @@ export default function Diagnostics() {
   useEffect(() => {
     apiFetch('/admin/diagnostics/limiter')
       .then((data) => setLimiterDisabled(!!data.disabled))
+      .catch(() => {})
+  }, [])
+
+  // Fetch the current maintenance state on mount.
+  useEffect(() => {
+    apiFetch('/admin/diagnostics/maintenance')
+      .then((data) => setMaintenanceEnabled(!!data.enabled))
       .catch(() => {})
   }, [])
 
@@ -190,6 +203,10 @@ export default function Diagnostics() {
         setRunLabel(event.label || null)
         setExpectedDuration(event.expectedDurationSeconds || null)
         setRunStatus('running')
+        // Auto-trigger may have flipped maintenance server-side; mirror.
+        if (typeof event.maintenance === 'boolean') {
+          setMaintenanceEnabled(event.maintenance)
+        }
         break
 
       case 'k6_bucket': {
@@ -236,6 +253,10 @@ export default function Diagnostics() {
       case 'run_ended':
         setRunStatus(event.status || 'completed')
         if (event.summary) setSummary(event.summary)
+        // Auto-clear may have flipped maintenance server-side; mirror.
+        if (typeof event.maintenance === 'boolean') {
+          setMaintenanceEnabled(event.maintenance)
+        }
         if (eventSourceRef.current) {
           eventSourceRef.current.close()
           eventSourceRef.current = null
@@ -292,6 +313,27 @@ export default function Diagnostics() {
       setError(err.message)
     } finally {
       setLimiterLoading(false)
+    }
+  }
+
+  async function handleToggleMaintenance() {
+    // Deliberately NOT disabled while a test is running. If a runaway
+    // test is hurting the site and the auto-disable hasn't fired, the
+    // admin still needs the manual override.
+    if (maintenanceLoading) return
+    const next = !maintenanceEnabled
+    setMaintenanceLoading(true)
+    setError(null)
+    try {
+      const data = await apiFetch('/admin/diagnostics/maintenance', {
+        method: 'POST',
+        body: JSON.stringify({ enabled: next })
+      })
+      setMaintenanceEnabled(!!data.enabled)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setMaintenanceLoading(false)
     }
   }
 
@@ -441,48 +483,88 @@ export default function Diagnostics() {
             </button>
           )}
 
-          {/* Rate limiter toggle pushed to the right of the row. */}
+          {/* Toggle group pushed to the right of the row. */}
           <div
             style={{
               marginLeft: 'auto',
               display: 'flex',
-              gap: '0.5rem',
+              gap: '1rem',
               alignItems: 'center',
-              fontSize: '0.85rem'
+              fontSize: '0.85rem',
+              flexWrap: 'wrap'
             }}
           >
-            <span style={{ color: '#374151' }}>Rate limiter:</span>
-            <button
-              type="button"
-              onClick={handleToggleLimiter}
-              disabled={isRunning || limiterLoading}
-              title={
-                isRunning
-                  ? 'Cannot change while a test is running'
-                  : limiterDisabled
-                  ? 'Click to re-enable rate limiting'
-                  : 'Click to disable rate limiting (load testing only)'
-              }
-              style={{
-                background: limiterDisabled ? '#fee2e2' : '#d1fae5',
-                color: limiterDisabled ? '#991b1b' : '#065f46',
-                border:
-                  '1px solid ' + (limiterDisabled ? '#fca5a5' : '#86efac'),
-                padding: '0.3rem 0.75rem',
-                borderRadius: 999,
-                fontSize: '0.78rem',
-                fontWeight: 'bold',
-                cursor:
-                  isRunning || limiterLoading ? 'not-allowed' : 'pointer',
-                opacity: isRunning || limiterLoading ? 0.6 : 1
-              }}
+            <div
+              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
             >
-              {limiterLoading
-                ? '…'
-                : limiterDisabled
-                ? 'OFF — click to enable'
-                : 'ON — click to disable'}
-            </button>
+              <span style={{ color: '#374151' }}>Rate limiter:</span>
+              <button
+                type="button"
+                onClick={handleToggleLimiter}
+                disabled={isRunning || limiterLoading}
+                title={
+                  isRunning
+                    ? 'Cannot change while a test is running'
+                    : limiterDisabled
+                    ? 'Click to re-enable rate limiting'
+                    : 'Click to disable rate limiting (load testing only)'
+                }
+                style={{
+                  background: limiterDisabled ? '#fee2e2' : '#d1fae5',
+                  color: limiterDisabled ? '#991b1b' : '#065f46',
+                  border:
+                    '1px solid ' + (limiterDisabled ? '#fca5a5' : '#86efac'),
+                  padding: '0.3rem 0.75rem',
+                  borderRadius: 999,
+                  fontSize: '0.78rem',
+                  fontWeight: 'bold',
+                  cursor:
+                    isRunning || limiterLoading ? 'not-allowed' : 'pointer',
+                  opacity: isRunning || limiterLoading ? 0.6 : 1
+                }}
+              >
+                {limiterLoading
+                  ? '…'
+                  : limiterDisabled
+                  ? 'OFF — click to enable'
+                  : 'ON — click to disable'}
+              </button>
+            </div>
+
+            <div
+              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+            >
+              <span style={{ color: '#374151' }}>Maintenance:</span>
+              <button
+                type="button"
+                onClick={handleToggleMaintenance}
+                disabled={maintenanceLoading}
+                title={
+                  maintenanceEnabled
+                    ? 'Click to bring the site back up'
+                    : 'Click to put the site in maintenance mode (admins always retain access)'
+                }
+                style={{
+                  background: maintenanceEnabled ? '#fde68a' : '#d1fae5',
+                  color: maintenanceEnabled ? '#78350f' : '#065f46',
+                  border:
+                    '1px solid ' +
+                    (maintenanceEnabled ? '#d97706' : '#86efac'),
+                  padding: '0.3rem 0.75rem',
+                  borderRadius: 999,
+                  fontSize: '0.78rem',
+                  fontWeight: 'bold',
+                  cursor: maintenanceLoading ? 'not-allowed' : 'pointer',
+                  opacity: maintenanceLoading ? 0.6 : 1
+                }}
+              >
+                {maintenanceLoading
+                  ? '…'
+                  : maintenanceEnabled
+                  ? 'ON — click to disable'
+                  : 'OFF — click to enable'}
+              </button>
+            </div>
           </div>
         </div>
 

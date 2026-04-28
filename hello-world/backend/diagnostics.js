@@ -29,6 +29,14 @@ const crypto = require('crypto');
 
 const { requireSuperAdmin } = require('./auth');
 const rateLimiterState = require('./rateLimiterState');
+const maintenanceState = require('./maintenanceState');
+
+// Scripts that should automatically enable maintenance mode while they
+// run. These are the ones that hit the application hard enough to make
+// the site unusable for ordinary visitors. Maintenance auto-clears on
+// run end / stop / spawn error so a forgotten flag can't outlive the
+// test that set it.
+const SCRIPTS_THAT_TRIGGER_MAINTENANCE = new Set(['api-overload']);
 
 const router = express.Router();
 
@@ -272,6 +280,31 @@ router.post('/limiter', requireSuperAdmin, (req, res) => {
   res.json({ disabled: rateLimiterState.isDisabled() });
 });
 
+// GET /api/admin/diagnostics/maintenance
+// Returns the current maintenance state (enabled flag + user-facing message).
+router.get('/maintenance', requireSuperAdmin, (req, res) => {
+  res.json(maintenanceState.getState());
+});
+
+// POST /api/admin/diagnostics/maintenance  body: { enabled: bool, message? }
+router.post('/maintenance', requireSuperAdmin, (req, res) => {
+  const value = !!req.body.enabled;
+  const customMessage =
+    typeof req.body.message === 'string' && req.body.message.length > 0
+      ? req.body.message
+      : null;
+  const wasEnabled = maintenanceState.isEnabled();
+  if (value) maintenanceState.enable(customMessage);
+  else maintenanceState.disable();
+  if (wasEnabled !== value) {
+    console.warn(
+      `[diagnostics] super_admin id=${req.session.userId} set maintenance ` +
+        `mode to ${value ? 'ENABLED' : 'DISABLED'}`
+    );
+  }
+  res.json(maintenanceState.getState());
+});
+
 // GET /api/admin/diagnostics/scripts
 // Returns the static metadata for available scripts.
 router.get('/scripts', requireSuperAdmin, (req, res) => {
@@ -352,13 +385,30 @@ router.post('/run', requireSuperAdmin, (req, res) => {
   });
   run.proc = proc;
 
+  // Auto-enable maintenance mode for scripts that will impact site users.
+  // This is recorded on the run object so we know to clean up later, and
+  // so we never accidentally disable a maintenance state we didn't set.
+  run.didEnableMaintenance = false;
+  if (SCRIPTS_THAT_TRIGGER_MAINTENANCE.has(scriptName)) {
+    if (!maintenanceState.isEnabled()) {
+      maintenanceState.enable(
+        `Site is temporarily unavailable while a load test (${meta.label}) is in progress.`
+      );
+      run.didEnableMaintenance = true;
+      console.warn(
+        `[diagnostics] auto-enabling maintenance for run ${runId} (${scriptName})`
+      );
+    }
+  }
+
   broadcast(run, {
     type: 'run_started',
     t: Date.now(),
     runId,
     scriptName,
     label: meta.label,
-    expectedDurationSeconds: meta.expectedDurationSeconds
+    expectedDurationSeconds: meta.expectedDurationSeconds,
+    maintenance: maintenanceState.isEnabled()
   });
 
   run.samplerInterval = startSystemSampler(run, 1000);
@@ -450,13 +500,23 @@ router.post('/run', requireSuperAdmin, (req, res) => {
     run.endedAt = Date.now();
     run.summary = computeFinalSummary(run);
 
+    // Auto-clear maintenance mode if we set it. A user manually-toggled
+    // maintenance is never touched here.
+    if (run.didEnableMaintenance && maintenanceState.isEnabled()) {
+      maintenanceState.disable();
+      console.warn(
+        `[diagnostics] auto-disabling maintenance after run ${runId}`
+      );
+    }
+
     broadcast(run, {
       type: 'run_ended',
       t: Date.now(),
       status: run.status,
       exitCode: code,
       signal,
-      summary: run.summary
+      summary: run.summary,
+      maintenance: maintenanceState.isEnabled()
     });
 
     for (const res of run.listeners) {
@@ -478,6 +538,12 @@ router.post('/run', requireSuperAdmin, (req, res) => {
       stream: 'stderr',
       text: `spawn error: ${err.message}`
     });
+    // If spawn itself failed, the close handler will still fire — but
+    // belt-and-suspenders: never leave maintenance on after a failed
+    // spawn that we triggered.
+    if (run.didEnableMaintenance && maintenanceState.isEnabled()) {
+      maintenanceState.disable();
+    }
   });
 
   res.json({ runId, scriptName, label: meta.label });

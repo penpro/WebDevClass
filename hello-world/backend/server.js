@@ -13,6 +13,7 @@ const tasksRouter = require('./tasks');
 const adminRouter = require('./admin');
 const diagnosticsRouter = require('./diagnostics');
 const rateLimiterState = require('./rateLimiterState');
+const maintenanceState = require('./maintenanceState');
 const {
   router: paymentsRouter,
   webhookHandler: paymentsWebhookHandler
@@ -148,6 +149,43 @@ app.use(
     }
   })
 );
+
+// ---------------------------------------------------------------------------
+// Maintenance mode middleware
+// ---------------------------------------------------------------------------
+//
+// When maintenanceState.isEnabled() is true, every API request gets a 503
+// EXCEPT the explicitly-bypassed paths below. The bypass list is the
+// safety net that keeps the site recoverable: an admin must always be
+// able to log in and reach the diagnostics toggle to flip maintenance
+// back off, even if everything else is intentionally down.
+//
+// The 503 body includes a `maintenance: true` flag so the SPA's apiFetch
+// can distinguish maintenance-mode 503s from genuine "service is broken"
+// 503s and show the user a friendly banner instead of a cryptic error.
+const MAINTENANCE_BYPASS = [
+  '/api/auth/',          // login, logout, /me, register, password reset
+  '/api/admin/',         // user search, role change, AND diagnostics
+  '/api/payments/webhook' // Stripe webhook must keep working — Stripe
+                         // retries with exponential backoff; missing
+                         // delivery during a 4-min test isn't fatal but
+                         // there's no reason to drop them
+];
+
+app.use((req, res, next) => {
+  if (!maintenanceState.isEnabled()) return next();
+  for (const prefix of MAINTENANCE_BYPASS) {
+    if (req.path.startsWith(prefix)) return next();
+  }
+  res
+    .status(503)
+    .set('Retry-After', '60')
+    .json({
+      error: 'Maintenance',
+      message: maintenanceState.getState().message,
+      maintenance: true
+    });
+});
 
 // ---------------------------------------------------------------------------
 // Route mounting with per-group rate limiters

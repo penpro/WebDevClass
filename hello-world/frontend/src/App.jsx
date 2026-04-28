@@ -2,7 +2,7 @@ import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from './AuthContext.jsx'
 
 export default function App() {
-  const { user, loading, logout } = useAuth()
+  const { user, loading, logout, maintenance } = useAuth()
   const navigate = useNavigate()
 
   async function handleLogout() {
@@ -12,6 +12,12 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', lineHeight: 1.6 }}>
+      {maintenance && maintenance.enabled && (
+        <MaintenanceBanner
+          message={maintenance.message}
+          isAdmin={user?.role === 'admin' || user?.role === 'super_admin'}
+        />
+      )}
       <header
         style={{
           display: 'flex',
@@ -66,6 +72,41 @@ export default function App() {
       <main style={{ padding: '2rem' }}>
         <Outlet />
       </main>
+    </div>
+  )
+}
+
+// Site-wide maintenance banner. Shown whenever AuthContext reports
+// maintenance.enabled === true. Two slightly different messages depending
+// on whether the viewer is an admin (who can still use admin pages and
+// reach the diagnostics toggle) versus a regular user (whose API calls
+// will be rejected with 503).
+function MaintenanceBanner({ message, isAdmin }) {
+  return (
+    <div
+      role="alert"
+      style={{
+        background: '#fde68a',
+        color: '#78350f',
+        borderBottom: '2px solid #d97706',
+        padding: '0.6rem 1.5rem',
+        textAlign: 'center',
+        fontSize: '0.9rem',
+        fontWeight: 'bold'
+      }}
+    >
+      ⚠ {message || 'Site is temporarily unavailable for maintenance.'}{' '}
+      {isAdmin ? (
+        <span style={{ fontWeight: 'normal' }}>
+          (You retain admin access — toggle this off from the Diagnostics
+          page when finished.)
+        </span>
+      ) : (
+        <span style={{ fontWeight: 'normal' }}>
+          Most features are temporarily disabled — try again in a few
+          minutes.
+        </span>
+      )}
     </div>
   )
 }

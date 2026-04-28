@@ -266,14 +266,20 @@ router.post('/logout', async (req, res) => {
 
 router.get('/me', async (req, res) => {
   try {
+    // Maintenance state is exposed here so the SPA learns about it on
+    // initial page load (the AuthContext fetches /me on mount). Bundling
+    // it into this response avoids needing a separate always-public
+    // /api/health endpoint that the rate limiter would have to skip.
+    const maintenance = require('./maintenanceState').getState();
+
     if (!req.session || !req.session.userId) {
-      return res.json({ user: null });
+      return res.json({ user: null, maintenance });
     }
     const [rows] = await pool.query(
       'SELECT id, email, role FROM users WHERE id = ?',
       [req.session.userId]
     );
-    res.json({ user: sanitizeUser(rows[0]) });
+    res.json({ user: sanitizeUser(rows[0]), maintenance });
   } catch (error) {
     console.error('Current-user lookup failed:', error);
     res.status(500).json({ error: 'Failed to fetch current user' });
