@@ -19,16 +19,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
 
@@ -445,46 +435,38 @@ export default function Diagnostics() {
         }}
       >
         <ChartCard title="Requests / sec (and errors)">
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={reqSeries}>
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="tLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="reqPerSec" stroke="#4f46e5" dot={false} name="req/s" isAnimationActive={false} />
-              <Line type="monotone" dataKey="failedPerSec" stroke="#b91c1c" dot={false} name="failed/s" isAnimationActive={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChart
+            data={reqSeries}
+            formatY={(v) => formatCount(v)}
+            series={[
+              { key: 'reqPerSec', label: 'req/s', color: '#4f46e5' },
+              { key: 'failedPerSec', label: 'failed/s', color: '#b91c1c' }
+            ]}
+          />
         </ChartCard>
 
         <ChartCard title="Latency (ms)">
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={latencySeries}>
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="tLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="mean" stroke="#9ca3af" dot={false} name="mean" isAnimationActive={false} />
-              <Line type="monotone" dataKey="p50" stroke="#0ea5e9" dot={false} name="p50" isAnimationActive={false} />
-              <Line type="monotone" dataKey="p95" stroke="#f59e0b" dot={false} name="p95" isAnimationActive={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChart
+            data={latencySeries}
+            formatY={(v) => `${Math.round(v)}ms`}
+            series={[
+              { key: 'mean', label: 'mean', color: '#9ca3af' },
+              { key: 'p50', label: 'p50', color: '#0ea5e9' },
+              { key: 'p95', label: 'p95', color: '#f59e0b' }
+            ]}
+          />
         </ChartCard>
 
         <ChartCard title="Server CPU & memory (%)">
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={systemSeries}>
-              <CartesianGrid stroke="#e5e7eb" />
-              <XAxis dataKey="tLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 10 }} domain={[0, 100]} />
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="cpuPercent" stroke="#dc2626" dot={false} name="CPU %" isAnimationActive={false} />
-              <Line type="monotone" dataKey="memPercent" stroke="#059669" dot={false} name="Mem %" isAnimationActive={false} />
-            </LineChart>
-          </ResponsiveContainer>
+          <LineChart
+            data={systemSeries}
+            yMax={100}
+            formatY={(v) => `${Math.round(v)}%`}
+            series={[
+              { key: 'cpuPercent', label: 'CPU %', color: '#dc2626' },
+              { key: 'memPercent', label: 'Mem %', color: '#059669' }
+            ]}
+          />
         </ChartCard>
       </div>
 
@@ -656,4 +638,190 @@ function SummaryStat({ label, value }) {
       </div>
     </div>
   )
+}
+
+function formatCount(v) {
+  if (v >= 1000) return `${(v / 1000).toFixed(1)}k`
+  if (v >= 100) return v.toFixed(0)
+  if (v >= 10) return v.toFixed(0)
+  if (v >= 1) return v.toFixed(1)
+  return v.toFixed(2)
+}
+
+// --- LineChart --------------------------------------------------------------
+//
+// Lightweight SVG line chart. Replaces the previously-used recharts library
+// because tree-shaking ~200 polar/radial chart files we never use was
+// bringing the t3.micro Vite build to its knees. This implementation is
+// ~150 lines, has no dependencies, and bundles into the page chunk for
+// effectively no cost.
+//
+// Props:
+//   data    - Array of { tLabel, ...numericSeries }. tLabel is the X-axis
+//             label (we use "MM:SS" wallclock). Y values are read by key.
+//   series  - Array of { key, label, color }. One <path> per entry.
+//   height  - SVG height in px. Width auto-fills the container via
+//             ResizeObserver.
+//   yMax    - Optional fixed Y ceiling. If null, computed from data with
+//             10% headroom.
+//   formatY - (number) => string for Y-axis tick labels.
+
+function LineChart({ data, series, height = 220, yMax = null, formatY = defaultFormatY }) {
+  const containerRef = useRef(null)
+  const [width, setWidth] = useState(0)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const measure = () => setWidth(el.getBoundingClientRect().width)
+    measure()
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(measure)
+      ro.observe(el)
+      return () => ro.disconnect()
+    }
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  const padding = { top: 8, right: 8, bottom: 24, left: 44 }
+  const innerW = Math.max(60, width - padding.left - padding.right)
+  const innerH = height - padding.top - padding.bottom
+
+  // Resolve Y ceiling.
+  let computedMax = yMax
+  if (computedMax == null) {
+    let m = 0
+    for (const d of data) {
+      for (const s of series) {
+        const v = d[s.key]
+        if (typeof v === 'number' && v > m) m = v
+      }
+    }
+    computedMax = Math.max(1, m * 1.1)
+  }
+
+  const xFor = (i) =>
+    padding.left +
+    (data.length > 1 ? (i / (data.length - 1)) * innerW : innerW / 2)
+  const yFor = (v) => {
+    const clipped = Math.max(0, Math.min(computedMax, v || 0))
+    return padding.top + innerH - (clipped / computedMax) * innerH
+  }
+
+  const yTickFractions = [0, 0.25, 0.5, 0.75, 1]
+  const yTicks = yTickFractions.map((t) => t * computedMax)
+
+  const paths = series.map((s) => {
+    if (data.length === 0) return { ...s, d: '' }
+    const cmds = data.map((d, i) => {
+      const v = typeof d[s.key] === 'number' ? d[s.key] : 0
+      return `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yFor(v).toFixed(1)}`
+    })
+    return { ...s, d: cmds.join(' ') }
+  })
+
+  let xTickIdx = []
+  if (data.length === 1) {
+    xTickIdx = [0]
+  } else if (data.length >= 2) {
+    xTickIdx = [0, Math.floor((data.length - 1) / 2), data.length - 1].filter(
+      (v, i, arr) => arr.indexOf(v) === i
+    )
+  }
+
+  return (
+    <div ref={containerRef} style={{ width: '100%' }}>
+      {width > 0 ? (
+        <svg width={width} height={height} style={{ display: 'block' }}>
+          {/* Horizontal grid lines + Y labels */}
+          {yTicks.map((v, i) => (
+            <g key={i}>
+              <line
+                x1={padding.left}
+                y1={yFor(v)}
+                x2={padding.left + innerW}
+                y2={yFor(v)}
+                stroke="#e5e7eb"
+                strokeWidth="1"
+              />
+              <text
+                x={padding.left - 6}
+                y={yFor(v)}
+                textAnchor="end"
+                dominantBaseline="middle"
+                fontSize="10"
+                fill="#6b7280"
+              >
+                {formatY(v)}
+              </text>
+            </g>
+          ))}
+          {/* X axis labels */}
+          {xTickIdx.map((i) => (
+            <text
+              key={i}
+              x={xFor(i)}
+              y={height - padding.bottom + 14}
+              textAnchor="middle"
+              fontSize="10"
+              fill="#6b7280"
+            >
+              {data[i].tLabel}
+            </text>
+          ))}
+          {/* Series lines */}
+          {paths.map((p, idx) => (
+            <path
+              key={idx}
+              d={p.d}
+              stroke={p.color}
+              fill="none"
+              strokeWidth={1.8}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          ))}
+        </svg>
+      ) : (
+        <div style={{ height }} />
+      )}
+      {/* Legend */}
+      <div
+        style={{
+          display: 'flex',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+          fontSize: '0.7rem',
+          marginTop: '0.25rem',
+          justifyContent: 'center',
+          color: '#374151'
+        }}
+      >
+        {series.map((s) => (
+          <div
+            key={s.key}
+            style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}
+          >
+            <span
+              style={{
+                display: 'inline-block',
+                width: 12,
+                height: 2,
+                background: s.color
+              }}
+            />
+            {s.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function defaultFormatY(v) {
+  if (Math.abs(v) >= 1000) return v.toFixed(0)
+  if (Math.abs(v) >= 10) return v.toFixed(0)
+  if (Math.abs(v) >= 1) return v.toFixed(1)
+  return v.toFixed(2)
 }
