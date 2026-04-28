@@ -377,11 +377,18 @@ router.post('/run', requireSuperAdmin, (req, res) => {
   };
   activeRuns.set(runId, run);
 
+  // Register this runId so requests carrying it as an X-Diagnostic-Run
+  // header bypass the maintenance middleware. We unregister on close /
+  // error so the bypass can never outlive the test that needed it.
+  maintenanceState.registerRunId(runId);
+
   // --quiet drops the ASCII banner and the progress bar, keeping the JSON
-  // stream clean. We log via our own SSE channel anyway.
+  // stream clean. We log via our own SSE channel anyway. DIAG_RUN_ID is
+  // read by each k6 script from __ENV.DIAG_RUN_ID and attached as a
+  // request header so the maintenance middleware lets the test through.
   const proc = spawn('k6', ['run', '--out', 'json=-', '--quiet', meta.file], {
     cwd: REPO_ROOT,
-    env: { ...process.env }
+    env: { ...process.env, DIAG_RUN_ID: runId }
   });
   run.proc = proc;
 
@@ -508,6 +515,8 @@ router.post('/run', requireSuperAdmin, (req, res) => {
         `[diagnostics] auto-disabling maintenance after run ${runId}`
       );
     }
+    // Always unregister the runId so a stale id can't bypass maintenance.
+    maintenanceState.unregisterRunId(runId);
 
     broadcast(run, {
       type: 'run_ended',
@@ -539,11 +548,12 @@ router.post('/run', requireSuperAdmin, (req, res) => {
       text: `spawn error: ${err.message}`
     });
     // If spawn itself failed, the close handler will still fire — but
-    // belt-and-suspenders: never leave maintenance on after a failed
-    // spawn that we triggered.
+    // belt-and-suspenders: never leave maintenance on or a runId
+    // registered after a failed spawn that we triggered.
     if (run.didEnableMaintenance && maintenanceState.isEnabled()) {
       maintenanceState.disable();
     }
+    maintenanceState.unregisterRunId(runId);
   });
 
   res.json({ runId, scriptName, label: meta.label });

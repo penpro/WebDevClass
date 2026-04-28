@@ -21,6 +21,14 @@ let message =
   'The site is temporarily unavailable while a load test is in progress.';
 let enabledAt = null;
 
+// Set of currently-active diagnostic run IDs. The server.js maintenance
+// middleware bypasses requests carrying an X-Diagnostic-Run: <id> header
+// whose id is in this set, so the load test traffic spawned by the
+// diagnostics router can reach the real /api/messages handler even while
+// maintenance is on for everyone else. The diagnostics router adds and
+// removes ids around each run.
+const activeRunIds = new Set();
+
 module.exports = {
   isEnabled() {
     return enabled;
@@ -38,5 +46,14 @@ module.exports = {
     enabled = false;
     enabledAt = null;
     return { enabled, message, enabledAt };
+  },
+  registerRunId(id) {
+    if (id) activeRunIds.add(String(id));
+  },
+  unregisterRunId(id) {
+    if (id) activeRunIds.delete(String(id));
+  },
+  isActiveRunId(id) {
+    return id != null && activeRunIds.has(String(id));
   }
 };

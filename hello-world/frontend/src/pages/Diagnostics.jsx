@@ -56,6 +56,9 @@ export default function Diagnostics() {
   const [maintenanceEnabled, setMaintenanceEnabled] = useState(false)
   const [maintenanceLoading, setMaintenanceLoading] = useState(false)
 
+  // Copy-button feedback state: 'idle' | 'copied' | 'error'.
+  const [copyState, setCopyState] = useState('idle')
+
   const eventSourceRef = useRef(null)
   const logBoxRef = useRef(null)
 
@@ -314,6 +317,20 @@ export default function Diagnostics() {
     } finally {
       setLimiterLoading(false)
     }
+  }
+
+  async function handleCopyLog() {
+    if (logs.length === 0) return
+    const text = logs.map((l) => l.text).join('\n')
+    try {
+      // navigator.clipboard requires a secure context (HTTPS), which
+      // we have, plus a transient user activation, which a click is.
+      await navigator.clipboard.writeText(text)
+      setCopyState('copied')
+    } catch {
+      setCopyState('error')
+    }
+    setTimeout(() => setCopyState('idle'), 2000)
   }
 
   async function handleToggleMaintenance() {
@@ -703,10 +720,56 @@ export default function Diagnostics() {
             padding: '0.5rem 0.75rem',
             fontSize: '0.85rem',
             borderTopLeftRadius: 8,
-            borderTopRightRadius: 8
+            borderTopRightRadius: 8,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}
         >
-          Log output ({logs.length} line{logs.length === 1 ? '' : 's'})
+          <span>
+            Log output ({logs.length} line{logs.length === 1 ? '' : 's'})
+          </span>
+          <button
+            type="button"
+            onClick={handleCopyLog}
+            disabled={logs.length === 0}
+            title={logs.length === 0 ? 'No log to copy' : 'Copy log output'}
+            style={{
+              background: 'transparent',
+              color: copyState === 'copied' ? '#34d399' : '#e5e7eb',
+              border: '1px solid ' + (copyState === 'copied' ? '#34d399' : '#374151'),
+              padding: '0.25rem 0.6rem',
+              borderRadius: 4,
+              fontSize: '0.75rem',
+              cursor: logs.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: logs.length === 0 ? 0.5 : 1,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem'
+            }}
+          >
+            {/* Lucide-style "copy" icon (two stacked rectangles) */}
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            {copyState === 'copied'
+              ? 'Copied'
+              : copyState === 'error'
+              ? 'Copy failed'
+              : 'Copy'}
+          </button>
         </div>
         <div
           ref={logBoxRef}

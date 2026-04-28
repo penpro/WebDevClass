@@ -39,8 +39,16 @@ export const options = {
 
 const BASE_URL = __ENV.BASE_URL || 'https://penumbrapro.duckdns.org'
 
+// Bypass maintenance mode when launched from the diagnostics router.
+// Critical for this script in particular: it auto-enables maintenance,
+// and without the header every request would hit the 503 path instead
+// of the actual app — turning the test into a measurement of the
+// maintenance middleware's throughput, not the application ceiling.
+const RUN_ID = __ENV.DIAG_RUN_ID || ''
+const params = RUN_ID ? { headers: { 'X-Diagnostic-Run': RUN_ID } } : {}
+
 export default function () {
-  const res = http.get(`${BASE_URL}/api/messages`)
+  const res = http.get(`${BASE_URL}/api/messages`, params)
 
   check(res, {
     'status is 200': (r) => r.status === 200

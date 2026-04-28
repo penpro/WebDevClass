@@ -33,8 +33,16 @@ export const options = {
 
 const BASE_URL = __ENV.BASE_URL || 'https://penumbrapro.duckdns.org'
 
+// When the diagnostics router spawns k6 it sets DIAG_RUN_ID. We pass it
+// back as a header so requests bypass maintenance mode for the duration
+// of this run — without the header maintenance returns 503 to everything.
+// Manual `k6 run` from the CLI has no DIAG_RUN_ID and that's fine; you
+// just need maintenance to be off in that case.
+const RUN_ID = __ENV.DIAG_RUN_ID || ''
+const params = RUN_ID ? { headers: { 'X-Diagnostic-Run': RUN_ID } } : {}
+
 export default function () {
-  const res = http.get(`${BASE_URL}/`)
+  const res = http.get(`${BASE_URL}/`, params)
 
   check(res, {
     'status is 200': (r) => r.status === 200,

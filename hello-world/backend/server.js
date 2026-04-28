@@ -177,6 +177,17 @@ app.use((req, res, next) => {
   for (const prefix of MAINTENANCE_BYPASS) {
     if (req.path.startsWith(prefix)) return next();
   }
+  // Load-test traffic spawned by the diagnostics router carries an
+  // X-Diagnostic-Run header whose value matches an active run id. We
+  // let it through so the test actually hits the real endpoint instead
+  // of measuring the throughput of this 503 path. An attacker who
+  // forges a stale id sees nothing useful — only currently-running
+  // ids match — and the worst-case is they get to bypass the
+  // administrative maintenance flag, which is not a security boundary.
+  const diagRun = req.headers['x-diagnostic-run'];
+  if (diagRun && maintenanceState.isActiveRunId(diagRun)) {
+    return next();
+  }
   res
     .status(503)
     .set('Retry-After', '60')
