@@ -12,6 +12,7 @@ const boardsRouter = require('./boards');
 const tasksRouter = require('./tasks');
 const adminRouter = require('./admin');
 const diagnosticsRouter = require('./diagnostics');
+const rateLimiterState = require('./rateLimiterState');
 const {
   router: paymentsRouter,
   webhookHandler: paymentsWebhookHandler
@@ -45,19 +46,18 @@ app.use(express.json());
 // Three tiers keyed by the client's IP (which nginx passes via
 // X-Forwarded-For, interpreted by trust proxy above).
 //
-// All four limiters honor a DISABLE_RATE_LIMITS=true escape hatch via
-// the express-rate-limit `skip` option. That's intended for load testing
-// only — when set, every limiter passes through with no checking, so we
-// can measure the actual application/DB ceiling without 429s in the way.
-// Toggling requires a `pm2 restart hello-backend` to pick up the new env.
-const rateLimitsDisabled = process.env.DISABLE_RATE_LIMITS === 'true';
-if (rateLimitsDisabled) {
+// All four limiters honor a runtime-mutable "disabled" flag via the
+// express-rate-limit `skip` option. The flag's initial value comes from
+// the DISABLE_RATE_LIMITS env var (see rateLimiterState.js), and can also
+// be flipped at runtime by the super-admin diagnostics endpoints. Each
+// request invokes skip() so it always reads the current value.
+if (rateLimiterState.isDisabled()) {
   console.warn(
     'WARNING: rate limits are DISABLED (DISABLE_RATE_LIMITS=true). ' +
     'Use only for load testing — unset and restart for production.'
   );
 }
-const skipIfDisabled = () => rateLimitsDisabled;
+const skipIfDisabled = () => rateLimiterState.isDisabled();
 
 // Global safety net: 100 requests per minute per IP across all API routes.
 // Generous enough to never bother a real user; tight enough to slow a

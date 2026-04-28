@@ -28,6 +28,7 @@ const { spawn } = require('child_process');
 const crypto = require('crypto');
 
 const { requireSuperAdmin } = require('./auth');
+const rateLimiterState = require('./rateLimiterState');
 
 const router = express.Router();
 
@@ -63,8 +64,21 @@ const SCRIPTS = {
       'Ramp from 10 to 100 concurrent VUs over 3 minutes with no sleep. ' +
       'Designed to find the breaking point. With the rate limiter on you ' +
       'will see a flood of 429s — that\'s by design, the limiter is the ' +
-      'first bottleneck.',
+      'first bottleneck. Toggle the limiter off below to measure the ' +
+      'actual app/DB ceiling instead.',
     expectedDurationSeconds: 180
+  },
+  'api-overload': {
+    file: path.join(LOADTESTS_DIR, 'api-overload.js'),
+    label: 'API overload (ramp 50 to 500 VUs) — TRUE LIMIT',
+    description:
+      'Aggressive ramp 50 -> 200 -> 500 -> 0 over 4 minutes hitting ' +
+      '/api/messages with no sleep. Designed to find the actual t3.micro ' +
+      'ceiling, not the rate-limiter ceiling. Strongly recommended to ' +
+      'disable the rate limiter via the toggle below — otherwise you are ' +
+      'just measuring how fast the limiter returns 429s under siege. ' +
+      'Watch the CPU chart pin to 100% and the latency curve inflect.',
+    expectedDurationSeconds: 240
   }
 };
 
@@ -235,6 +249,28 @@ function computeFinalSummary(run) {
 }
 
 // --- Routes ---------------------------------------------------------------
+
+// GET /api/admin/diagnostics/limiter
+// Returns the current state of the runtime rate-limit-disabled flag.
+router.get('/limiter', requireSuperAdmin, (req, res) => {
+  res.json({ disabled: rateLimiterState.isDisabled() });
+});
+
+// POST /api/admin/diagnostics/limiter  body: { disabled: boolean }
+// Flips the runtime rate-limit-disabled flag. Logs to stderr so there's a
+// durable trail of who toggled it (PM2 captures stderr to its log file).
+router.post('/limiter', requireSuperAdmin, (req, res) => {
+  const value = !!req.body.disabled;
+  const wasDisabled = rateLimiterState.isDisabled();
+  rateLimiterState.setDisabled(value);
+  if (wasDisabled !== value) {
+    console.warn(
+      `[diagnostics] super_admin id=${req.session.userId} set rate ` +
+        `limiter to ${value ? 'DISABLED' : 'ENABLED'}`
+    );
+  }
+  res.json({ disabled: rateLimiterState.isDisabled() });
+});
 
 // GET /api/admin/diagnostics/scripts
 // Returns the static metadata for available scripts.

@@ -45,6 +45,11 @@ export default function Diagnostics() {
   const [summary, setSummary] = useState(null)
   const [error, setError] = useState(null)
 
+  // Live mirror of the backend's runtime rate-limit-disabled flag. Loaded
+  // on mount and updated optimistically when the user clicks the toggle.
+  const [limiterDisabled, setLimiterDisabled] = useState(false)
+  const [limiterLoading, setLimiterLoading] = useState(false)
+
   const eventSourceRef = useRef(null)
   const logBoxRef = useRef(null)
 
@@ -59,6 +64,13 @@ export default function Diagnostics() {
       })
       .catch((err) => setScriptsError(err.message))
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Fetch the current rate-limiter state on mount.
+  useEffect(() => {
+    apiFetch('/admin/diagnostics/limiter')
+      .then((data) => setLimiterDisabled(!!data.disabled))
+      .catch(() => {})
   }, [])
 
   // Re-attach to an active run (e.g. after page reload).
@@ -265,6 +277,24 @@ export default function Diagnostics() {
     }
   }
 
+  async function handleToggleLimiter() {
+    if (isRunning || limiterLoading) return
+    const next = !limiterDisabled
+    setLimiterLoading(true)
+    setError(null)
+    try {
+      const data = await apiFetch('/admin/diagnostics/limiter', {
+        method: 'POST',
+        body: JSON.stringify({ disabled: next })
+      })
+      setLimiterDisabled(!!data.disabled)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLimiterLoading(false)
+    }
+  }
+
   const isRunning = runStatus === 'running' || runStatus === 'starting'
   const selectedMeta = scripts && scripts.find((s) => s.key === selectedScript)
 
@@ -284,6 +314,25 @@ export default function Diagnostics() {
         <p style={{ color: 'crimson' }}>
           Failed to load script list: {scriptsError}
         </p>
+      )}
+
+      {limiterDisabled && (
+        <div
+          style={{
+            background: '#fef2f2',
+            border: '1px solid #fca5a5',
+            color: '#991b1b',
+            padding: '0.6rem 0.85rem',
+            borderRadius: 6,
+            fontSize: '0.85rem',
+            marginBottom: '1rem'
+          }}
+        >
+          <strong>Rate limiter is DISABLED.</strong> All API endpoints are
+          currently unprotected from request flooding. Toggle back to ON
+          when you're done load testing — this state persists until you
+          flip it back or the backend is restarted.
+        </div>
       )}
 
       {/* --- Script picker -------------------------------------------- */}
@@ -348,7 +397,15 @@ export default function Diagnostics() {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '0.5rem',
+            marginTop: '1rem',
+            alignItems: 'center',
+            flexWrap: 'wrap'
+          }}
+        >
           <button
             type="button"
             onClick={handleStart}
@@ -383,6 +440,50 @@ export default function Diagnostics() {
               Stop
             </button>
           )}
+
+          {/* Rate limiter toggle pushed to the right of the row. */}
+          <div
+            style={{
+              marginLeft: 'auto',
+              display: 'flex',
+              gap: '0.5rem',
+              alignItems: 'center',
+              fontSize: '0.85rem'
+            }}
+          >
+            <span style={{ color: '#374151' }}>Rate limiter:</span>
+            <button
+              type="button"
+              onClick={handleToggleLimiter}
+              disabled={isRunning || limiterLoading}
+              title={
+                isRunning
+                  ? 'Cannot change while a test is running'
+                  : limiterDisabled
+                  ? 'Click to re-enable rate limiting'
+                  : 'Click to disable rate limiting (load testing only)'
+              }
+              style={{
+                background: limiterDisabled ? '#fee2e2' : '#d1fae5',
+                color: limiterDisabled ? '#991b1b' : '#065f46',
+                border:
+                  '1px solid ' + (limiterDisabled ? '#fca5a5' : '#86efac'),
+                padding: '0.3rem 0.75rem',
+                borderRadius: 999,
+                fontSize: '0.78rem',
+                fontWeight: 'bold',
+                cursor:
+                  isRunning || limiterLoading ? 'not-allowed' : 'pointer',
+                opacity: isRunning || limiterLoading ? 0.6 : 1
+              }}
+            >
+              {limiterLoading
+                ? '…'
+                : limiterDisabled
+                ? 'OFF — click to enable'
+                : 'ON — click to disable'}
+            </button>
+          </div>
         </div>
 
         {error && <p style={{ color: 'crimson', marginTop: '0.5rem' }}>{error}</p>}
