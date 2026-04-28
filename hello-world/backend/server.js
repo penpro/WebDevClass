@@ -43,6 +43,20 @@ app.use(express.json());
 // ---------------------------------------------------------------------------
 // Three tiers keyed by the client's IP (which nginx passes via
 // X-Forwarded-For, interpreted by trust proxy above).
+//
+// All four limiters honor a DISABLE_RATE_LIMITS=true escape hatch via
+// the express-rate-limit `skip` option. That's intended for load testing
+// only — when set, every limiter passes through with no checking, so we
+// can measure the actual application/DB ceiling without 429s in the way.
+// Toggling requires a `pm2 restart hello-backend` to pick up the new env.
+const rateLimitsDisabled = process.env.DISABLE_RATE_LIMITS === 'true';
+if (rateLimitsDisabled) {
+  console.warn(
+    'WARNING: rate limits are DISABLED (DISABLE_RATE_LIMITS=true). ' +
+    'Use only for load testing — unset and restart for production.'
+  );
+}
+const skipIfDisabled = () => rateLimitsDisabled;
 
 // Global safety net: 100 requests per minute per IP across all API routes.
 // Generous enough to never bother a real user; tight enough to slow a
@@ -52,7 +66,8 @@ const globalLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many requests — please wait a moment' }
+  message: { error: 'Too many requests — please wait a moment' },
+  skip: skipIfDisabled
 });
 app.use('/api', globalLimiter);
 
@@ -65,7 +80,8 @@ const authMutationLimiter = rateLimit({
   max: 10,                   // 10 attempts per 15 min per IP
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many attempts — please try again later' }
+  message: { error: 'Too many attempts — please try again later' },
+  skip: skipIfDisabled
 });
 
 // Forgot-password is even tighter to limit email spam potential.
@@ -74,7 +90,8 @@ const forgotPasswordLimiter = rateLimit({
   max: 5,                   // 5 requests per hour per IP
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many password reset requests — please try again later' }
+  message: { error: 'Too many password reset requests — please try again later' },
+  skip: skipIfDisabled
 });
 
 // Admin routes: moderate limiter. Admins are trusted but the endpoints
@@ -85,7 +102,8 @@ const adminLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Admin rate limit exceeded' }
+  message: { error: 'Admin rate limit exceeded' },
+  skip: skipIfDisabled
 });
 
 // ---------------------------------------------------------------------------
