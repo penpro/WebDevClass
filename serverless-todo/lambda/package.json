@@ -1,0 +1,7 @@
+{
+  "name": "serverless-todo-lambda",
+  "version": "1.0.0",
+  "description": "AWS Lambda handler for the serverless-todo class assignment",
+  "main": "index.js",
+  "private": true
+}
