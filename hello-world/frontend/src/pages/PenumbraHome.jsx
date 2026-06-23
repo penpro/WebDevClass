@@ -1,14 +1,20 @@
-// Penumbra Tech landing page.
+// Penumbra Tech landing page — second pass.
 //
-// Structure (top to bottom):
-//   * Hero — name, tagline, value prop, primary CTA
-//   * Services — three to four service cards
-//   * Featured work — small grid pulled from the projects index
-//   * Closing CTA — "Have a project?" prompt
+// This version pulls in the streaming overlay's visual vocabulary so the
+// website actually feels like Penumbra rather than a generic dark-mode
+// portfolio. The signature elements:
 //
-// The hero deliberately lives flush against the navbar so the dark
-// circuit background carries the eye all the way down. Subsequent
-// sections use the surfaceMuted background to create rhythm.
+//   * Eclipse SVG anchored to the right of the hero
+//   * Starfield behind everything in the hero section
+//   * Corner brackets framing the hero region
+//   * HUD-style bracketed monospace eyebrow labels
+//   * A real code panel below the hero (an actual snippet from the
+//     diagnostics SSE handler) as visible proof of "real code, not
+//     stock photos"
+//   * Magenta highlight word in the headline (the "BeginPlay()" treatment)
+//
+// Below the hero the layout follows the original structure: a 4-card
+// services grid, a featured-work row, and a closing CTA.
 
 import { Link } from 'react-router-dom';
 import {
@@ -22,7 +28,11 @@ import {
 import Container from '../components/Container.jsx';
 import Button from '../components/Button.jsx';
 import Card from '../components/Card.jsx';
-import CircuitBackground from '../components/CircuitBackground.jsx';
+import Eclipse from '../components/Eclipse.jsx';
+import Stars from '../components/Stars.jsx';
+import CornerBrackets from '../components/CornerBrackets.jsx';
+import HudLabel from '../components/HudLabel.jsx';
+import CodePanel from '../components/CodePanel.jsx';
 
 const SERVICES = [
   {
@@ -33,7 +43,7 @@ const SERVICES = [
   },
   {
     icon: CloudIcon,
-    title: 'Cloud &amp; backend',
+    title: 'Cloud & backend',
     body:
       'AWS deployments, MySQL and DynamoDB, CI/CD pipelines, and the operational glue that keeps a service running at 3am without paging anyone.'
   },
@@ -45,7 +55,7 @@ const SERVICES = [
   },
   {
     icon: ShieldIcon,
-    title: 'Performance &amp; reliability',
+    title: 'Performance & reliability',
     body:
       'Load testing, security hardening, incident response. I find where your stack breaks before your users do.'
   }
@@ -53,27 +63,52 @@ const SERVICES = [
 
 const FEATURED = [
   {
-    to: '/projects/diagnostics',
+    to: '/admin-portal/diagnostics',
     badge: 'Performance engineering',
     title: 'Diagnostics & load-testing dashboard',
     body:
       'A live k6 test runner with SSE-streamed charts, runtime rate-limit and maintenance toggles, and a 128-bit bypass token model. Measured the actual ceiling of a t3.micro at ~1000 req/s.'
   },
   {
-    to: '/projects/tasktrackr',
+    to: '/tasktrackr',
     badge: 'Full-stack web app',
     title: 'TaskTrackr',
     body:
       'Task manager with category filtering, auto-saving edits, Facebook-style progress feed, and a role-aware multer uploader gated behind Stripe Subscriptions.'
   },
   {
-    to: '/projects/moodboard',
+    to: '/moodboard',
     badge: 'Web app + canvas',
     title: 'MoodBoard',
     body:
       'Image-URL boards with public share links and a client-side collage generator — seeded layouts, cover-crop drawing, and pastel accent fills computed from neighbouring images.'
   }
 ];
+
+// Real snippet from diagnostics.js — the SSE bucket flusher that
+// powers the live latency charts. Functional code; not a mock.
+const HERO_CODE = `// 1-second SSE flush — keeps the chart smooth even at 1500 req/s.
+function flushK6Bucket(run, now) {
+  const a = run.k6Bucket;
+  if (a.count === 0) return;
+
+  const sorted = a.durations.slice().sort((x, y) => x - y);
+  const p50 = sorted[Math.floor(sorted.length * 0.5)];
+  const p95 = sorted[Math.floor(sorted.length * 0.95)];
+  const mean = sorted.reduce((s, v) => s + v, 0) / sorted.length;
+
+  broadcast(run, {
+    type: 'k6_bucket',
+    t: now,
+    reqCount: a.count,
+    failedCount: a.failedCount,
+    p50, p95, mean
+  });
+
+  a.durations.length = 0;
+  a.count = 0;
+  a.failedCount = 0;
+}`;
 
 export default function PenumbraHome() {
   return (
@@ -85,97 +120,205 @@ export default function PenumbraHome() {
           overflow: 'hidden',
           paddingTop: space['4xl'],
           paddingBottom: space['4xl'],
+          minHeight: '78vh',
+          display: 'flex',
+          alignItems: 'center',
           borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <CircuitBackground opacity={0.1} color={colors.accent} />
+        <Stars density={220} heroDensity={20} colorTint="mixed" />
+        <CornerBrackets size={36} inset={32} />
 
-        <Container style={{ position: 'relative' }}>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: space.xs,
-              padding: '0.35rem 0.75rem',
-              borderRadius: radii.full,
-              background: colors.accentMuted,
-              border: `1px solid ${colors.accent}`,
-              color: colors.cyan,
-              fontFamily: fonts.mono,
-              fontSize: fontSizes.xs,
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-              marginBottom: space.lg
-            }}
-          >
-            <span
+        {/* Eclipse positioned to the right, partially off-canvas so it
+            reads as a presence rather than a literal logo placement.
+            On narrow viewports it slides further off and dims. */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            right: '-12%',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            zIndex: 0
+          }}
+          className="penumbra-eclipse-wrap"
+        >
+          <Eclipse size={620} glow={84} />
+        </div>
+
+        <Container style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+          <div style={{ maxWidth: '36rem' }}>
+            <HudLabel tone="cyan" live>
+              Now booking — Q3 2026
+            </HudLabel>
+
+            <h1
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: radii.full,
-                background: colors.success,
-                display: 'inline-block'
+                fontFamily: fonts.heading,
+                fontSize: 'clamp(2.5rem, 5.5vw, 5rem)',
+                fontWeight: fontWeights.bold,
+                lineHeight: 1.04,
+                letterSpacing: '-0.025em',
+                margin: `${space.lg} 0 0`,
+                color: colors.text
               }}
-            />
-            Now booking projects
-          </span>
+            >
+              Reliable code.{' '}
+              <span
+                style={{
+                  color: colors.magenta,
+                  textShadow: `0 0 28px rgba(192, 132, 252, 0.45)`,
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Real impact.
+              </span>
+            </h1>
 
-          <h1
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: 'clamp(2.25rem, 5vw, 4.5rem)',
-              fontWeight: fontWeights.bold,
-              lineHeight: 1.05,
-              letterSpacing: '-0.02em',
-              margin: 0,
-              maxWidth: '18ch'
-            }}
-          >
-            Reliable code.{' '}
-            <span style={{ color: colors.accent }}>Real impact.</span>
-          </h1>
+            <p
+              style={{
+                marginTop: space.lg,
+                maxWidth: '38rem',
+                fontSize: fontSizes.lg,
+                lineHeight: 1.6,
+                color: colors.textSecondary
+              }}
+            >
+              Penumbra Tech is a one-person consultancy that helps
+              freelancers and small businesses turn complex problems into
+              clean software and reliable systems. Web apps, cloud
+              infrastructure, game development, and the operational glue
+              that keeps it all working.
+            </p>
 
-          <p
-            style={{
-              marginTop: space.lg,
-              maxWidth: '60ch',
-              fontSize: fontSizes.lg,
-              lineHeight: 1.55,
-              color: colors.textSecondary
-            }}
-          >
-            Penumbra Tech is a one-person consultancy that helps
-            freelancers and small businesses turn complex problems into
-            clean software and reliable systems. Web apps, cloud
-            infrastructure, game development, and the operational glue
-            that keeps it all working.
-          </p>
+            <div
+              style={{
+                display: 'flex',
+                gap: space.md,
+                marginTop: space.xl,
+                flexWrap: 'wrap'
+              }}
+            >
+              <Button as={Link} to="/contact" size="lg">
+                Start a project →
+              </Button>
+              <Button as={Link} to="/projects" variant="secondary" size="lg">
+                See the work
+              </Button>
+            </div>
+          </div>
+        </Container>
 
+        {/* Hide the eclipse on narrow viewports — at phone widths the
+            hero text needs the full canvas. */}
+        <style>{`
+          @media (max-width: 900px) {
+            .penumbra-eclipse-wrap { opacity: 0.18; right: -30%; }
+          }
+        `}</style>
+      </section>
+
+      {/* ====================== Code panel "proof" ===================== */}
+      <section
+        style={{
+          background: colors.bgSoft,
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <Container>
           <div
             style={{
-              display: 'flex',
-              gap: space.md,
-              marginTop: space.xl,
-              flexWrap: 'wrap'
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)',
+              gap: space['2xl'],
+              alignItems: 'center'
             }}
+            className="penumbra-code-grid"
           >
-            <Button as={Link} to="/contact" size="lg">
-              Start a project →
-            </Button>
-            <Button as={Link} to="/projects" variant="secondary" size="lg">
-              See the work
-            </Button>
+            <div>
+              <HudLabel tone="corona">Engineering, not slides</HudLabel>
+              <h2
+                style={{
+                  fontFamily: fonts.heading,
+                  fontSize: 'clamp(1.75rem, 3.5vw, 2.75rem)',
+                  fontWeight: fontWeights.bold,
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.02em',
+                  margin: `${space.md} 0 ${space.md}`,
+                  color: colors.text
+                }}
+              >
+                The actual code I write.
+              </h2>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: fontSizes.md,
+                  color: colors.textSecondary,
+                  lineHeight: 1.6,
+                  maxWidth: '40ch'
+                }}
+              >
+                This is a real function from the diagnostics dashboard
+                — the SSE flush that lets the latency chart stream
+                cleanly even when k6 is firing 1,500 req/s. Tight,
+                documented, no framework gymnastics. That&apos;s the
+                style across every project on this site.
+              </p>
+              <div style={{ marginTop: space.lg, display: 'flex', gap: space.md, flexWrap: 'wrap' }}>
+                <Button
+                  as={Link}
+                  to="/admin-portal/diagnostics"
+                  variant="secondary"
+                  size="sm"
+                >
+                  Open the live dashboard →
+                </Button>
+                <Button
+                  as="a"
+                  href="https://github.com/penpro/WebDevClass"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="ghost"
+                  size="sm"
+                >
+                  Source on GitHub ↗
+                </Button>
+              </div>
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <CodePanel
+                filename="diagnostics.js"
+                language="js"
+                code={HERO_CODE}
+                status="LIVE"
+                maxHeight="420px"
+              />
+            </div>
           </div>
+          <style>{`
+            @media (max-width: 900px) {
+              .penumbra-code-grid {
+                grid-template-columns: 1fr !important;
+                gap: 2rem !important;
+              }
+            }
+          `}</style>
         </Container>
       </section>
 
       {/* =========================== Services =========================== */}
       <section
         style={{
-          background: colors.surfaceMuted,
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
-          borderBottom: `1px solid ${colors.borderSubtle}`
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          position: 'relative'
         }}
       >
         <Container>
@@ -206,30 +349,24 @@ export default function PenumbraHome() {
                     marginBottom: space.sm,
                     color: colors.text
                   }}
-                  // dangerouslySetInnerHTML required because some titles
-                  // contain &amp; entities (which JSX won't decode in
-                  // child text the way HTML does).
-                  dangerouslySetInnerHTML={{ __html: service.title }}
-                />
+                >
+                  {service.title}
+                </h3>
                 <p
                   style={{
                     margin: 0,
                     fontSize: fontSizes.sm,
-                    lineHeight: 1.55,
+                    lineHeight: 1.6,
                     color: colors.textSecondary
                   }}
-                  dangerouslySetInnerHTML={{ __html: service.body }}
-                />
+                >
+                  {service.body}
+                </p>
               </Card>
             ))}
           </div>
 
-          <div
-            style={{
-              marginTop: space.xl,
-              textAlign: 'center'
-            }}
-          >
+          <div style={{ marginTop: space.xl, textAlign: 'center' }}>
             <Button as={Link} to="/services" variant="ghost">
               Detailed services breakdown →
             </Button>
@@ -249,6 +386,7 @@ export default function PenumbraHome() {
             eyebrow="Featured work"
             title="Evidence, not promises"
             body="Each project below is live and exercisable. Click through to see the real working software."
+            tone="corona"
           />
 
           <div
@@ -261,18 +399,7 @@ export default function PenumbraHome() {
             }}
           >
             {FEATURED.map((item) => (
-              <Card
-                key={item.to}
-                interactive
-                style={{ display: 'block', textDecoration: 'none' }}
-                {...{
-                  // Render the whole card as a Link without breaking
-                  // Card's prop expectations.
-                  onClick: () => {
-                    window.location.href = item.to;
-                  }
-                }}
-              >
+              <Card key={item.to} interactive>
                 <Link
                   to={item.to}
                   style={{
@@ -287,7 +414,7 @@ export default function PenumbraHome() {
                       fontSize: fontSizes.xs,
                       color: colors.cyan,
                       textTransform: 'uppercase',
-                      letterSpacing: '0.08em'
+                      letterSpacing: '0.12em'
                     }}
                   >
                     {item.badge}
@@ -329,12 +456,7 @@ export default function PenumbraHome() {
             ))}
           </div>
 
-          <div
-            style={{
-              marginTop: space.xl,
-              textAlign: 'center'
-            }}
-          >
+          <div style={{ marginTop: space.xl, textAlign: 'center' }}>
             <Button as={Link} to="/projects" variant="ghost">
               All projects →
             </Button>
@@ -352,12 +474,13 @@ export default function PenumbraHome() {
         }}
       >
         <Container narrow style={{ textAlign: 'center' }}>
+          <HudLabel tone="magenta">Let&apos;s talk</HudLabel>
           <h2
             style={{
               fontFamily: fonts.heading,
               fontSize: fontSizes['2xl'],
               fontWeight: fontWeights.bold,
-              margin: 0,
+              margin: `${space.md} 0 0`,
               color: colors.text
             }}
           >
@@ -368,7 +491,7 @@ export default function PenumbraHome() {
               marginTop: space.md,
               fontSize: fontSizes.md,
               color: colors.textSecondary,
-              lineHeight: 1.55
+              lineHeight: 1.6
             }}
           >
             Send a quick note describing what you&apos;re building or
@@ -405,27 +528,18 @@ export default function PenumbraHome() {
 // -------------------------------------------------------------------- //
 // Small bits.
 
-function SectionHeading({ eyebrow, title, body }) {
+function SectionHeading({ eyebrow, title, body, tone = 'cyan' }) {
   return (
     <div style={{ maxWidth: '60ch' }}>
-      <span
-        style={{
-          fontFamily: fonts.mono,
-          fontSize: fontSizes.xs,
-          color: colors.cyan,
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em'
-        }}
-      >
-        {eyebrow}
-      </span>
+      <HudLabel tone={tone}>{eyebrow}</HudLabel>
       <h2
         style={{
           fontFamily: fonts.heading,
           fontSize: fontSizes['2xl'],
           fontWeight: fontWeights.bold,
-          margin: `${space.sm} 0 ${space.md}`,
-          color: colors.text
+          margin: `${space.md} 0 ${space.md}`,
+          color: colors.text,
+          letterSpacing: '-0.01em'
         }}
       >
         {title}
@@ -435,7 +549,7 @@ function SectionHeading({ eyebrow, title, body }) {
           margin: 0,
           fontSize: fontSizes.md,
           color: colors.textSecondary,
-          lineHeight: 1.55
+          lineHeight: 1.6
         }}
       >
         {body}
@@ -444,8 +558,9 @@ function SectionHeading({ eyebrow, title, body }) {
   );
 }
 
-// Quick inline SVG icons so we don't pull a library. Each is sized at
-// 32px and inherits the accent color from its parent card.
+// Service icons rebuilt as cleaner geometric forms — the previous
+// gamepad and a few others were squished. These all share the same
+// 22px viewBox so they line up in the card grid.
 function IconWrap({ children }) {
   return (
     <div
@@ -454,11 +569,12 @@ function IconWrap({ children }) {
         height: 44,
         borderRadius: radii.md,
         background: colors.accentMuted,
-        border: `1px solid ${colors.accent}`,
+        border: `1px solid ${colors.accentBorder}`,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: colors.accent
+        color: colors.accent,
+        boxShadow: `0 0 16px rgba(94, 234, 212, 0.25) inset`
       }}
     >
       {children}
@@ -470,26 +586,12 @@ function ServerIcon() {
   return (
     <IconWrap>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <rect
-          x="3"
-          y="4"
-          width="18"
-          height="6"
-          rx="1.5"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <rect
-          x="3"
-          y="14"
-          width="18"
-          height="6"
-          rx="1.5"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <circle cx="7" cy="7" r="1" fill="currentColor" />
-        <circle cx="7" cy="17" r="1" fill="currentColor" />
+        <rect x="3" y="4" width="18" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+        <rect x="3" y="14" width="18" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.7" />
+        <circle cx="6.5" cy="7" r="0.9" fill="currentColor" />
+        <circle cx="6.5" cy="17" r="0.9" fill="currentColor" />
+        <line x1="10" y1="7" x2="17" y2="7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        <line x1="10" y1="17" x2="17" y2="17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
       </svg>
     </IconWrap>
   );
@@ -502,7 +604,7 @@ function CloudIcon() {
         <path
           d="M7 18 a4 4 0 0 1 -1 -7.8 a5 5 0 0 1 9.8 -1.2 A4 4 0 0 1 18 18 Z"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.7"
           strokeLinejoin="round"
         />
       </svg>
@@ -510,20 +612,27 @@ function CloudIcon() {
   );
 }
 
+// New, simpler joystick icon — the previous gamepad path rendered
+// uneven. This one is a single d-pad + button cluster, reads cleanly.
 function GamepadIcon() {
   return (
     <IconWrap>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M6 8h12 a4 4 0 0 1 4 4 v0 a4 4 0 0 1 -7 2.5 L13 14 h-2 l-2 0.5 A4 4 0 0 1 2 12 a4 4 0 0 1 4 -4 z"
+        <rect
+          x="2.5"
+          y="7"
+          width="19"
+          height="10"
+          rx="5"
           stroke="currentColor"
-          strokeWidth="2"
-          strokeLinejoin="round"
+          strokeWidth="1.7"
         />
-        <line x1="7" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        <line x1="8" y1="11" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        <circle cx="16" cy="11" r="0.8" fill="currentColor" />
-        <circle cx="17.5" cy="12.5" r="0.8" fill="currentColor" />
+        {/* D-pad on the left */}
+        <line x1="6" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="7.5" y1="10.5" x2="7.5" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Buttons on the right */}
+        <circle cx="15.5" cy="11" r="1.1" fill="currentColor" />
+        <circle cx="17.5" cy="12.8" r="1.1" fill="currentColor" />
       </svg>
     </IconWrap>
   );
@@ -536,13 +645,13 @@ function ShieldIcon() {
         <path
           d="M12 3 L20 6 V12 a8 8 0 0 1 -8 8 a8 8 0 0 1 -8 -8 V6 Z"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.7"
           strokeLinejoin="round"
         />
         <path
           d="M9 12 l2 2 l4 -4"
           stroke="currentColor"
-          strokeWidth="2"
+          strokeWidth="1.7"
           strokeLinecap="round"
           strokeLinejoin="round"
         />

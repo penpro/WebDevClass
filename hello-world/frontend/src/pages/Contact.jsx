@@ -22,6 +22,9 @@ import {
 import Container from '../components/Container.jsx';
 import Card from '../components/Card.jsx';
 import Button from '../components/Button.jsx';
+import Stars from '../components/Stars.jsx';
+import CornerBrackets from '../components/CornerBrackets.jsx';
+import HudLabel from '../components/HudLabel.jsx';
 import { apiFetch } from '../lib/api.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -89,22 +92,16 @@ export default function Contact() {
   return (
     <section
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         paddingTop: space['3xl'],
         paddingBottom: space['4xl']
       }}
     >
-      <Container narrow>
-        <span
-          style={{
-            fontFamily: fonts.mono,
-            fontSize: fontSizes.xs,
-            color: colors.cyan,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em'
-          }}
-        >
-          Contact
-        </span>
+      <Stars density={100} heroDensity={10} colorTint="corona" />
+      <CornerBrackets size={28} inset={24} />
+      <Container narrow style={{ position: 'relative', zIndex: 1 }}>
+        <HudLabel tone="cyan" live>Contact</HudLabel>
         <h1
           style={{
             fontFamily: fonts.heading,
@@ -112,7 +109,7 @@ export default function Contact() {
             fontWeight: fontWeights.bold,
             lineHeight: 1.1,
             letterSpacing: '-0.02em',
-            margin: `${space.sm} 0 ${space.md}`,
+            margin: `${space.md} 0 ${space.md}`,
             color: colors.text
           }}
         >

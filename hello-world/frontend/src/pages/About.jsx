@@ -14,6 +14,10 @@ import {
 import Container from '../components/Container.jsx';
 import Card from '../components/Card.jsx';
 import Button from '../components/Button.jsx';
+import Stars from '../components/Stars.jsx';
+import CornerBrackets from '../components/CornerBrackets.jsx';
+import HudLabel from '../components/HudLabel.jsx';
+import Eclipse from '../components/Eclipse.jsx';
 
 const PILLARS = [
   {
@@ -37,22 +41,37 @@ export default function About() {
   return (
     <section
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         paddingTop: space['3xl'],
         paddingBottom: space['4xl']
       }}
     >
-      <Container narrow>
-        <span
-          style={{
-            fontFamily: fonts.mono,
-            fontSize: fontSizes.xs,
-            color: colors.cyan,
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em'
-          }}
-        >
-          About
-        </span>
+      <Stars density={120} heroDensity={12} colorTint="mixed" />
+      <CornerBrackets size={28} inset={24} />
+
+      {/* Subtle eclipse on the far right as a brand accent. Sits off
+          the canvas edge so it's atmosphere, not a focal element. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          right: '-22%',
+          top: '12%',
+          opacity: 0.55,
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+        className="penumbra-about-eclipse"
+      >
+        <Eclipse size={520} glow={64} />
+      </div>
+      <style>{`
+        @media (max-width: 900px) { .penumbra-about-eclipse { display: none; } }
+      `}</style>
+
+      <Container narrow style={{ position: 'relative', zIndex: 1 }}>
+        <HudLabel tone="magenta">About</HudLabel>
         <h1
           style={{
             fontFamily: fonts.heading,
@@ -60,7 +79,7 @@ export default function About() {
             fontWeight: fontWeights.bold,
             lineHeight: 1.1,
             letterSpacing: '-0.02em',
-            margin: `${space.sm} 0 ${space.lg}`,
+            margin: `${space.md} 0 ${space.lg}`,
             color: colors.text
           }}
         >

@@ -14,6 +14,9 @@ import {
 import Container from '../components/Container.jsx';
 import Card from '../components/Card.jsx';
 import Button from '../components/Button.jsx';
+import Stars from '../components/Stars.jsx';
+import CornerBrackets from '../components/CornerBrackets.jsx';
+import HudLabel from '../components/HudLabel.jsx';
 
 const SERVICES = [
   {
@@ -79,23 +82,17 @@ export default function Services() {
     <>
       <section
         style={{
+          position: 'relative',
+          overflow: 'hidden',
           paddingTop: space['3xl'],
           paddingBottom: space.xl,
           borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <Container>
-          <span
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: fontSizes.xs,
-              color: colors.cyan,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em'
-            }}
-          >
-            Services
-          </span>
+        <Stars density={90} heroDensity={10} colorTint="corona" />
+        <CornerBrackets size={28} inset={24} />
+        <Container style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="cyan">Services</HudLabel>
           <h1
             style={{
               fontFamily: fonts.heading,
@@ -103,7 +100,7 @@ export default function Services() {
               fontWeight: fontWeights.bold,
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
-              margin: `${space.sm} 0 ${space.md}`,
+              margin: `${space.md} 0 ${space.md}`,
               color: colors.text
             }}
           >
@@ -113,7 +110,7 @@ export default function Services() {
             style={{
               maxWidth: '60ch',
               fontSize: fontSizes.lg,
-              lineHeight: 1.55,
+              lineHeight: 1.6,
               color: colors.textSecondary,
               margin: 0
             }}

@@ -14,6 +14,9 @@ import {
 } from '../theme.js';
 import Container from '../components/Container.jsx';
 import Card from '../components/Card.jsx';
+import Stars from '../components/Stars.jsx';
+import CornerBrackets from '../components/CornerBrackets.jsx';
+import HudLabel from '../components/HudLabel.jsx';
 
 const PROJECTS = [
   {
@@ -93,23 +96,17 @@ export default function Projects() {
     <>
       <section
         style={{
+          position: 'relative',
+          overflow: 'hidden',
           paddingTop: space['3xl'],
           paddingBottom: space.xl,
           borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <Container>
-          <span
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: fontSizes.xs,
-              color: colors.cyan,
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em'
-            }}
-          >
-            Projects
-          </span>
+        <Stars density={100} heroDensity={10} colorTint="corona" />
+        <CornerBrackets size={28} inset={24} />
+        <Container style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="corona">Projects</HudLabel>
           <h1
             style={{
               fontFamily: fonts.heading,
@@ -117,7 +114,7 @@ export default function Projects() {
               fontWeight: fontWeights.bold,
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
-              margin: `${space.sm} 0 ${space.md}`,
+              margin: `${space.md} 0 ${space.md}`,
               color: colors.text
             }}
           >
@@ -129,7 +126,7 @@ export default function Projects() {
               maxWidth: '60ch',
               fontSize: fontSizes.lg,
               color: colors.textSecondary,
-              lineHeight: 1.55
+              lineHeight: 1.6
             }}
           >
             Each project below is running right now and you can click
