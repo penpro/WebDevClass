@@ -2,6 +2,19 @@ import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
+import {
+  colors,
+  fonts,
+  fontSizes,
+  fontWeights,
+  radii,
+  space
+} from '../theme.js'
+import Container from '../components/Container.jsx'
+import Card from '../components/Card.jsx'
+import Button from '../components/Button.jsx'
+import HudLabel from '../components/HudLabel.jsx'
+import CornerBrackets from '../components/CornerBrackets.jsx'
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin'])
 const ROLE_OPTIONS = [
@@ -29,22 +42,27 @@ export default function AdminPortal() {
   // Per-user-id role-change state: 'idle' | 'saving' | 'saved' | 'error'
   const [roleStates, setRoleStates] = useState({})
 
-  if (loading) return <p>Loading…</p>
+  if (loading) {
+    return (
+      <Container narrow style={{ paddingTop: space['3xl'] }}>
+        <p style={{ color: colors.textSecondary }}>Loading…</p>
+      </Container>
+    )
+  }
   if (!user) {
     return (
-      <Navigate
-        to="/login"
-        state={{ from: '/admin-portal' }}
-        replace
-      />
+      <Navigate to="/login" state={{ from: '/admin-portal' }} replace />
     )
   }
   if (!ADMIN_ROLES.has(user.role)) {
     return (
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h1>Admin Portal</h1>
-        <p>You do not have access to this tool.</p>
-      </div>
+      <Container narrow style={{ paddingTop: space['3xl'] }}>
+        <HudLabel tone="cyan">Admin Portal</HudLabel>
+        <h1 style={pageTitleStyle}>You don&apos;t have access to this tool.</h1>
+        <p style={{ color: colors.textSecondary, marginTop: space.md }}>
+          The Admin Portal is restricted to admin and super-admin users.
+        </p>
+      </Container>
     )
   }
 
@@ -92,22 +110,22 @@ export default function AdminPortal() {
   async function handleChangeRole(targetUser) {
     const newRole = pendingRoles[targetUser.id] || targetUser.role
     if (newRole === targetUser.role) return
-    if (!window.confirm(
-      `Change ${targetUser.email}'s role from ` +
-      `${ROLE_LABELS[targetUser.role]} to ${ROLE_LABELS[newRole]}?`
-    )) return
+    if (
+      !window.confirm(
+        `Change ${targetUser.email}'s role from ` +
+          `${ROLE_LABELS[targetUser.role]} to ${ROLE_LABELS[newRole]}?`
+      )
+    ) {
+      return
+    }
 
     setError(null)
     setRoleStates((prev) => ({ ...prev, [targetUser.id]: 'saving' }))
     try {
-      const updated = await apiFetch(
-        `/admin/users/${targetUser.id}/role`,
-        {
-          method: 'PUT',
-          body: JSON.stringify({ role: newRole })
-        }
-      )
-      // Update the row in place so the UI reflects the new role
+      const updated = await apiFetch(`/admin/users/${targetUser.id}/role`, {
+        method: 'PUT',
+        body: JSON.stringify({ role: newRole })
+      })
       setResults((prev) =>
         prev
           ? prev.map((u) =>
@@ -138,255 +156,348 @@ export default function AdminPortal() {
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1>Admin Portal</h1>
-      <p style={{ color: '#6b7280' }}>
-        Admin tools for the site. Search users below to send password
-        resets{isSuperAdmin && ' or change roles'}.
-        {isSuperAdmin && (
-          <>
-            {' '}As a super admin you also have access to{' '}
-            <Link to="/admin-portal/diagnostics">
-              Diagnostics &amp; Tests
-            </Link>
-            .
-          </>
-        )}
-      </p>
-
-      {isSuperAdmin && (
-        <section
-          style={{
-            border: '1px solid #c7d2fe',
-            background: '#eef2ff',
-            borderRadius: 8,
-            padding: '0.75rem 1rem',
-            marginBottom: '1.5rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0.5rem'
-          }}
-        >
-          <div>
-            <strong style={{ display: 'block' }}>Diagnostics &amp; Tests</strong>
-            <span style={{ fontSize: '0.85rem', color: '#374151' }}>
-              Run k6 load tests against this server with live charts and
-              CPU/memory readouts.
-            </span>
-          </div>
-          <Link
-            to="/admin-portal/diagnostics"
-            style={{
-              background: '#4f46e5',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: 6,
-              textDecoration: 'none',
-              fontSize: '0.9rem',
-              fontWeight: 'bold'
-            }}
-          >
-            Open Diagnostics →
-          </Link>
-        </section>
-      )}
-
-      <h2 style={{ marginTop: '1.5rem' }}>User search</h2>
-
+    <>
+      {/* Page hero with HUD chrome, matching the marketing pages. */}
       <section
         style={{
-          border: '1px solid #d1d5db',
-          borderRadius: 8,
-          padding: '1rem',
-          marginBottom: '1.5rem',
-          background: '#f9fafb'
+          position: 'relative',
+          overflow: 'hidden',
+          paddingTop: space['3xl'],
+          paddingBottom: space.xl,
+          borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <form
-          onSubmit={handleSearch}
-          style={{ display: 'flex', gap: '0.5rem' }}
-        >
-          <input
-            type="text"
-            placeholder="Search user email (substring match)"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
+        <CornerBrackets size={28} inset={24} />
+        <Container narrow style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="corona" live>
+            Admin portal
+          </HudLabel>
+          <h1 style={pageTitleStyle}>User search &amp; password resets.</h1>
+          <p
             style={{
-              flex: 1,
-              padding: '0.5rem',
-              boxSizing: 'border-box'
+              margin: `${space.md} 0 0`,
+              color: colors.textSecondary,
+              fontSize: fontSizes.md,
+              lineHeight: 1.6
             }}
-          />
-          <button type="submit" disabled={searching || !query.trim()}>
-            {searching ? 'Searching…' : 'Search'}
-          </button>
-        </form>
+          >
+            Admin tools for the site. Search users below to send password
+            resets{isSuperAdmin && ' or change roles'}.
+          </p>
+        </Container>
       </section>
 
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
+      <section style={{ paddingTop: space['2xl'], paddingBottom: space['3xl'] }}>
+        <Container narrow>
+          {/* Diagnostics jump card — super_admin only */}
+          {isSuperAdmin && (
+            <Card
+              variant="accent"
+              style={{
+                marginBottom: space.xl,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: space.md,
+                flexWrap: 'wrap'
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontWeight: fontWeights.semibold,
+                    color: colors.text,
+                    fontSize: fontSizes.md,
+                    marginBottom: space.xs
+                  }}
+                >
+                  Diagnostics &amp; Tests
+                </div>
+                <div
+                  style={{
+                    fontSize: fontSizes.sm,
+                    color: colors.textSecondary,
+                    lineHeight: 1.55,
+                    maxWidth: '52ch'
+                  }}
+                >
+                  Run k6 load tests against this server with live charts and
+                  CPU/memory readouts. Lets you toggle the rate limiter and
+                  maintenance banner at runtime.
+                </div>
+              </div>
+              <Button as={Link} to="/admin-portal/diagnostics">
+                Open Diagnostics →
+              </Button>
+            </Card>
+          )}
 
-      {results === null ? (
-        <p style={{ color: '#6b7280' }}>
-          Enter a search term above to look up users.
-        </p>
-      ) : results.length === 0 ? (
-        <p>No users matched that search.</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {results.map((u) => {
-            const resetState = resetStates[u.id] || 'idle'
-            const resetDisabled =
-              resetState === 'sending' || resetState === 'sent'
-            const isSelf = u.id === user.id
-            const pendingRole = pendingRoles[u.id] || u.role
-            const roleState = roleStates[u.id] || 'idle'
-            const roleChanged = pendingRole !== u.role
+          <SectionTitle>User search</SectionTitle>
 
-            return (
-              <li
-                key={u.id}
-                style={{
-                  border: '1px solid #d1d5db',
-                  borderRadius: 8,
-                  padding: '1rem',
-                  marginBottom: '0.75rem',
-                  background: 'white'
-                }}
+          <Card style={{ marginBottom: space.lg }}>
+            <form
+              onSubmit={handleSearch}
+              style={{ display: 'flex', gap: space.sm, flexWrap: 'wrap' }}
+            >
+              <input
+                type="text"
+                placeholder="Search user email (substring match)"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                style={inputStyle}
+              />
+              <Button
+                type="submit"
+                disabled={searching || !query.trim()}
+                size="md"
               >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    flexWrap: 'wrap'
-                  }}
-                >
-                  <strong style={{ fontSize: '1rem' }}>{u.email}</strong>
-                  <RoleBadge role={u.role} />
-                  {isSelf && (
-                    <span
-                      style={{
-                        fontSize: '0.7rem',
-                        color: '#6b7280',
-                        fontStyle: 'italic'
-                      }}
-                    >
-                      (you)
-                    </span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    fontSize: '0.8rem',
-                    color: '#6b7280',
-                    marginTop: '0.25rem'
-                  }}
-                >
-                  Created {new Date(u.created_at).toLocaleString()}
-                  {' · '}
-                  Last login{' '}
-                  {u.last_login_at
-                    ? new Date(u.last_login_at).toLocaleString()
-                    : 'never'}
-                </div>
+                {searching ? 'Searching…' : 'Search'}
+              </Button>
+            </form>
+          </Card>
 
-                <div
-                  style={{
-                    marginTop: '0.75rem',
-                    display: 'flex',
-                    gap: '0.5rem',
-                    flexWrap: 'wrap',
-                    alignItems: 'center'
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => handleSendReset(u.id)}
-                    disabled={resetDisabled}
-                  >
-                    {resetButtonLabel(u.id)}
-                  </button>
+          {error && (
+            <p
+              style={{
+                color: colors.danger,
+                background: colors.dangerMuted,
+                border: `1px solid ${colors.danger}`,
+                borderRadius: radii.md,
+                padding: `${space.sm} ${space.md}`,
+                fontSize: fontSizes.sm,
+                margin: `0 0 ${space.lg}`
+              }}
+            >
+              {error}
+            </p>
+          )}
 
-                  {isSuperAdmin && !isSelf && (
-                    <>
-                      <span
+          {results === null ? (
+            <p style={{ color: colors.textMuted, fontSize: fontSizes.sm }}>
+              Enter a search term above to look up users.
+            </p>
+          ) : results.length === 0 ? (
+            <p style={{ color: colors.textSecondary }}>
+              No users matched that search.
+            </p>
+          ) : (
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {results.map((u) => {
+                const resetState = resetStates[u.id] || 'idle'
+                const resetDisabled =
+                  resetState === 'sending' || resetState === 'sent'
+                const isSelf = u.id === user.id
+                const pendingRole = pendingRoles[u.id] || u.role
+                const roleState = roleStates[u.id] || 'idle'
+                const roleChanged = pendingRole !== u.role
+
+                return (
+                  <li key={u.id} style={{ marginBottom: space.md }}>
+                    <Card>
+                      <div
                         style={{
-                          color: '#6b7280',
-                          fontSize: '0.85rem'
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: space.sm,
+                          flexWrap: 'wrap'
                         }}
                       >
-                        |
-                      </span>
-                      <label
+                        <strong
+                          style={{
+                            fontSize: fontSizes.md,
+                            color: colors.text,
+                            fontFamily: fonts.body
+                          }}
+                        >
+                          {u.email}
+                        </strong>
+                        <RoleBadge role={u.role} />
+                        {isSelf && (
+                          <span
+                            style={{
+                              fontSize: fontSizes.xs,
+                              color: colors.textMuted,
+                              fontStyle: 'italic'
+                            }}
+                          >
+                            (you)
+                          </span>
+                        )}
+                      </div>
+                      <div
                         style={{
-                          fontSize: '0.85rem',
+                          fontSize: fontSizes.xs,
+                          color: colors.textMuted,
+                          marginTop: space.xs,
+                          fontFamily: fonts.mono
+                        }}
+                      >
+                        created {new Date(u.created_at).toLocaleString()}
+                        {' · '}
+                        last login{' '}
+                        {u.last_login_at
+                          ? new Date(u.last_login_at).toLocaleString()
+                          : 'never'}
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: space.md,
                           display: 'flex',
-                          gap: '0.35rem',
+                          gap: space.sm,
+                          flexWrap: 'wrap',
                           alignItems: 'center'
                         }}
                       >
-                        Role:
-                        <select
-                          value={pendingRole}
-                          onChange={(e) =>
-                            setPendingRoles((prev) => ({
-                              ...prev,
-                              [u.id]: e.target.value
-                            }))
-                          }
-                          disabled={roleState === 'saving'}
+                        <Button
+                          variant={resetState === 'sent' ? 'secondary' : 'primary'}
+                          size="sm"
+                          onClick={() => handleSendReset(u.id)}
+                          disabled={resetDisabled}
                         >
-                          {ROLE_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <button
-                        type="button"
-                        disabled={!roleChanged || roleState === 'saving'}
-                        onClick={() => handleChangeRole(u)}
-                      >
-                        {roleState === 'saving'
-                          ? 'Saving…'
-                          : roleState === 'saved'
-                          ? 'Saved ✓'
-                          : 'Apply'}
-                      </button>
-                    </>
-                  )}
-                </div>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-    </div>
+                          {resetButtonLabel(u.id)}
+                        </Button>
+
+                        {isSuperAdmin && !isSelf && (
+                          <>
+                            <span
+                              style={{
+                                color: colors.borderSubtle,
+                                fontSize: fontSizes.sm
+                              }}
+                            >
+                              |
+                            </span>
+                            <label
+                              style={{
+                                fontSize: fontSizes.sm,
+                                color: colors.textSecondary,
+                                display: 'flex',
+                                gap: space.xs,
+                                alignItems: 'center'
+                              }}
+                            >
+                              Role:
+                              <select
+                                value={pendingRole}
+                                onChange={(e) =>
+                                  setPendingRoles((prev) => ({
+                                    ...prev,
+                                    [u.id]: e.target.value
+                                  }))
+                                }
+                                disabled={roleState === 'saving'}
+                                style={selectStyle}
+                              >
+                                {ROLE_OPTIONS.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <Button
+                              size="sm"
+                              variant={
+                                roleState === 'saved' ? 'secondary' : 'primary'
+                              }
+                              disabled={!roleChanged || roleState === 'saving'}
+                              onClick={() => handleChangeRole(u)}
+                            >
+                              {roleState === 'saving'
+                                ? 'Saving…'
+                                : roleState === 'saved'
+                                ? 'Saved ✓'
+                                : 'Apply'}
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </Container>
+      </section>
+    </>
+  )
+}
+
+// ----------------------------- shared bits ----------------------------- //
+
+const pageTitleStyle = {
+  fontFamily: fonts.heading,
+  fontSize: 'clamp(2rem, 4vw, 3rem)',
+  fontWeight: fontWeights.bold,
+  lineHeight: 1.1,
+  letterSpacing: '-0.02em',
+  margin: `${space.md} 0 0`,
+  color: colors.text
+}
+
+const inputStyle = {
+  flex: 1,
+  minWidth: '12rem',
+  padding: '0.6rem 0.75rem',
+  background: colors.bg,
+  color: colors.text,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  fontFamily: fonts.body,
+  fontSize: fontSizes.base,
+  outline: 'none'
+}
+
+const selectStyle = {
+  background: colors.bg,
+  color: colors.text,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.sm,
+  padding: '0.3rem 0.5rem',
+  fontFamily: fonts.body,
+  fontSize: fontSizes.sm,
+  cursor: 'pointer'
+}
+
+function SectionTitle({ children }) {
+  return (
+    <h2
+      style={{
+        fontFamily: fonts.heading,
+        fontSize: fontSizes.lg,
+        fontWeight: fontWeights.semibold,
+        color: colors.text,
+        margin: `0 0 ${space.md}`
+      }}
+    >
+      {children}
+    </h2>
   )
 }
 
 function RoleBadge({ role }) {
   const tiers = {
-    super_admin: { label: 'super admin', bg: '#fbbf24', color: '#111827' },
-    admin: { label: 'admin', bg: '#111827', color: 'white' },
-    premium: { label: 'premium', bg: '#a78bfa', color: '#111827' },
-    user: { label: 'user', bg: '#e5e7eb', color: '#374151' }
+    super_admin: { label: 'super admin', bg: colors.accent, fg: '#04221b' },
+    admin: { label: 'admin', bg: colors.success, fg: '#04221b' },
+    premium: { label: 'premium', bg: colors.cyan, fg: '#04222a' },
+    user: { label: 'user', bg: colors.surfaceHover, fg: colors.textSecondary }
   }
   const tier = tiers[role] || tiers.user
   return (
     <span
       style={{
-        fontSize: '0.7rem',
-        padding: '0.1rem 0.45rem',
-        borderRadius: 999,
+        fontSize: fontSizes.xs,
+        padding: '0.15rem 0.5rem',
+        borderRadius: radii.full,
         background: tier.bg,
-        color: tier.color,
+        color: tier.fg,
         textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        fontWeight: 'bold'
+        letterSpacing: '0.06em',
+        fontWeight: fontWeights.bold,
+        fontFamily: fonts.body
       }}
     >
       {tier.label}

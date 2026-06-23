@@ -22,6 +22,19 @@ import { Link, Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
 import LineChart from '../components/LineChart.jsx'
+import Container from '../components/Container.jsx'
+import Card from '../components/Card.jsx'
+import Button from '../components/Button.jsx'
+import HudLabel from '../components/HudLabel.jsx'
+import CornerBrackets from '../components/CornerBrackets.jsx'
+import {
+  colors,
+  fonts,
+  fontSizes,
+  fontWeights,
+  radii,
+  space
+} from '../theme.js'
 
 const MAX_LOG_LINES = 500
 
@@ -133,7 +146,13 @@ export default function Diagnostics() {
     }
   }, [])
 
-  if (loading) return <p>Loading…</p>
+  if (loading) {
+    return (
+      <Container narrow style={{ paddingTop: space['3xl'] }}>
+        <p style={{ color: colors.textSecondary }}>Loading…</p>
+      </Container>
+    )
+  }
   if (!user) {
     return (
       <Navigate
@@ -145,13 +164,26 @@ export default function Diagnostics() {
   }
   if (user.role !== 'super_admin') {
     return (
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h1>Diagnostics &amp; Tests</h1>
-        <p>This page is restricted to super admins.</p>
-        <p>
-          <Link to="/admin-portal">← Back to Admin Portal</Link>
+      <Container narrow style={{ paddingTop: space['3xl'] }}>
+        <HudLabel tone="magenta">Diagnostics &amp; Tests</HudLabel>
+        <h1 style={pageTitleStyle}>
+          This page is restricted to super admins.
+        </h1>
+        <p
+          style={{
+            marginTop: space.md,
+            color: colors.textSecondary,
+            fontSize: fontSizes.md
+          }}
+        >
+          <Link
+            to="/admin-portal"
+            style={{ color: colors.accent, textDecoration: 'none' }}
+          >
+            ← Back to Admin Portal
+          </Link>
         </p>
-      </div>
+      </Container>
     )
   }
 
@@ -359,146 +391,202 @@ export default function Diagnostics() {
   const selectedMeta = scripts && scripts.find((s) => s.key === selectedScript)
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-      <p style={{ marginBottom: '0.5rem' }}>
-        <Link to="/admin-portal">← Back to Admin Portal</Link>
-      </p>
-      <h1>Diagnostics &amp; Tests</h1>
-      <p style={{ color: '#6b7280' }}>
-        Run a pre-defined k6 load test against this server. Charts update
-        every second while the test runs. CPU and memory readouts come from
-        the EC2 instance the backend lives on.
-      </p>
-
-      {scriptsError && (
-        <p style={{ color: 'crimson' }}>
-          Failed to load script list: {scriptsError}
-        </p>
-      )}
-
-      {limiterDisabled && (
-        <div
-          style={{
-            background: '#fef2f2',
-            border: '1px solid #fca5a5',
-            color: '#991b1b',
-            padding: '0.6rem 0.85rem',
-            borderRadius: 6,
-            fontSize: '0.85rem',
-            marginBottom: '1rem'
-          }}
-        >
-          <strong>Rate limiter is DISABLED.</strong> All API endpoints are
-          currently unprotected from request flooding. Toggle back to ON
-          when you're done load testing — this state persists until you
-          flip it back or the backend is restarted.
-        </div>
-      )}
-
-      {/* --- Script picker -------------------------------------------- */}
+    <>
       <section
         style={{
-          border: '1px solid #d1d5db',
-          borderRadius: 8,
-          padding: '1rem',
-          marginBottom: '1rem',
-          background: '#f9fafb'
+          position: 'relative',
+          overflow: 'hidden',
+          paddingTop: space['2xl'],
+          paddingBottom: space.lg,
+          borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <h2 style={{ marginTop: 0 }}>Select test</h2>
+        <CornerBrackets size={28} inset={20} />
+        <Container style={{ position: 'relative', zIndex: 1 }}>
+          <Link
+            to="/admin-portal"
+            style={{
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.sm,
+              color: colors.textSecondary,
+              textDecoration: 'none'
+            }}
+          >
+            ← Back to Admin Portal
+          </Link>
+          <div style={{ marginTop: space.md }}>
+            <HudLabel tone="magenta" live>
+              Diagnostics &amp; Tests
+            </HudLabel>
+          </div>
+          <h1 style={pageTitleStyle}>Load testing dashboard.</h1>
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              color: colors.textSecondary,
+              fontSize: fontSizes.md,
+              lineHeight: 1.6,
+              maxWidth: '62ch'
+            }}
+          >
+            Run a pre-defined k6 load test against this server. Charts
+            update every second while the test runs. CPU and memory
+            readouts come from the EC2 instance the backend lives on.
+          </p>
+        </Container>
+      </section>
+
+      <Container style={{ paddingTop: space.xl, paddingBottom: space['3xl'] }}>
+        {scriptsError && (
+          <p
+            style={{
+              color: colors.danger,
+              background: colors.dangerMuted,
+              border: `1px solid ${colors.danger}`,
+              borderRadius: radii.md,
+              padding: `${space.sm} ${space.md}`,
+              fontSize: fontSizes.sm,
+              margin: `0 0 ${space.md}`
+            }}
+          >
+            Failed to load script list: {scriptsError}
+          </p>
+        )}
+
+        {limiterDisabled && (
+          <div
+            style={{
+              background: colors.dangerMuted,
+              border: `1px solid ${colors.danger}`,
+              color: colors.danger,
+              padding: `${space.sm} ${space.md}`,
+              borderRadius: radii.md,
+              fontSize: fontSizes.sm,
+              marginBottom: space.lg,
+              lineHeight: 1.55
+            }}
+          >
+            <strong style={{ color: colors.text }}>
+              Rate limiter is DISABLED.
+            </strong>{' '}
+            All API endpoints are currently unprotected from request
+            flooding. Toggle back to ON when you&apos;re done load testing
+            — this state persists until you flip it back or the backend is
+            restarted.
+          </div>
+        )}
+
+      {/* --- Script picker -------------------------------------------- */}
+      <Card style={{ marginBottom: space.md }}>
+        <SectionTitle>Select test</SectionTitle>
         {scripts === null ? (
-          <p>Loading…</p>
+          <p style={{ color: colors.textSecondary }}>Loading…</p>
         ) : scripts.length === 0 ? (
-          <p>No scripts available.</p>
+          <p style={{ color: colors.textSecondary }}>No scripts available.</p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {scripts.map((s) => (
-              <label
-                key={s.key}
-                style={{
-                  display: 'flex',
-                  gap: '0.6rem',
-                  alignItems: 'flex-start',
-                  padding: '0.5rem',
-                  border:
-                    selectedScript === s.key
-                      ? '2px solid #4f46e5'
-                      : '1px solid #d1d5db',
-                  borderRadius: 6,
-                  background: 'white',
-                  cursor: isRunning ? 'not-allowed' : 'pointer'
-                }}
-              >
-                <input
-                  type="radio"
-                  name="script"
-                  value={s.key}
-                  checked={selectedScript === s.key}
-                  disabled={isRunning}
-                  onChange={() => setSelectedScript(s.key)}
-                />
-                <div>
-                  <strong>{s.label}</strong>
-                  <span
-                    style={{
-                      marginLeft: '0.5rem',
-                      color: '#6b7280',
-                      fontSize: '0.8rem'
-                    }}
-                  >
-                    ~{s.expectedDurationSeconds}s
-                  </span>
-                  <div style={{ fontSize: '0.85rem', color: '#374151', marginTop: '0.25rem' }}>
-                    {s.description}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: space.sm }}>
+            {scripts.map((s) => {
+              const selected = selectedScript === s.key
+              return (
+                <label
+                  key={s.key}
+                  style={{
+                    display: 'flex',
+                    gap: space.sm,
+                    alignItems: 'flex-start',
+                    padding: space.md,
+                    border:
+                      '1px solid ' +
+                      (selected ? colors.accent : colors.border),
+                    background: selected ? colors.accentMuted : colors.bg,
+                    borderRadius: radii.md,
+                    cursor: isRunning ? 'not-allowed' : 'pointer',
+                    transition: 'background 150ms ease, border-color 150ms ease'
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="script"
+                    value={s.key}
+                    checked={selected}
+                    disabled={isRunning}
+                    onChange={() => setSelectedScript(s.key)}
+                    style={{ accentColor: colors.accent, marginTop: '0.25rem' }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'baseline',
+                        gap: space.sm,
+                        flexWrap: 'wrap'
+                      }}
+                    >
+                      <strong
+                        style={{
+                          fontFamily: fonts.heading,
+                          color: colors.text,
+                          fontSize: fontSizes.base
+                        }}
+                      >
+                        {s.label}
+                      </strong>
+                      <span
+                        style={{
+                          color: colors.cyan,
+                          fontSize: fontSizes.xs,
+                          fontFamily: fonts.mono,
+                          letterSpacing: '0.05em'
+                        }}
+                      >
+                        ~{s.expectedDurationSeconds}s
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: fontSizes.sm,
+                        color: colors.textSecondary,
+                        marginTop: space.xs,
+                        lineHeight: 1.55
+                      }}
+                    >
+                      {s.description}
+                    </div>
                   </div>
-                </div>
-              </label>
-            ))}
+                </label>
+              )
+            })}
           </div>
         )}
 
         <div
           style={{
             display: 'flex',
-            gap: '0.5rem',
-            marginTop: '1rem',
+            gap: space.sm,
+            marginTop: space.lg,
             alignItems: 'center',
             flexWrap: 'wrap'
           }}
         >
-          <button
+          <Button
             type="button"
             onClick={handleStart}
             disabled={isRunning || !selectedMeta}
-            style={{
-              background: '#4f46e5',
-              color: 'white',
-              border: 'none',
-              padding: '0.5rem 1.25rem',
-              borderRadius: 6,
-              fontWeight: 'bold',
-              cursor: isRunning ? 'not-allowed' : 'pointer',
-              opacity: isRunning ? 0.5 : 1
-            }}
           >
-            {runStatus === 'starting' ? 'Starting…' : 'Run test'}
-          </button>
+            {runStatus === 'starting' ? 'Starting…' : 'Run test →'}
+          </Button>
           {isRunning && (
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleStop}
               style={{
-                background: 'white',
-                color: '#b91c1c',
-                border: '1px solid #b91c1c',
-                padding: '0.5rem 1.25rem',
-                borderRadius: 6,
-                fontWeight: 'bold',
-                cursor: 'pointer'
+                color: colors.danger,
+                borderColor: colors.danger
               }}
             >
               Stop
-            </button>
+            </Button>
           )}
 
           {/* Toggle group pushed to the right of the row. */}
@@ -506,124 +594,65 @@ export default function Diagnostics() {
             style={{
               marginLeft: 'auto',
               display: 'flex',
-              gap: '1rem',
+              gap: space.lg,
               alignItems: 'center',
-              fontSize: '0.85rem',
+              fontSize: fontSizes.sm,
               flexWrap: 'wrap'
             }}
           >
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-            >
-              <span style={{ color: '#374151' }}>Rate limiter:</span>
-              <button
-                type="button"
-                onClick={handleToggleLimiter}
-                disabled={isRunning || limiterLoading}
-                title={
-                  isRunning
-                    ? 'Cannot change while a test is running'
-                    : limiterDisabled
-                    ? 'Click to re-enable rate limiting'
-                    : 'Click to disable rate limiting (load testing only)'
-                }
-                style={{
-                  background: limiterDisabled ? '#fee2e2' : '#d1fae5',
-                  color: limiterDisabled ? '#991b1b' : '#065f46',
-                  border:
-                    '1px solid ' + (limiterDisabled ? '#fca5a5' : '#86efac'),
-                  padding: '0.3rem 0.75rem',
-                  borderRadius: 999,
-                  fontSize: '0.78rem',
-                  fontWeight: 'bold',
-                  cursor:
-                    isRunning || limiterLoading ? 'not-allowed' : 'pointer',
-                  opacity: isRunning || limiterLoading ? 0.6 : 1
-                }}
-              >
-                {limiterLoading
-                  ? '…'
+            <ToggleBlock
+              label="Rate limiter"
+              on={!limiterDisabled}
+              loading={limiterLoading}
+              disabledClick={isRunning || limiterLoading}
+              onClick={handleToggleLimiter}
+              alertWhenOff
+              title={
+                isRunning
+                  ? 'Cannot change while a test is running'
                   : limiterDisabled
-                  ? 'OFF — click to enable'
-                  : 'ON — click to disable'}
-              </button>
-            </div>
-
-            <div
-              style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-            >
-              <span style={{ color: '#374151' }}>Maintenance:</span>
-              <button
-                type="button"
-                onClick={handleToggleMaintenance}
-                disabled={maintenanceLoading}
-                title={
-                  maintenanceEnabled
-                    ? 'Click to bring the site back up'
-                    : 'Click to put the site in maintenance mode (admins always retain access)'
-                }
-                style={{
-                  background: maintenanceEnabled ? '#fde68a' : '#d1fae5',
-                  color: maintenanceEnabled ? '#78350f' : '#065f46',
-                  border:
-                    '1px solid ' +
-                    (maintenanceEnabled ? '#d97706' : '#86efac'),
-                  padding: '0.3rem 0.75rem',
-                  borderRadius: 999,
-                  fontSize: '0.78rem',
-                  fontWeight: 'bold',
-                  cursor: maintenanceLoading ? 'not-allowed' : 'pointer',
-                  opacity: maintenanceLoading ? 0.6 : 1
-                }}
-              >
-                {maintenanceLoading
-                  ? '…'
-                  : maintenanceEnabled
-                  ? 'ON — click to disable'
-                  : 'OFF — click to enable'}
-              </button>
-            </div>
+                  ? 'Click to re-enable rate limiting'
+                  : 'Click to disable rate limiting (load testing only)'
+              }
+            />
+            <ToggleBlock
+              label="Maintenance"
+              on={!maintenanceEnabled}
+              loading={maintenanceLoading}
+              disabledClick={maintenanceLoading}
+              onClick={handleToggleMaintenance}
+              alertWhenOff={false}
+              alertWhenOn
+              title={
+                maintenanceEnabled
+                  ? 'Click to bring the site back up'
+                  : 'Click to put the site in maintenance mode (admins always retain access)'
+              }
+            />
           </div>
         </div>
 
-        {error && <p style={{ color: 'crimson', marginTop: '0.5rem' }}>{error}</p>}
-      </section>
+        {error && (
+          <p
+            style={{
+              color: colors.danger,
+              marginTop: space.md,
+              fontSize: fontSizes.sm
+            }}
+          >
+            {error}
+          </p>
+        )}
+      </Card>
 
       {/* --- Run status ----------------------------------------------- */}
       {runStatus !== 'idle' && (
-        <section
-          style={{
-            border: '1px solid #d1d5db',
-            borderRadius: 8,
-            padding: '0.75rem 1rem',
-            marginBottom: '1rem',
-            background:
-              runStatus === 'running'
-                ? '#fef3c7'
-                : runStatus === 'completed'
-                ? '#d1fae5'
-                : runStatus === 'failed' || runStatus === 'stopped'
-                ? '#fee2e2'
-                : '#f3f4f6',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0.5rem'
-          }}
-        >
-          <div>
-            <strong>{labelForStatus(runStatus)}</strong>
-            {runLabel && <> — {runLabel}</>}
-          </div>
-          <div style={{ fontSize: '0.85rem', color: '#374151' }}>
-            {runStatus === 'running' && expectedDuration
-              ? `${formatDuration(elapsed)} / ~${formatDuration(expectedDuration)}`
-              : runStatus === 'running'
-              ? formatDuration(elapsed)
-              : ''}
-          </div>
-        </section>
+        <RunStatusBanner
+          runStatus={runStatus}
+          runLabel={runLabel}
+          elapsed={elapsed}
+          expectedDuration={expectedDuration}
+        />
       )}
 
       {/* --- Charts --------------------------------------------------- */}
@@ -631,8 +660,8 @@ export default function Diagnostics() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))',
-          gap: '1rem',
-          marginBottom: '1rem'
+          gap: space.md,
+          marginBottom: space.md
         }}
       >
         <ChartCard title="Requests / sec (and errors)">
@@ -640,8 +669,8 @@ export default function Diagnostics() {
             data={reqSeries}
             formatY={(v) => formatCount(v)}
             series={[
-              { key: 'reqPerSec', label: 'req/s', color: '#4f46e5' },
-              { key: 'failedPerSec', label: 'failed/s', color: '#b91c1c' }
+              { key: 'reqPerSec', label: 'req/s', color: colors.accent },
+              { key: 'failedPerSec', label: 'failed/s', color: colors.danger }
             ]}
           />
         </ChartCard>
@@ -651,9 +680,9 @@ export default function Diagnostics() {
             data={latencySeries}
             formatY={(v) => `${Math.round(v)}ms`}
             series={[
-              { key: 'mean', label: 'mean', color: '#9ca3af' },
-              { key: 'p50', label: 'p50', color: '#0ea5e9' },
-              { key: 'p95', label: 'p95', color: '#f59e0b' }
+              { key: 'mean', label: 'mean', color: colors.textMuted },
+              { key: 'p50', label: 'p50', color: colors.cyan },
+              { key: 'p95', label: 'p95', color: colors.magenta }
             ]}
           />
         </ChartCard>
@@ -664,8 +693,8 @@ export default function Diagnostics() {
             yMax={100}
             formatY={(v) => `${Math.round(v)}%`}
             series={[
-              { key: 'cpuPercent', label: 'CPU %', color: '#dc2626' },
-              { key: 'memPercent', label: 'Mem %', color: '#059669' }
+              { key: 'cpuPercent', label: 'CPU %', color: colors.danger },
+              { key: 'memPercent', label: 'Mem %', color: colors.accent }
             ]}
           />
         </ChartCard>
@@ -673,21 +702,13 @@ export default function Diagnostics() {
 
       {/* --- Summary -------------------------------------------------- */}
       {summary && (
-        <section
-          style={{
-            border: '1px solid #c7d2fe',
-            background: '#eef2ff',
-            borderRadius: 8,
-            padding: '1rem',
-            marginBottom: '1rem'
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>Summary</h2>
+        <Card variant="accent" style={{ marginBottom: space.md }}>
+          <SectionTitle>Summary</SectionTitle>
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-              gap: '0.75rem'
+              gap: space.sm
             }}
           >
             <SummaryStat label="Total requests" value={summary.totalRequests.toLocaleString()} />
@@ -703,32 +724,32 @@ export default function Diagnostics() {
             <SummaryStat label="p99" value={`${summary.p99.toFixed(2)} ms`} />
             <SummaryStat label="Max" value={`${summary.max.toFixed(2)} ms`} />
           </div>
-        </section>
+        </Card>
       )}
 
       {/* --- Log ------------------------------------------------------ */}
-      <section
+      <div
         style={{
-          border: '1px solid #d1d5db',
-          borderRadius: 8,
-          marginBottom: '2rem'
+          border: `1px solid ${colors.border}`,
+          borderRadius: radii.lg,
+          overflow: 'hidden',
+          marginBottom: space['2xl']
         }}
       >
         <div
           style={{
-            background: '#111827',
-            color: '#e5e7eb',
-            padding: '0.5rem 0.75rem',
-            fontSize: '0.85rem',
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
+            background: colors.codeChrome,
+            color: colors.text,
+            padding: `${space.sm} ${space.md}`,
+            fontSize: fontSizes.sm,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: space.sm,
+            borderBottom: `1px solid ${colors.border}`
           }}
         >
-          <span>
+          <span style={{ fontFamily: fonts.mono, color: colors.textSecondary }}>
             Log output ({logs.length} line{logs.length === 1 ? '' : 's'})
           </span>
           <button
@@ -738,11 +759,15 @@ export default function Diagnostics() {
             title={logs.length === 0 ? 'No log to copy' : 'Copy log output'}
             style={{
               background: 'transparent',
-              color: copyState === 'copied' ? '#34d399' : '#e5e7eb',
-              border: '1px solid ' + (copyState === 'copied' ? '#34d399' : '#374151'),
+              color:
+                copyState === 'copied' ? colors.accent : colors.textSecondary,
+              border:
+                '1px solid ' +
+                (copyState === 'copied' ? colors.accent : colors.border),
               padding: '0.25rem 0.6rem',
-              borderRadius: 4,
-              fontSize: '0.75rem',
+              borderRadius: radii.sm,
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.xs,
               cursor: logs.length === 0 ? 'not-allowed' : 'pointer',
               opacity: logs.length === 0 ? 0.5 : 1,
               display: 'inline-flex',
@@ -750,7 +775,6 @@ export default function Diagnostics() {
               gap: '0.35rem'
             }}
           >
-            {/* Lucide-style "copy" icon (two stacked rectangles) */}
             <svg
               width="13"
               height="13"
@@ -775,26 +799,25 @@ export default function Diagnostics() {
         <div
           ref={logBoxRef}
           style={{
-            background: '#1f2937',
-            color: '#d1d5db',
-            fontFamily: 'monospace',
+            background: colors.codeBg,
+            color: colors.text,
+            fontFamily: fonts.mono,
             fontSize: '0.78rem',
-            padding: '0.75rem',
+            padding: space.md,
             height: 220,
             overflowY: 'auto',
-            borderBottomLeftRadius: 8,
-            borderBottomRightRadius: 8,
             whiteSpace: 'pre-wrap'
           }}
         >
           {logs.length === 0 ? (
-            <span style={{ color: '#6b7280' }}>No log output yet.</span>
+            <span style={{ color: colors.textMuted }}>No log output yet.</span>
           ) : (
             logs.map((line, idx) => (
               <div
                 key={idx}
                 style={{
-                  color: line.stream === 'stderr' ? '#fca5a5' : '#d1d5db'
+                  color:
+                    line.stream === 'stderr' ? colors.danger : colors.text
                 }}
               >
                 {line.text}
@@ -802,8 +825,9 @@ export default function Diagnostics() {
             ))
           )}
         </div>
-      </section>
-    </div>
+      </div>
+      </Container>
+    </>
   )
 }
 
@@ -851,19 +875,48 @@ function labelForStatus(s) {
   }
 }
 
-function ChartCard({ title, children }) {
+const pageTitleStyle = {
+  fontFamily: fonts.heading,
+  fontSize: 'clamp(2rem, 4vw, 3rem)',
+  fontWeight: fontWeights.bold,
+  lineHeight: 1.1,
+  letterSpacing: '-0.02em',
+  margin: `${space.md} 0 0`,
+  color: colors.text
+}
+
+function SectionTitle({ children }) {
   return (
-    <div
+    <h2
       style={{
-        border: '1px solid #d1d5db',
-        borderRadius: 8,
-        padding: '0.75rem',
-        background: 'white'
+        fontFamily: fonts.heading,
+        fontSize: fontSizes.lg,
+        fontWeight: fontWeights.semibold,
+        color: colors.text,
+        margin: `0 0 ${space.md}`
       }}
     >
-      <h3 style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>{title}</h3>
       {children}
-    </div>
+    </h2>
+  )
+}
+
+function ChartCard({ title, children }) {
+  return (
+    <Card padding={space.md}>
+      <h3
+        style={{
+          margin: `0 0 ${space.sm}`,
+          fontFamily: fonts.heading,
+          fontSize: fontSizes.sm,
+          fontWeight: fontWeights.semibold,
+          color: colors.text
+        }}
+      >
+        {title}
+      </h3>
+      {children}
+    </Card>
   )
 }
 
@@ -871,17 +924,143 @@ function SummaryStat({ label, value }) {
   return (
     <div
       style={{
-        background: 'white',
-        borderRadius: 6,
+        background: colors.bg,
+        borderRadius: radii.md,
         padding: '0.5rem 0.75rem',
-        border: '1px solid #c7d2fe'
+        border: `1px solid ${colors.borderSubtle}`
       }}
     >
-      <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: '#6b7280', letterSpacing: '0.05em' }}>
+      <div
+        style={{
+          fontSize: fontSizes.xs,
+          textTransform: 'uppercase',
+          color: colors.textMuted,
+          letterSpacing: '0.08em',
+          fontFamily: fonts.mono
+        }}
+      >
         {label}
       </div>
-      <div style={{ fontSize: '1.1rem', fontWeight: 'bold', marginTop: '0.15rem' }}>
+      <div
+        style={{
+          fontSize: fontSizes.lg,
+          fontWeight: fontWeights.bold,
+          color: colors.text,
+          marginTop: '0.15rem',
+          fontFamily: fonts.mono
+        }}
+      >
         {value}
+      </div>
+    </div>
+  )
+}
+
+// ToggleBlock — green pill when "on", warning-tinted when "off". `alertWhenOff`
+// is for the rate limiter (off = danger). `alertWhenOn` is for maintenance
+// mode (on = warning visible to all users). The `on`/`off` semantics flip
+// between the two so we can keep the green = good convention.
+function ToggleBlock({
+  label,
+  on,
+  loading,
+  disabledClick,
+  onClick,
+  alertWhenOff,
+  alertWhenOn,
+  title
+}) {
+  const danger = (!on && alertWhenOff) || (on && alertWhenOn)
+  const bg = on
+    ? alertWhenOn
+      ? colors.warning + '22'
+      : colors.successMuted
+    : colors.dangerMuted
+  const fg = on
+    ? alertWhenOn
+      ? colors.warning
+      : colors.success
+    : colors.danger
+  const border = '1px solid ' + (danger ? fg : colors.borderAccent)
+  return (
+    <div style={{ display: 'flex', gap: space.sm, alignItems: 'center' }}>
+      <span
+        style={{
+          color: colors.textSecondary,
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.xs,
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase'
+        }}
+      >
+        {label}:
+      </span>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabledClick}
+        title={title}
+        style={{
+          background: bg,
+          color: fg,
+          border,
+          padding: '0.3rem 0.75rem',
+          borderRadius: radii.full,
+          fontSize: fontSizes.xs,
+          fontFamily: fonts.mono,
+          fontWeight: fontWeights.semibold,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          cursor: disabledClick ? 'not-allowed' : 'pointer',
+          opacity: disabledClick ? 0.65 : 1
+        }}
+      >
+        {loading ? '…' : on ? 'ON — click to disable' : 'OFF — click to enable'}
+      </button>
+    </div>
+  )
+}
+
+function RunStatusBanner({ runStatus, runLabel, elapsed, expectedDuration }) {
+  const config = {
+    running: { bg: colors.cyanMuted, border: colors.cyan, fg: colors.text },
+    completed: { bg: colors.successMuted, border: colors.success, fg: colors.text },
+    failed: { bg: colors.dangerMuted, border: colors.danger, fg: colors.text },
+    stopped: { bg: colors.dangerMuted, border: colors.danger, fg: colors.text },
+    starting: { bg: colors.surface, border: colors.border, fg: colors.text }
+  }[runStatus] || { bg: colors.surface, border: colors.border, fg: colors.text }
+  return (
+    <div
+      style={{
+        background: config.bg,
+        border: `1px solid ${config.border}`,
+        borderRadius: radii.md,
+        padding: `${space.sm} ${space.md}`,
+        marginBottom: space.md,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: space.sm,
+        color: config.fg
+      }}
+    >
+      <div style={{ fontFamily: fonts.heading, fontSize: fontSizes.md }}>
+        <strong>{labelForStatus(runStatus)}</strong>
+        {runLabel && <> — {runLabel}</>}
+      </div>
+      <div
+        style={{
+          fontSize: fontSizes.sm,
+          color: colors.textSecondary,
+          fontFamily: fonts.mono
+        }}
+      >
+        {runStatus === 'running' && expectedDuration
+          ? `${formatDuration(elapsed)} / ~${formatDuration(expectedDuration)}`
+          : runStatus === 'running'
+          ? formatDuration(elapsed)
+          : ''}
       </div>
     </div>
   )

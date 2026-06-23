@@ -285,26 +285,65 @@ export default function NavBar() {
 
 function RoleBadge({ role }) {
   const tiers = {
-    super_admin: { label: 'super admin', bg: colors.accent, color: '#fff' },
-    admin: { label: 'admin', bg: colors.success, color: '#04221b' },
-    premium: { label: 'premium', bg: colors.cyan, color: '#04222a' }
+    super_admin: {
+      label: 'super admin',
+      bg: colors.accent,
+      color: '#04221b',
+      to: '/admin-portal'
+    },
+    admin: {
+      label: 'admin',
+      bg: colors.success,
+      color: '#04221b',
+      to: '/admin-portal'
+    },
+    premium: {
+      label: 'premium',
+      bg: colors.cyan,
+      color: '#04222a',
+      to: null
+    }
   };
   const tier = tiers[role];
   if (!tier) return null;
-  return (
-    <span
-      style={{
-        fontSize: '0.65rem',
-        padding: '0.1rem 0.45rem',
-        borderRadius: radii.full,
-        background: tier.bg,
-        color: tier.color,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        fontWeight: 700
-      }}
-    >
-      {tier.label}
-    </span>
-  );
+
+  const baseStyle = {
+    fontSize: '0.65rem',
+    padding: '0.15rem 0.5rem',
+    borderRadius: radii.full,
+    background: tier.bg,
+    color: tier.color,
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    fontWeight: 700,
+    fontFamily: 'inherit',
+    textDecoration: 'none',
+    display: 'inline-block',
+    transition: 'transform 120ms ease, box-shadow 120ms ease, filter 120ms ease'
+  };
+
+  // Admin / super_admin badges double as a one-click jump to the
+  // Admin Portal. Premium has no destination so it stays decorative.
+  if (tier.to) {
+    return (
+      <Link
+        to={tier.to}
+        style={baseStyle}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = `0 0 12px ${tier.bg}`;
+          e.currentTarget.style.filter = 'brightness(1.08)';
+          e.currentTarget.style.transform = 'translateY(-1px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = 'none';
+          e.currentTarget.style.filter = 'none';
+          e.currentTarget.style.transform = 'none';
+        }}
+        title="Open the Admin Portal"
+      >
+        {tier.label}
+      </Link>
+    );
+  }
+  return <span style={baseStyle}>{tier.label}</span>;
 }
