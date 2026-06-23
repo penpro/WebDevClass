@@ -16,6 +16,8 @@ import Projects from './pages/Projects.jsx'
 // copy + a screenshot/sample, so the home page never links visitors
 // directly into an auth-gated admin route.
 import DiagnosticsCase from './pages/projects/DiagnosticsCase.jsx'
+import TheoryOfComputationCase from './pages/projects/TheoryOfComputationCase.jsx'
+import Repair360Case from './pages/projects/Repair360Case.jsx'
 
 // Existing pages preserved. The old `Home.jsx` is gone from the route
 // table (PenumbraHome is the new landing). The mini-apps below will move
@@ -46,6 +48,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="services" element={<Services />} />
             <Route path="projects" element={<Projects />} />
             <Route path="projects/diagnostics" element={<DiagnosticsCase />} />
+            <Route
+              path="projects/theory-of-computation"
+              element={<TheoryOfComputationCase />}
+            />
+            <Route path="projects/repair360-auto" element={<Repair360Case />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
 

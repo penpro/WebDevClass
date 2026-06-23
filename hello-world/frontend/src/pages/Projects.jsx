@@ -31,6 +31,24 @@ const PROJECTS = [
     auth: 'Case study (live tool is super_admin only)'
   },
   {
+    to: '/projects/theory-of-computation',
+    badge: 'Computer science depth',
+    title: 'Theory of Computation review tool',
+    summary:
+      "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Built to prove I can think about computability and complexity, not just stitch libraries.",
+    stack: ['Vanilla JS', 'KaTeX', 'Spaced repetition', 'Offline-first'],
+    auth: 'Case study (the tool itself runs offline)'
+  },
+  {
+    to: '/projects/repair360-auto',
+    badge: 'Client work',
+    title: 'Repair360 Auto — modern site inside a Wix panel',
+    summary:
+      "Client wanted to keep their Wix host because their booking, email, and listings were already wired to it. Built them a responsive React-based front-end and shoehorned it into a Wix HTML/Iframe panel, with a small postMessage size-negotiation layer so the embed reflows correctly inside Wix's static iframe container. Sometimes the engineering work is meeting the client's constraints.",
+    stack: ['React', 'postMessage', 'Responsive CSS', 'Wix embed'],
+    auth: 'Live site link inside the case study'
+  },
+  {
     to: '/projects/tasktrackr',
     fallback: '/tasktrackr',
     badge: 'Full-stack web app',
