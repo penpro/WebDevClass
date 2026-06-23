@@ -4,7 +4,19 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import App from './App.jsx'
 import { AuthProvider } from './AuthContext.jsx'
-import Home from './pages/Home.jsx'
+
+// New Penumbra Tech marketing pages.
+import PenumbraHome from './pages/PenumbraHome.jsx'
+import Services from './pages/Services.jsx'
+import About from './pages/About.jsx'
+import Contact from './pages/Contact.jsx'
+import Projects from './pages/Projects.jsx'
+
+// Existing pages preserved. The old `Home.jsx` is gone from the route
+// table (PenumbraHome is the new landing). The mini-apps below will move
+// under /projects/<slug> in task #4, but for now they're still reachable
+// at their original top-level paths so existing bookmarks and the
+// Projects index fallback links keep working.
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import ForgotPassword from './pages/ForgotPassword.jsx'
@@ -24,25 +36,41 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <Routes>
           <Route path="/" element={<App />}>
-            <Route index element={<Home />} />
+            {/* Penumbra Tech marketing surface */}
+            <Route index element={<PenumbraHome />} />
+            <Route path="services" element={<Services />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
+
+            {/* Auth pages */}
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
+
+            {/* Existing mini-apps. Will move under /projects/<slug> in
+                task #4; until then they're still served at their original
+                paths so the Projects page's fallback links work. */}
             <Route path="quicknotes" element={<QuickNotes />} />
             <Route path="moodboard" element={<MoodBoards />} />
             <Route path="moodboard/:token" element={<MoodBoard />} />
             <Route path="tasktrackr" element={<TaskTrackr />} />
+            <Route path="api-guide" element={<ApiGuide />} />
+            <Route path="subscribe" element={<Subscribe />} />
+
+            {/* Admin */}
             <Route path="admin-portal" element={<AdminPortal />} />
-            <Route path="admin-portal/diagnostics" element={<Diagnostics />} />
-            {/* Backwards-compat: the page used to live at /customer-service.
-                Old bookmarks redirect into the renamed route. */}
+            <Route
+              path="admin-portal/diagnostics"
+              element={<Diagnostics />}
+            />
+
+            {/* Backwards-compat redirects */}
             <Route
               path="customer-service"
               element={<Navigate to="/admin-portal" replace />}
             />
-            <Route path="api-guide" element={<ApiGuide />} />
-            <Route path="subscribe" element={<Subscribe />} />
           </Route>
         </Routes>
       </AuthProvider>

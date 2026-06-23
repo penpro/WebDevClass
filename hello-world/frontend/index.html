@@ -3,68 +3,88 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World App</title>
+    <title>Penumbra Tech — Tech consulting &amp; software solutions</title>
+    <meta
+      name="description"
+      content="Penumbra Tech helps businesses and freelancers turn complex problems into clean software and reliable systems. Reliable code. Real impact."
+    />
+    <meta name="theme-color" content="#0B1220" />
+
+    <!-- Brand fonts. Preconnect for the handshake, then a single
+         stylesheet pulling Space Grotesk for headings and Inter for
+         body. JetBrains Mono is loaded for the few places we render
+         code samples. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Inline SVG favicon: simple circled P matching the brand logo. -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230B1220'/%3E%3Cg stroke='%232563EB' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='32' cy='32' r='24'/%3E%3Cpath d='M24 18 L24 48 M24 18 L38 18 a8 8 0 0 1 0 16 L24 34'/%3E%3C/g%3E%3C/svg%3E"
+    />
+
     <script type="module" src="/src/main.jsx"></script>
+
     <style>
-      /* Sticky footer layout: body is a grid with a flexible first row
-         (where React mounts) and an auto-sized second row (the footer).
-         Guarantees the footer sits at the bottom of the viewport even on
-         short pages without React having to know anything about it. */
+      /* Defaults: dark background while React hydrates, plus
+         brand-appropriate base font. The actual layout and footer are
+         owned by Layout.jsx now, not by index.html. */
+      html,
       body {
         margin: 0;
-        min-height: 100vh;
-        display: grid;
-        grid-template-rows: 1fr auto;
+        padding: 0;
+        background: #0b1220;
+        color: #e8eef7;
+        font-family:
+          'Inter',
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
-      .site-footer {
-        background: #111827;
-        color: white;
-        padding: 1.5rem 2rem;
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
       }
 
-      .site-footer-inner {
-        max-width: 960px;
-        margin: 0 auto;
+      /* Custom-scrollbar treatment on webkit browsers so the scroll
+         track doesn't look like a Windows 95 leftover against the dark
+         surface. */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0b1220;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #1f2a44;
+        border-radius: 8px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #2b3759;
       }
 
-      .site-footer-nav {
-        display: flex;
-        gap: 1.5rem;
-        flex-wrap: wrap;
-        margin-bottom: 1rem;
-      }
-
-      .site-footer-nav a {
-        color: white;
-        text-decoration: none;
-      }
-
-      .site-footer-nav a:hover {
-        text-decoration: underline;
-      }
-
-      .site-footer-copyright {
-        margin: 0;
-        font-size: 0.85rem;
-        opacity: 0.7;
+      a {
+        color: inherit;
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
-
-    <footer class="site-footer">
-      <div class="site-footer-inner">
-        <nav class="site-footer-nav">
-          <a href="/">Home</a>
-          <a href="/api-guide">API Guide</a>
-          <a href="https://github.com/penpro/Resume-CV" target="_blank" rel="noopener noreferrer">GitHub</a>
-          <a href="tel:+13608507876">(360) 850-7876</a>
-          <a href="mailto:wesleyaweaverjr@gmail.com">wesleyaweaverjr@gmail.com</a>
-        </nav>
-        <p class="site-footer-copyright">&copy; 2026 Wesley Weaver Jr. All rights reserved.</p>
-      </div>
-    </footer>
   </body>
 </html>
