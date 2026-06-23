@@ -1,5 +1,30 @@
 # WebDev Class Deployment Notes
 
+> **Heads-up for newcomers (2026-04 rebrand).** This repository now backs
+> two related things on the same EC2 stack:
+>
+> 1. **Penumbra Tech** (`penumbra-tech.com`) — the new top-level site:
+>    a consulting / portfolio landing page for tech consulting, software
+>    development, game dev, and photography. The Penumbra Tech-branded
+>    React app lives in `hello-world/frontend/` (yes, the folder still
+>    reads "hello-world" for historical reasons — every commit in here is
+>    real production code now, not class scaffolding).
+> 2. **Demo projects (formerly "the class apps")** — the original
+>    QuickNotes / MoodBoard / TaskTrackr / Subscribe / API Guide /
+>    Diagnostics work still lives at the same routes (`/quicknotes`,
+>    `/moodboard`, etc.) and is surfaced as portfolio evidence under
+>    `/projects`. The original measurements, security hardening, and
+>    architectural narrative below describe the same stack — they just
+>    apply to the demo apps now rather than to the headline product.
+>
+> The rest of this README is the original deployment / architecture write-up
+> for the underlying stack. Everything in it is still accurate: Penumbra
+> Tech rides on the same Express + MySQL + nginx + PM2 + EC2 infrastructure
+> with one additional table (`contacts`) and one additional API surface
+> (`/api/contact` + `/api/admin/contacts`) for the contact form. The DNS
+> swap from `penumbrapro.duckdns.org` to `penumbra-tech.com` is the only
+> infrastructure change still pending.
+
 ## Overview
 
 This project started as a basic full-stack "Hello, World" deployment and has grown into a small multi-app site sharing a single login. The stack is:
