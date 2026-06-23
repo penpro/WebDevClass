@@ -143,7 +143,7 @@ export default function ApiGuide() {
             A reference for every endpoint this site exposes, plus the
             REST principles the API follows. Every route lives under{' '}
             <code style={codeStyle}>/api</code> on{' '}
-            <code style={codeStyle}>https://penumbrapro.duckdns.org</code>.
+            <code style={codeStyle}>https://penumbra-tech.com</code>.
           </p>
         </Container>
       </section>

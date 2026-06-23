@@ -45,7 +45,7 @@ export const options = {
   // failures are part of what we're measuring.
 }
 
-const BASE_URL = __ENV.BASE_URL || 'https://penumbrapro.duckdns.org'
+const BASE_URL = __ENV.BASE_URL || 'https://penumbra-tech.com'
 
 // Bypass maintenance mode when launched from the diagnostics router.
 // See homepage.js for the full explanation.

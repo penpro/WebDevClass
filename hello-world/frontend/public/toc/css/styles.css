@@ -19,9 +19,9 @@
 }
 [data-theme="dark"] {
   /* Penumbra Tech corona palette — matches the parent site so the live
-     embed reads as part of penumbrapro.duckdns.org rather than a
-     stand-alone study tool. The offline copy on GitHub keeps its own
-     generic dark palette; this is the "live themed build." */
+     embed reads as part of penumbra-tech.com rather than a stand-alone
+     study tool. The offline copy on GitHub keeps its own generic dark
+     palette; this is the "live themed build." */
   --bg: #07021a;
   --panel: #150b30;
   --panel-2: #1e1145;
@@ -43,7 +43,7 @@
    Penumbra Tech brand strip — slim bar at the top of the live
    themed build. Sits above the tool's own .topbar. Not part of
    the original tool; only present in the build hosted at /toc/
-   on penumbrapro.duckdns.org.
+   on penumbra-tech.com.
    ============================================================ */
 .pt-strip {
   position: sticky;

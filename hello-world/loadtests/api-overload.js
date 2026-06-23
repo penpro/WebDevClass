@@ -37,7 +37,7 @@ export const options = {
   // No thresholds — we expect failures, that's the whole point.
 }
 
-const BASE_URL = __ENV.BASE_URL || 'https://penumbrapro.duckdns.org'
+const BASE_URL = __ENV.BASE_URL || 'https://penumbra-tech.com'
 
 // Bypass maintenance mode when launched from the diagnostics router.
 // Critical for this script in particular: it auto-enables maintenance,

@@ -21,9 +21,9 @@
 > for the underlying stack. Everything in it is still accurate: Penumbra
 > Tech rides on the same Express + MySQL + nginx + PM2 + EC2 infrastructure
 > with one additional table (`contacts`) and one additional API surface
-> (`/api/contact` + `/api/admin/contacts`) for the contact form. The DNS
-> swap from `penumbrapro.duckdns.org` to `penumbra-tech.com` is the only
-> infrastructure change still pending.
+> (`/api/contact` + `/api/admin/contacts`) for the contact form. The
+> canonical hostname is now **penumbra-tech.com**; `penumbrapro.duckdns.org`
+> is kept as a legacy alias on the same TLS certificate.
 
 ## Overview
 
@@ -60,7 +60,7 @@ Nginx :443 (Let's Encrypt cert, auto-redirects :80 -> :443,
   +-- /api/loadtest/*            /     (header-gated synthetic endpoints)
 ```
 
-The site is live at **https://penumbrapro.duckdns.org**. Unauthenticated visitors see the seeded hello-world messages and a public **API Guide** documenting every endpoint. Logged-in users have access to:
+The site is live at **https://penumbra-tech.com** (with `https://penumbrapro.duckdns.org` kept as a legacy alias). Unauthenticated visitors see the seeded hello-world messages and a public **API Guide** documenting every endpoint. Logged-in users have access to:
 
 - **QuickNotes** — user-scoped note list with full CRUD
 - **MoodBoard** — image-URL boards, public share link, plus a client-side **Create Collage** feature that renders a downloadable portrait collage entirely in the browser
@@ -805,7 +805,7 @@ Without this rule the first send attempt hangs or fails with `ETIMEDOUT` / `ECON
 From the server:
 
 ```bash
-curl -sX POST https://penumbrapro.duckdns.org/api/auth/forgot-password \
+curl -sX POST https://penumbra-tech.com/api/auth/forgot-password \
   -H "Content-Type: application/json" \
   -d '{"email":"your.email@gmail.com"}'
 pm2 logs hello-backend --lines 20 --nostream
@@ -841,13 +841,13 @@ curl http://127.0.0.1:3000/api/notes             # 401 + {"error":"Authenticatio
 Test nginx:
 
 ```bash
-curl -I https://penumbrapro.duckdns.org          # 200
-curl -I http://penumbrapro.duckdns.org           # 301 -> https
+curl -I https://penumbra-tech.com                # 200
+curl -I http://penumbra-tech.com                 # 301 -> https
 ```
 
 ### Browser test
 
-Open **https://penumbrapro.duckdns.org** and walk through:
+Open **https://penumbra-tech.com** and walk through:
 
 1. Home page loads with the seeded messages
 2. Register or log in
@@ -1284,7 +1284,7 @@ The fact that every flag is in-memory only means a process restart is always a c
 
 ## Final Result
 
-The project is live at **https://penumbrapro.duckdns.org**, with:
+The project is live at **https://penumbra-tech.com**, with:
 
 - a React + react-router SPA served by nginx (built frontend in `/var/www/hello-app`)
 - a Node/Express backend managed by PM2 (process `hello-backend`) behind nginx at `127.0.0.1:3000`

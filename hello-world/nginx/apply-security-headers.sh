@@ -29,7 +29,10 @@ else
   # Insert the include line right after the first 'server_name' directive
   # inside the HTTPS server block. This is a safe insertion point that
   # exists in every certbot-managed config.
-  sudo sed -i "/server_name penumbrapro.duckdns.org;/{
+  # Match any server_name line containing 'penumbra' so this works
+  # whether the cert covers penumbrapro.duckdns.org, penumbra-tech.com,
+  # or both (post --expand).
+  sudo sed -i "/server_name .*penumbra.*;/{
     a\\
 ${INCLUDE_LINE}
   }" "$NGINX_CONF"
@@ -43,4 +46,4 @@ echo "Reloading nginx..."
 sudo systemctl reload nginx
 
 echo "Done. Verify with:"
-echo "  curl -sI https://penumbrapro.duckdns.org | grep -iE 'strict|x-content|x-frame|content-security|referrer'"
+echo "  curl -sI https://penumbra-tech.com | grep -iE 'strict|x-content|x-frame|content-security|referrer'"

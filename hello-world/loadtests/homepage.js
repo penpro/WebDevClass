@@ -31,7 +31,7 @@ export const options = {
   }
 }
 
-const BASE_URL = __ENV.BASE_URL || 'https://penumbrapro.duckdns.org'
+const BASE_URL = __ENV.BASE_URL || 'https://penumbra-tech.com'
 
 // When the diagnostics router spawns k6 it sets DIAG_RUN_ID. We pass it
 // back as a header so requests bypass maintenance mode for the duration

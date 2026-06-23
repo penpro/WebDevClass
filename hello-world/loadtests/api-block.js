@@ -35,7 +35,7 @@ export const options = {
   // No thresholds — we expect timeouts, that's the whole point.
 }
 
-const BASE_URL = __ENV.BASE_URL || 'https://penumbrapro.duckdns.org'
+const BASE_URL = __ENV.BASE_URL || 'https://penumbra-tech.com'
 const RUN_ID = __ENV.DIAG_RUN_ID || ''
 const params = RUN_ID ? { headers: { 'X-Diagnostic-Run': RUN_ID } } : {}
 
