@@ -16,6 +16,10 @@ const loadtestEndpoints = require('./loadtestEndpoints');
 const rateLimiterState = require('./rateLimiterState');
 const maintenanceState = require('./maintenanceState');
 const {
+  router: contactRouter,
+  adminRouter: contactAdminRouter
+} = require('./contact');
+const {
   router: paymentsRouter,
   webhookHandler: paymentsWebhookHandler
 } = require('./payments');
@@ -106,6 +110,22 @@ const adminLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Admin rate limit exceeded' },
+  skip: skipIfDisabled
+});
+
+// Contact form: tight per-IP cap. Each submission writes a row and may
+// trigger a notification email, so a bot loop is both spam in the inbox
+// and DB pressure. Five per hour is more than any real human will submit
+// and well below what would meaningfully drown the operator.
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error:
+      'Too many contact requests — please try again later or email directly.'
+  },
   skip: skipIfDisabled
 });
 
@@ -228,12 +248,19 @@ app.use('/api/notes', notesRouter);
 app.use('/api/boards', boardsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/payments', paymentsRouter);
+// Public contact-form submission. Uses its own tight limiter rather than
+// the admin or auth tiers — bots find these endpoints and any structured
+// form goes through them. Five submissions per hour per IP.
+app.use('/api/contact', contactLimiter, contactRouter);
 // Diagnostics is mounted BEFORE the broader /api/admin prefix so its more
 // specific path wins. We deliberately skip the adminLimiter here: SSE
 // streams hold a single request open for the whole test, and the global
 // limiter is still applied via app.use('/api', globalLimiter) above. Each
 // route inside also calls requireSuperAdmin individually.
 app.use('/api/admin/diagnostics', diagnosticsRouter);
+// Admin contacts surface (list / patch) — mounted before the broader
+// admin router so its more specific path wins, like diagnostics.
+app.use('/api/admin/contacts', adminLimiter, contactAdminRouter);
 app.use('/api/admin', adminLimiter, adminRouter);
 // Synthetic load-test endpoints. Header-gated; invisible to anyone who
 // isn't currently running a test through the diagnostics page.
