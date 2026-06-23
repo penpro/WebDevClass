@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Theory of Computation — Penumbra Tech</title>
+  <meta name="description" content="Live themed copy of the Penumbra Tech Theory of Computation review tool. 670+ auto-graded questions across Chapters 0–8 of Sipser. Offline version on GitHub." />
+  <meta name="theme-color" content="#07021a" />
+
+  <!-- Inline SVG favicon — circled P in the corona color, matches the
+       main Penumbra Tech site so the browser tab reads as the same brand. -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2307021a'/%3E%3Cg stroke='%235eead4' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='32' cy='32' r='24'/%3E%3Cpath d='M24 18 L24 48 M24 18 L38 18 a8 8 0 0 1 0 16 L24 34'/%3E%3C/g%3E%3C/svg%3E"
+  />
+
+  <link rel="stylesheet" href="vendor/katex/katex.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- ====== Penumbra Tech brand strip ======
+       Slim top bar that links back to the parent site. Lives ABOVE the
+       tool's own topbar so the existing nav stays untouched. -->
+  <div class="pt-strip">
+    <a class="pt-strip-link" href="/projects/theory-of-computation" title="Back to the Penumbra Tech case study">
+      <svg width="20" height="20" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <g stroke="#5eead4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="32" cy="32" r="24"></circle>
+          <path d="M24 18 L24 48 M24 18 L38 18 a8 8 0 0 1 0 16 L24 34"></path>
+        </g>
+      </svg>
+      <span class="pt-strip-name">Penumbra Tech</span>
+    </a>
+    <span class="pt-strip-tag">
+      <span class="pt-strip-dot"></span>
+      Live themed build &middot; offline copy on
+      <a class="pt-strip-gh" href="https://github.com/penpro/theory-of-computation-review" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">∴</span>
+      <div>
+        <div class="brand-title">Theory of Computation</div>
+        <div class="brand-sub">Final Review &middot; Sipser 3rd ed.</div>
+      </div>
+    </div>
+
+    <div class="overall" id="overall-summary" title="Overall mastery across chapters 0–8">
+      <svg class="ring" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+        <circle class="ring-bg" cx="23" cy="23" r="19" />
+        <circle class="ring-fg" id="overall-ring" cx="23" cy="23" r="19" />
+      </svg>
+      <div class="overall-text">
+        <div class="overall-pct" id="overall-pct">0%</div>
+        <div class="overall-sub" id="overall-mastered">0 / 0 mastered</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-view="study">Study</button>
+      <button class="nav-btn" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="settings">Settings</button>
+      <button class="icon-btn" id="theme-toggle" title="Toggle light/dark">◐</button>
+    </nav>
+  </header>
+
+  <main class="main">
+    <!-- STUDY -->
+    <section id="view-study" class="view">
+      <div class="study-controls">
+        <label class="field">
+          <span>Focus</span>
+          <select id="focus-select"></select>
+        </label>
+        <label class="field">
+          <span>Go&nbsp;to&nbsp;#</span>
+          <input id="goto-num" class="goto-input" type="number" min="1" placeholder="#" title="Jump to a question by its number" />
+        </label>
+        <div class="chips">
+          <span class="chip" id="chip-chapter">—</span>
+          <span class="chip" id="chip-streak">streak 0</span>
+          <span class="chip" id="chip-due">0 due</span>
+        </div>
+      </div>
+
+      <div id="question-area"><!-- question card injected here --></div>
+
+      <p class="empty" id="study-empty" hidden>
+        Nothing to study here yet. Pick a different focus, or add questions to this chapter.
+      </p>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view" hidden>
+      <div class="dash-head">
+        <h2>Your progress</h2>
+        <div class="dash-stats" id="dash-stats"></div>
+      </div>
+      <div class="chapter-grid" id="chapter-grid"></div>
+      <div class="flag-wrap">
+        <h3>🚩 Flagged for help <span class="muted" id="flag-count"></span></h3>
+        <ul class="flag-list" id="flag-list"></ul>
+      </div>
+      <div class="weak-wrap">
+        <h3>Weakest topics <span class="muted">(focus your time here)</span></h3>
+        <ul class="weak-list" id="weak-list"></ul>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view" hidden>
+      <h2>Settings</h2>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Progression mode</strong>
+          <p class="muted">Guided gates each chapter behind the previous one's mastery. Free practice opens everything for targeted cramming.</p>
+        </div>
+        <div class="seg" id="mode-seg">
+          <button data-mode="guided">Guided (gated)</button>
+          <button data-mode="free">Free practice</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Ease-in difficulty ramp</strong>
+          <p class="muted">Start each chapter with plain-language definitions; harder questions unlock as you get the basics down. Turn off to see every difficulty at once.</p>
+        </div>
+        <div class="seg" id="ramp-seg">
+          <button data-ramp="on">On</button>
+          <button data-ramp="off">Off</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Corrects to master a question</strong>
+          <p class="muted">A question only counts as mastered after this many correct answers in a row — so a lucky guess never sticks. <code id="ms-val"></code></p>
+        </div>
+        <input type="range" id="master-streak" min="2" max="5" step="1" />
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Mastery needed to unlock the next chapter</strong>
+          <p class="muted">"Near 100%." Earlier chapters keep mixing in afterward — especially questions you've missed. <code id="ut-val"></code></p>
+        </div>
+        <input type="range" id="unlock-threshold" min="0.8" max="0.98" step="0.01" />
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Save / restore progress</strong>
+          <p class="muted">Progress lives in this browser. Export a backup, or move it to another machine.</p>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="export-btn">Export backup</button>
+          <button class="btn" id="import-btn">Import backup</button>
+          <input type="file" id="import-file" accept="application/json" hidden />
+          <button class="btn danger" id="reset-btn">Reset all progress</button>
+        </div>
+      </div>
+
+      <p class="muted small">Built for offline use — no internet required. Math rendered with a bundled copy of KaTeX.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="footer-hint">Keys: <kbd>1</kbd>–<kbd>9</kbd> choose &middot; <kbd>T</kbd>/<kbd>F</kbd> true/false &middot; <kbd>Enter</kbd> submit / next &middot; <kbd>E</kbd> explain deeper</span>
+  </footer>
+
+  <!-- KaTeX (offline) -->
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/contrib/auto-render.min.js"></script>
+
+  <!-- config + question bank -->
+  <script src="js/config.js"></script>
+  <script src="js/questions/_registry.js"></script>
+  <script src="js/questions/ch0.js"></script>
+  <script src="js/questions/ch1.js"></script>
+  <script src="js/questions/ch1-defs.js"></script>
+  <script src="js/questions/ch2.js"></script>
+  <script src="js/questions/ch2-defs.js"></script>
+  <script src="js/questions/ch3.js"></script>
+  <script src="js/questions/ch3-defs.js"></script>
+  <script src="js/questions/ch4.js"></script>
+  <script src="js/questions/ch4-defs.js"></script>
+  <script src="js/questions/ch5.js"></script>
+  <script src="js/questions/ch5-defs.js"></script>
+  <script src="js/questions/ch6.js"></script>
+  <script src="js/questions/ch6-defs.js"></script>
+  <script src="js/questions/ch7.js"></script>
+  <script src="js/questions/ch7-defs.js"></script>
+  <script src="js/questions/ch8.js"></script>
+  <script src="js/questions/ch8-defs.js"></script>
+  <script src="js/questions/exam1.js"></script>
+  <script src="js/questions/exam2.js"></script>
+  <script src="js/questions/final.js"></script>
+
+  <!-- deeper concept explainers (for the "Explain this" button) -->
+  <script src="js/concepts/_registry.js"></script>
+  <script src="js/concepts/ch0.js"></script>
+  <script src="js/concepts/ch1.js"></script>
+  <script src="js/concepts/ch2.js"></script>
+  <script src="js/concepts/ch3.js"></script>
+  <script src="js/concepts/ch4.js"></script>
+  <script src="js/concepts/ch5.js"></script>
+  <script src="js/concepts/ch6.js"></script>
+  <script src="js/concepts/ch7.js"></script>
+  <script src="js/concepts/ch8.js"></script>
+
+  <!-- distractor pools (extra wrong options, sampled per render) -->
+  <script src="js/pools/_registry.js"></script>
+  <script src="js/pools/ch0.js"></script>
+  <script src="js/pools/ch1.js"></script>
+  <script src="js/pools/ch2.js"></script>
+  <script src="js/pools/ch3.js"></script>
+  <script src="js/pools/ch4.js"></script>
+  <script src="js/pools/ch5.js"></script>
+  <script src="js/pools/ch6.js"></script>
+  <script src="js/pools/ch7.js"></script>
+  <script src="js/pools/ch8.js"></script>
+  <script src="js/pools/exam1.js"></script>
+  <script src="js/pools/exam2.js"></script>
+  <script src="js/pools/final.js"></script>
+
+  <!-- logic + ui -->
+  <script src="js/automaton.js"></script>
+  <script src="js/grade.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

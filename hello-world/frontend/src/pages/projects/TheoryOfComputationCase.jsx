@@ -144,6 +144,54 @@ export default function TheoryOfComputationCase() {
               </span>
             ))}
           </div>
+
+          <div
+            style={{
+              display: 'flex',
+              gap: space.md,
+              flexWrap: 'wrap',
+              marginTop: space.xl
+            }}
+          >
+            <Button as="a" href="/toc/" size="lg">
+              Try it live →
+            </Button>
+            <Button
+              as="a"
+              href="https://github.com/penpro/theory-of-computation-review"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+              size="lg"
+            >
+              Use offline (GitHub) ↗
+            </Button>
+          </div>
+
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              maxWidth: '60ch',
+              fontSize: fontSizes.sm,
+              color: colors.textMuted,
+              lineHeight: 1.6
+            }}
+          >
+            The live version at <code style={inlineCodeStyle}>/toc/</code>{' '}
+            is the same tool, just given a Penumbra-Tech makeover for
+            this site (corona palette, brand strip up top). The{' '}
+            <a
+              href="https://github.com/penpro/theory-of-computation-review"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: colors.accent, textDecoration: 'none' }}
+            >
+              GitHub repo
+            </a>{' '}
+            is the canonical offline build — clone it, double-click{' '}
+            <code style={inlineCodeStyle}>index.html</code>, and study
+            on a plane.
+          </p>
         </Container>
       </section>
 
@@ -449,6 +497,121 @@ export default function TheoryOfComputationCase() {
                 covered concept.
               </p>
             </Prose>
+          </div>
+        </Container>
+      </section>
+
+      {/* ===================== Live vs offline ============================= */}
+      <section
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          background: colors.bgSoft,
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <Container>
+          <div style={{ maxWidth: '64ch', marginBottom: space.xl }}>
+            <HudLabel tone="corona">Two ways to use it</HudLabel>
+            <h2 style={sectionTitleStyle}>
+              Same tool, two builds.
+            </h2>
+            <p
+              style={{
+                margin: `${space.md} 0 0`,
+                fontSize: fontSizes.md,
+                color: colors.textSecondary,
+                lineHeight: 1.65
+              }}
+            >
+              The tool itself is one codebase — vanilla JS, KaTeX, a
+              single <code style={inlineCodeStyle}>index.html</code>{' '}
+              you can double-click. There are two builds because the
+              right deployment depends on what you want to do with it.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: space.lg
+            }}
+          >
+            <Card variant="accent" padding={space.lg}>
+              <HudLabel tone="cyan">Live build · this site</HudLabel>
+              <h3
+                style={{
+                  fontFamily: fonts.heading,
+                  fontSize: fontSizes.lg,
+                  fontWeight: fontWeights.semibold,
+                  margin: `${space.sm} 0`,
+                  color: colors.text
+                }}
+              >
+                Try it in the browser.
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: fontSizes.sm,
+                  color: colors.textSecondary,
+                  lineHeight: 1.6
+                }}
+              >
+                Same tool with a Penumbra-Tech makeover — corona
+                palette, brand strip up top, dark mode by default.
+                Progress saves locally to this domain. Good for a
+                quick demo, not for studying on a flight.
+              </p>
+              <div style={{ marginTop: space.md }}>
+                <Button as="a" href="/toc/" size="md">
+                  Open the live build →
+                </Button>
+              </div>
+            </Card>
+
+            <Card variant="accent" padding={space.lg}>
+              <HudLabel tone="corona">Offline build · GitHub</HudLabel>
+              <h3
+                style={{
+                  fontFamily: fonts.heading,
+                  fontSize: fontSizes.lg,
+                  fontWeight: fontWeights.semibold,
+                  margin: `${space.sm} 0`,
+                  color: colors.text
+                }}
+              >
+                Clone it and study on a plane.
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: fontSizes.sm,
+                  color: colors.textSecondary,
+                  lineHeight: 1.6
+                }}
+              >
+                The canonical offline build — no Penumbra theming,
+                light/dark toggle, fully self-contained. Clone the
+                repo, double-click{' '}
+                <code style={inlineCodeStyle}>index.html</code>, your
+                progress lives in your own browser. Built for actual
+                exam prep.
+              </p>
+              <div style={{ marginTop: space.md }}>
+                <Button
+                  as="a"
+                  href="https://github.com/penpro/theory-of-computation-review"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="secondary"
+                  size="md"
+                >
+                  View on GitHub ↗
+                </Button>
+              </div>
+            </Card>
           </div>
         </Container>
       </section>

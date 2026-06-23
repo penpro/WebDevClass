@@ -1,0 +1,18 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Node (not used at runtime; only if someone installs to rebuild KaTeX)
+node_modules/
+package-lock.json
+
+# Exported progress backups
+toc-review-progress.json
+*.bak
+
+# Scratch / temp
+_*/
+*.tmp

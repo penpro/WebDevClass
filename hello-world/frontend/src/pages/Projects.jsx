@@ -35,9 +35,9 @@ const PROJECTS = [
     badge: 'Computer science depth',
     title: 'Theory of Computation review tool',
     summary:
-      "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Built to prove I can think about computability and complexity, not just stitch libraries.",
+      "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Live themed build runs in the browser at /toc/; canonical offline build is on GitHub. Built to prove I can think about computability and complexity, not just stitch libraries.",
     stack: ['Vanilla JS', 'KaTeX', 'Spaced repetition', 'Offline-first'],
-    auth: 'Case study (the tool itself runs offline)'
+    auth: 'Live + offline (GitHub) — see case study'
   },
   {
     to: '/projects/repair360-auto',
