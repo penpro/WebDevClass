@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { generateCollage } from '../lib/collage.js'
+import { colors, fonts, fontSizes, fontWeights, radii, space } from '../theme.js'
 
 // Shown in place of any image tile whose URL fails to load.
 // The file lives in public/ and is served as a static asset by nginx.
@@ -339,11 +340,11 @@ export default function MoodBoard() {
       {can_edit && (
         <section
           style={{
-            border: '1px solid #d1d5db',
+            border: `1px solid ${colors.border}`,
             borderRadius: 8,
             padding: '1rem',
             marginBottom: '1rem',
-            background: '#f9fafb'
+            background: colors.surfaceMuted
           }}
         >
           <form
@@ -376,7 +377,7 @@ export default function MoodBoard() {
               gap: '0.5rem',
               alignItems: 'center',
               fontSize: '0.85rem',
-              color: '#6b7280'
+              color: colors.textMuted
             }}
           >
             <span style={{ whiteSpace: 'nowrap' }}>Share link:</span>
@@ -428,7 +429,7 @@ export default function MoodBoard() {
                 aspectRatio: '1 / 1',
                 borderRadius: 8,
                 overflow: 'hidden',
-                background: '#e5e7eb'
+                background: colors.surfaceHover
               }}
             >
               <a
@@ -491,10 +492,10 @@ export default function MoodBoard() {
         <div
           style={{
             marginTop: '1.5rem',
-            border: '1px solid #d1d5db',
+            border: `1px solid ${colors.border}`,
             borderRadius: 8,
             padding: '1rem',
-            background: '#f9fafb'
+            background: colors.surfaceMuted
           }}
         >
           <div
@@ -579,7 +580,7 @@ export default function MoodBoard() {
         >
           <div
             style={{
-              background: 'white',
+              background: colors.surface,
               borderRadius: 12,
               padding: '2rem',
               textAlign: 'center',
@@ -589,7 +590,7 @@ export default function MoodBoard() {
             <p style={{ fontSize: '1.1rem', margin: 0 }}>
               Generating collage…
             </p>
-            <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
+            <p style={{ color: colors.textMuted, marginTop: '0.5rem' }}>
               Loading and arranging images
             </p>
           </div>
@@ -613,7 +614,7 @@ export default function MoodBoard() {
         >
           <div
             style={{
-              background: 'white',
+              background: colors.surface,
               borderRadius: 12,
               padding: '1.5rem',
               maxWidth: 500,
@@ -627,11 +628,11 @@ export default function MoodBoard() {
               style={{
                 width: '100%',
                 borderRadius: 8,
-                border: '1px solid #d1d5db',
+                border: `1px solid ${colors.border}`,
                 marginBottom: '1rem'
               }}
             />
-            <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+            <p style={{ fontSize: '0.85rem', color: colors.textMuted }}>
               {collageState.included} of{' '}
               {collageState.included + collageState.skipped} images included
               {collageState.skipped > 0 && (
@@ -645,7 +646,7 @@ export default function MoodBoard() {
             <p
               style={{
                 fontSize: '0.85rem',
-                color: '#b45309',
+                color: colors.warning,
                 fontStyle: 'italic',
                 margin: '0.75rem 0'
               }}
@@ -666,7 +667,7 @@ export default function MoodBoard() {
                 onClick={handleDownloadCollage}
                 style={{
                   padding: '0.5rem 1.5rem',
-                  background: '#111827',
+                  background: colors.bgSoft,
                   color: 'white',
                   border: 'none',
                   borderRadius: 6,

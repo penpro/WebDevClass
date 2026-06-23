@@ -1,54 +1,81 @@
 // Public API guide / reference page.
 //
 // Lists every endpoint the backend exposes plus the underlying REST
-// concepts they're built on. Educational for the class project; also
-// serves as a self-audit document for the API surface.
+// concepts they're built on. Educational + a self-audit of the API
+// surface.
+
+import Container from '../components/Container.jsx'
+import Card from '../components/Card.jsx'
+import HudLabel from '../components/HudLabel.jsx'
+import CornerBrackets from '../components/CornerBrackets.jsx'
+import {
+  colors as theme,
+  fonts,
+  fontSizes,
+  fontWeights,
+  radii,
+  space
+} from '../theme.js'
 
 const tableStyle = {
   width: '100%',
   borderCollapse: 'collapse',
   marginBottom: '1.5rem',
-  fontSize: '0.9rem'
+  fontSize: '0.9rem',
+  color: theme.text
 }
 const thStyle = {
   textAlign: 'left',
-  borderBottom: '2px solid #d1d5db',
-  padding: '0.4rem 0.5rem',
-  background: '#f9fafb',
-  fontWeight: 'bold'
+  borderBottom: `1px solid ${theme.border}`,
+  padding: '0.5rem 0.75rem',
+  background: theme.bgSoft,
+  color: theme.cyan,
+  fontFamily: fonts.mono,
+  fontSize: '0.78rem',
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  fontWeight: fontWeights.semibold
 }
 const tdStyle = {
-  borderBottom: '1px solid #e5e7eb',
-  padding: '0.4rem 0.5rem',
-  verticalAlign: 'top'
+  borderBottom: `1px solid ${theme.borderSubtle}`,
+  padding: '0.5rem 0.75rem',
+  verticalAlign: 'top',
+  color: theme.textSecondary
 }
 const codeStyle = {
-  background: '#f3f4f6',
-  padding: '0.1rem 0.35rem',
-  borderRadius: 3,
-  fontFamily: 'ui-monospace, monospace',
-  fontSize: '0.85em'
+  background: theme.bg,
+  border: `1px solid ${theme.borderSubtle}`,
+  padding: '0.1rem 0.4rem',
+  borderRadius: radii.sm,
+  fontFamily: fonts.mono,
+  fontSize: '0.85em',
+  color: theme.accentBright
 }
 
+// HTTP method pill. Verb colors tuned to the corona palette so they
+// stop reading as "default bootstrap badges."
 function Method({ verb }) {
-  const colors = {
-    GET: '#15803d',
-    POST: '#1d4ed8',
-    PUT: '#b45309',
-    DELETE: '#b91c1c'
+  const methodColors = {
+    GET: theme.accent,         // corona — safe, idempotent
+    POST: theme.cyan,          // cyan — creation
+    PUT: theme.warning,        // amber — mutation
+    PATCH: theme.warning,
+    DELETE: theme.danger       // red — destructive
   }
+  const bg = methodColors[verb] || theme.surface
   return (
     <span
       style={{
         display: 'inline-block',
-        background: colors[verb] || '#374151',
-        color: 'white',
-        padding: '0.05rem 0.4rem',
-        borderRadius: 3,
-        fontFamily: 'ui-monospace, monospace',
-        fontSize: '0.75rem',
-        fontWeight: 'bold',
-        minWidth: 50,
+        background: bg,
+        color: '#04221b',
+        padding: '0.1rem 0.5rem',
+        borderRadius: radii.sm,
+        fontFamily: fonts.mono,
+        fontSize: '0.72rem',
+        fontWeight: fontWeights.bold,
+        letterSpacing: '0.05em',
+        minWidth: 54,
         textAlign: 'center'
       }}
     >
@@ -77,7 +104,7 @@ function EndpointTable({ rows }) {
             <td style={{ ...tdStyle, fontFamily: 'ui-monospace, monospace', fontSize: '0.85em' }}>
               {r.path}
             </td>
-            <td style={{ ...tdStyle, fontSize: '0.85em', color: '#6b7280' }}>
+            <td style={{ ...tdStyle, fontSize: '0.85em', color: theme.textMuted, fontFamily: fonts.mono }}>
               {r.auth}
             </td>
             <td style={tdStyle}>{r.desc}</td>
@@ -90,51 +117,81 @@ function EndpointTable({ rows }) {
 
 export default function ApiGuide() {
   return (
-    <div style={{ maxWidth: 880, margin: '0 auto', lineHeight: 1.65 }}>
-      <h1 style={{ marginTop: 0 }}>API Guide</h1>
-      <p style={{ color: '#6b7280' }}>
-        A reference for every endpoint this site exposes, plus the REST
-        principles the API follows. Every route lives under{' '}
-        <code style={codeStyle}>/api</code> on{' '}
-        <code style={codeStyle}>https://penumbrapro.duckdns.org</code>.
-      </p>
-
-      {/* -------- Table of contents -------- */}
-      <nav
+    <>
+      <section
         style={{
-          background: '#f9fafb',
-          border: '1px solid #d1d5db',
-          borderRadius: 8,
-          padding: '0.75rem 1rem',
-          margin: '1.5rem 0'
+          position: 'relative',
+          overflow: 'hidden',
+          paddingTop: space['3xl'],
+          paddingBottom: space.xl,
+          borderBottom: `1px solid ${theme.borderSubtle}`
         }}
       >
-        <strong style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          Contents
-        </strong>
-        <ul style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.25rem' }}>
-          <li><a href="#stack">The stack</a></li>
-          <li><a href="#rest">REST conventions</a></li>
-          <li><a href="#status">Status codes</a></li>
-          <li><a href="#auth">Authentication and sessions</a></li>
-          <li><a href="#roles">User roles</a></li>
-          <li><a href="#rate-limits">Rate limits</a></li>
-          <li>
-            Endpoints
-            <ul>
-              <li><a href="#endpoints-messages">Messages</a></li>
-              <li><a href="#endpoints-auth">Auth</a></li>
-              <li><a href="#endpoints-notes">Notes (QuickNotes)</a></li>
-              <li><a href="#endpoints-boards">Boards (MoodBoard)</a></li>
-              <li><a href="#endpoints-tasks">Tasks (TaskTrackr)</a></li>
-              <li><a href="#endpoints-task-updates">Task updates (progress posts)</a></li>
-              <li><a href="#endpoints-payments">Payments (Stripe subscriptions)</a></li>
-              <li><a href="#endpoints-admin">Admin (Customer Service)</a></li>
-            </ul>
-          </li>
-          <li><a href="#diverges">Where this API diverges from textbook REST</a></li>
-        </ul>
-      </nav>
+        <CornerBrackets size={28} inset={24} />
+        <Container style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="cyan">API Guide</HudLabel>
+          <h1 style={pageTitleStyle}>Every endpoint, documented.</h1>
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              color: theme.textSecondary,
+              fontSize: fontSizes.lg,
+              lineHeight: 1.6,
+              maxWidth: '64ch'
+            }}
+          >
+            A reference for every endpoint this site exposes, plus the
+            REST principles the API follows. Every route lives under{' '}
+            <code style={codeStyle}>/api</code> on{' '}
+            <code style={codeStyle}>https://penumbrapro.duckdns.org</code>.
+          </p>
+        </Container>
+      </section>
+
+      <Container
+        style={{
+          paddingTop: space['2xl'],
+          paddingBottom: space['4xl'],
+          lineHeight: 1.65,
+          color: theme.textSecondary
+        }}
+      >
+        {/* -------- Table of contents -------- */}
+        <Card padding={space.lg} style={{ margin: `0 0 ${space.xl}` }}>
+          <strong
+            style={{
+              fontSize: fontSizes.xs,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: theme.cyan,
+              fontFamily: fonts.mono
+            }}
+          >
+            Contents
+          </strong>
+          <ul style={{ margin: `${space.sm} 0 0 0`, paddingLeft: '1.25rem' }}>
+            <li><a href="#stack" style={tocLinkStyle}>The stack</a></li>
+            <li><a href="#rest" style={tocLinkStyle}>REST conventions</a></li>
+            <li><a href="#status" style={tocLinkStyle}>Status codes</a></li>
+            <li><a href="#auth" style={tocLinkStyle}>Authentication and sessions</a></li>
+            <li><a href="#roles" style={tocLinkStyle}>User roles</a></li>
+            <li><a href="#rate-limits" style={tocLinkStyle}>Rate limits</a></li>
+            <li style={{ color: theme.text, fontWeight: fontWeights.semibold, marginTop: '0.25rem' }}>
+              Endpoints
+              <ul>
+                <li><a href="#endpoints-messages" style={tocLinkStyle}>Messages</a></li>
+                <li><a href="#endpoints-auth" style={tocLinkStyle}>Auth</a></li>
+                <li><a href="#endpoints-notes" style={tocLinkStyle}>Notes (QuickNotes)</a></li>
+                <li><a href="#endpoints-boards" style={tocLinkStyle}>Boards (MoodBoard)</a></li>
+                <li><a href="#endpoints-tasks" style={tocLinkStyle}>Tasks (TaskTrackr)</a></li>
+                <li><a href="#endpoints-task-updates" style={tocLinkStyle}>Task updates</a></li>
+                <li><a href="#endpoints-payments" style={tocLinkStyle}>Payments (Stripe)</a></li>
+                <li><a href="#endpoints-admin" style={tocLinkStyle}>Admin (Customer Service)</a></li>
+              </ul>
+            </li>
+            <li><a href="#diverges" style={tocLinkStyle}>Where this API diverges from textbook REST</a></li>
+          </ul>
+        </Card>
 
       {/* -------- Stack -------- */}
       <h2 id="stack">The stack</h2>
@@ -194,7 +251,7 @@ export default function ApiGuide() {
           </tr>
         </tbody>
       </table>
-      <p style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+      <p style={{ fontSize: '0.9rem', color: theme.textMuted }}>
         <em>Idempotent</em> means calling N times produces the same end-state as
         calling once — important so a network blip retry can't compound damage.
         Only POST is non-idempotent here (you really do create a new note each time).
@@ -395,7 +452,7 @@ export default function ApiGuide() {
 
       {/* payments */}
       <h3 id="endpoints-payments">Payments — Stripe subscriptions</h3>
-      <p style={{ fontSize: '0.9rem', color: '#6b7280' }}>
+      <p style={{ fontSize: '0.9rem', color: theme.textMuted }}>
         Subscription billing for the Premium tier, integrated with Stripe.
         The frontend uses Stripe Elements (Payment Element) so card details
         are sent directly from the browser to Stripe — they never touch this
@@ -414,7 +471,7 @@ export default function ApiGuide() {
           { method: 'POST', path: '/api/payments/webhook', auth: 'Stripe-signed', desc: 'Stripe-only endpoint. Verifies the signature against STRIPE_WEBHOOK_SECRET, dedupes by event id (stripe_events table), and updates user role on customer.subscription.* events. Returns 5xx on processing failure so Stripe retries.' }
         ]}
       />
-      <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+      <p style={{ fontSize: '0.85rem', color: theme.textMuted }}>
         The webhook endpoint is registered with{' '}
         <code style={codeStyle}>express.raw()</code> in{' '}
         <code style={codeStyle}>server.js</code> BEFORE the global{' '}
@@ -466,6 +523,23 @@ export default function ApiGuide() {
         edits, no idempotency keys for retried POSTs. All reasonable to skip at
         class-project scope; all worth knowing exist.
       </p>
-    </div>
+      </Container>
+    </>
   )
+}
+
+const pageTitleStyle = {
+  fontFamily: fonts.heading,
+  fontSize: 'clamp(2rem, 4vw, 3.25rem)',
+  fontWeight: fontWeights.bold,
+  lineHeight: 1.1,
+  letterSpacing: '-0.02em',
+  margin: `${space.md} 0 0`,
+  color: theme.text
+}
+
+const tocLinkStyle = {
+  color: theme.accent,
+  textDecoration: 'none',
+  fontFamily: fonts.body
 }

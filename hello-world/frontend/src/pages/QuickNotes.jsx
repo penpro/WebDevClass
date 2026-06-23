@@ -2,6 +2,19 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
+import Container from '../components/Container.jsx'
+import Card from '../components/Card.jsx'
+import Button from '../components/Button.jsx'
+import HudLabel from '../components/HudLabel.jsx'
+import CornerBrackets from '../components/CornerBrackets.jsx'
+import {
+  colors,
+  fonts,
+  fontSizes,
+  fontWeights,
+  radii,
+  space
+} from '../theme.js'
 
 export default function QuickNotes() {
   const { user, loading } = useAuth()
@@ -18,8 +31,6 @@ export default function QuickNotes() {
   const [editTitle, setEditTitle] = useState('')
   const [editBody, setEditBody] = useState('')
 
-  // Load the user's notes once the auth check is done and we know there
-  // is a logged-in user.
   useEffect(() => {
     if (loading || !user) return
     let cancelled = false
@@ -39,7 +50,13 @@ export default function QuickNotes() {
     }
   }, [loading, user])
 
-  if (loading) return <p>Loading…</p>
+  if (loading) {
+    return (
+      <Container narrow style={{ paddingTop: space['3xl'] }}>
+        <p style={{ color: colors.textSecondary }}>Loading…</p>
+      </Container>
+    )
+  }
   if (!user) {
     return <Navigate to="/login" state={{ from: '/quicknotes' }} replace />
   }
@@ -85,10 +102,7 @@ export default function QuickNotes() {
         method: 'PUT',
         body: JSON.stringify({ title: editTitle, body: editBody })
       })
-      // The server returns the whole row including the new updated_at.
-      // Replace in place, but move the updated note to the top to match
-      // the server's default sort.
-      setNotes((prev) => [updated, ...prev.filter((n) => n.id !== id)])
+      setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)))
       cancelEdit()
     } catch (err) {
       setError(err.message)
@@ -101,158 +115,241 @@ export default function QuickNotes() {
     try {
       await apiFetch(`/notes/${id}`, { method: 'DELETE' })
       setNotes((prev) => prev.filter((n) => n.id !== id))
-      if (editingId === id) cancelEdit()
     } catch (err) {
       setError(err.message)
     }
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1>QuickNotes</h1>
-      <p style={{ color: '#6b7280' }}>
-        Jot things down. Only you can see your notes.
-      </p>
-
+    <>
       <section
         style={{
-          border: '1px solid #d1d5db',
-          borderRadius: 8,
-          padding: '1rem',
-          marginBottom: '2rem',
-          background: '#f9fafb'
+          position: 'relative',
+          overflow: 'hidden',
+          paddingTop: space['2xl'],
+          paddingBottom: space.lg,
+          borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <h2 style={{ marginTop: 0, fontSize: '1.1rem' }}>New note</h2>
-        <form onSubmit={handleCreate}>
-          <input
-            type="text"
-            placeholder="Title"
-            value={newTitle}
-            onChange={(event) => setNewTitle(event.target.value)}
-            maxLength={255}
+        <CornerBrackets size={28} inset={24} />
+        <Container narrow style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="corona">QuickNotes</HudLabel>
+          <h1 style={pageTitleStyle}>Jot things down.</h1>
+          <p
             style={{
-              width: '100%',
-              padding: '0.5rem',
-              marginBottom: '0.5rem',
-              boxSizing: 'border-box'
+              margin: `${space.md} 0 0`,
+              color: colors.textSecondary,
+              fontSize: fontSizes.md,
+              lineHeight: 1.6
             }}
-          />
-          <textarea
-            placeholder="Write something…"
-            value={newBody}
-            onChange={(event) => setNewBody(event.target.value)}
-            rows={4}
-            style={{
-              width: '100%',
-              padding: '0.5rem',
-              marginBottom: '0.5rem',
-              fontFamily: 'inherit',
-              boxSizing: 'border-box'
-            }}
-          />
-          <button type="submit" disabled={creating}>
-            {creating ? 'Creating…' : 'Create note'}
-          </button>
-        </form>
+          >
+            Only you can see your notes. Sessions auth + MySQL foreign
+            keys do the rest.
+          </p>
+        </Container>
       </section>
 
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-
-      {listLoading ? (
-        <p>Loading notes…</p>
-      ) : notes.length === 0 ? (
-        <p>No notes yet. Create your first one above.</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {notes.map((note) => (
-            <li
-              key={note.id}
+      <Container narrow style={{ paddingTop: space.xl, paddingBottom: space['3xl'] }}>
+        <Card style={{ marginBottom: space.lg }}>
+          <h2
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: fontSizes.lg,
+              fontWeight: fontWeights.semibold,
+              color: colors.text,
+              margin: `0 0 ${space.md}`
+            }}
+          >
+            New note
+          </h2>
+          <form onSubmit={handleCreate}>
+            <input
+              type="text"
+              placeholder="Title"
+              value={newTitle}
+              onChange={(event) => setNewTitle(event.target.value)}
+              maxLength={255}
+              style={{ ...inputStyle, marginBottom: space.sm }}
+            />
+            <textarea
+              placeholder="Write something…"
+              value={newBody}
+              onChange={(event) => setNewBody(event.target.value)}
+              rows={4}
               style={{
-                border: '1px solid #d1d5db',
-                borderRadius: 8,
-                padding: '1rem',
-                marginBottom: '0.75rem',
-                background: 'white'
+                ...inputStyle,
+                marginBottom: space.sm,
+                fontFamily: fonts.body,
+                resize: 'vertical'
               }}
-            >
-              {editingId === note.id ? (
-                <>
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(event) => setEditTitle(event.target.value)}
-                    maxLength={255}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      marginBottom: '0.5rem',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                  <textarea
-                    value={editBody}
-                    onChange={(event) => setEditBody(event.target.value)}
-                    rows={6}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      marginBottom: '0.5rem',
-                      fontFamily: 'inherit',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button type="button" onClick={() => handleSave(note.id)}>
-                      Save
-                    </button>
-                    <button type="button" onClick={cancelEdit}>
-                      Cancel
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <h3 style={{ marginTop: 0, marginBottom: '0.5rem' }}>
-                    {note.title}
-                  </h3>
-                  {note.body && (
-                    <p style={{ whiteSpace: 'pre-wrap', marginTop: 0 }}>
-                      {note.body}
-                    </p>
+            />
+            <Button type="submit" disabled={creating}>
+              {creating ? 'Creating…' : 'Create note →'}
+            </Button>
+          </form>
+        </Card>
+
+        {error && <ErrorBanner>{error}</ErrorBanner>}
+
+        {listLoading ? (
+          <p style={{ color: colors.textSecondary }}>Loading notes…</p>
+        ) : notes.length === 0 ? (
+          <p style={{ color: colors.textSecondary }}>
+            No notes yet. Create your first one above.
+          </p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {notes.map((note) => (
+              <li key={note.id} style={{ marginBottom: space.md }}>
+                <Card>
+                  {editingId === note.id ? (
+                    <>
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(event) => setEditTitle(event.target.value)}
+                        maxLength={255}
+                        style={{ ...inputStyle, marginBottom: space.sm }}
+                      />
+                      <textarea
+                        value={editBody}
+                        onChange={(event) => setEditBody(event.target.value)}
+                        rows={6}
+                        style={{
+                          ...inputStyle,
+                          marginBottom: space.sm,
+                          fontFamily: fonts.body,
+                          resize: 'vertical'
+                        }}
+                      />
+                      <div style={{ display: 'flex', gap: space.sm }}>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => handleSave(note.id)}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={cancelEdit}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h3
+                        style={{
+                          fontFamily: fonts.heading,
+                          fontSize: fontSizes.lg,
+                          fontWeight: fontWeights.semibold,
+                          color: colors.text,
+                          margin: `0 0 ${space.sm}`
+                        }}
+                      >
+                        {note.title}
+                      </h3>
+                      {note.body && (
+                        <p
+                          style={{
+                            whiteSpace: 'pre-wrap',
+                            margin: `0 0 ${space.md}`,
+                            color: colors.textSecondary,
+                            lineHeight: 1.6
+                          }}
+                        >
+                          {note.body}
+                        </p>
+                      )}
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: space.sm,
+                          alignItems: 'center',
+                          flexWrap: 'wrap'
+                        }}
+                      >
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => startEdit(note)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(note.id)}
+                          style={{ color: colors.danger }}
+                        >
+                          Delete
+                        </Button>
+                        <span
+                          style={{
+                            fontSize: fontSizes.xs,
+                            color: colors.textMuted,
+                            marginLeft: 'auto',
+                            fontFamily: fonts.mono
+                          }}
+                        >
+                          updated {new Date(note.updated_at).toLocaleString()}
+                        </span>
+                      </div>
+                    </>
                   )}
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '0.5rem',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <button type="button" onClick={() => startEdit(note)}>
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(note.id)}
-                    >
-                      Delete
-                    </button>
-                    <span
-                      style={{
-                        fontSize: '0.75rem',
-                        color: '#6b7280',
-                        marginLeft: 'auto'
-                      }}
-                    >
-                      Updated {new Date(note.updated_at).toLocaleString()}
-                    </span>
-                  </div>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Container>
+    </>
+  )
+}
+
+const pageTitleStyle = {
+  fontFamily: fonts.heading,
+  fontSize: 'clamp(2rem, 4vw, 3rem)',
+  fontWeight: fontWeights.bold,
+  lineHeight: 1.1,
+  letterSpacing: '-0.02em',
+  margin: `${space.md} 0 0`,
+  color: colors.text
+}
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.6rem 0.75rem',
+  background: colors.bg,
+  color: colors.text,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  fontFamily: fonts.body,
+  fontSize: fontSizes.base,
+  outline: 'none',
+  boxSizing: 'border-box'
+}
+
+function ErrorBanner({ children }) {
+  return (
+    <p
+      style={{
+        color: colors.danger,
+        background: colors.dangerMuted,
+        border: `1px solid ${colors.danger}`,
+        borderRadius: radii.md,
+        padding: `${space.sm} ${space.md}`,
+        fontSize: fontSizes.sm,
+        margin: `0 0 ${space.md}`
+      }}
+    >
+      {children}
+    </p>
   )
 }

@@ -2,6 +2,17 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
+import Container from '../components/Container.jsx'
+import HudLabel from '../components/HudLabel.jsx'
+import CornerBrackets from '../components/CornerBrackets.jsx'
+import {
+  colors,
+  fonts,
+  fontSizes,
+  fontWeights,
+  radii,
+  space
+} from '../theme.js'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -359,7 +370,49 @@ export default function TaskTrackr() {
   // ---------- render ----------
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto' }}>
+    <>
+      <section
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          paddingTop: space['2xl'],
+          paddingBottom: space.lg,
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <CornerBrackets size={28} inset={24} />
+        <Container style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="cyan">TaskTrackr</HudLabel>
+          <h1
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: fontWeights.bold,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              margin: `${space.md} 0 0`,
+              color: colors.text
+            }}
+          >
+            Tasks organized by category.
+          </h1>
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              color: colors.textSecondary,
+              fontSize: fontSizes.md,
+              lineHeight: 1.6,
+              maxWidth: '60ch'
+            }}
+          >
+            Auto-saving edits, due-date tracking, and a Facebook-style
+            progress feed per task. Free tier uploads images; Premium
+            uploads video.
+          </p>
+        </Container>
+      </section>
+
+      <Container style={{ paddingTop: space.xl, paddingBottom: space['3xl'] }}>
       <style>{`
         .tt-grid { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
         @media (min-width: 720px) {
@@ -367,20 +420,22 @@ export default function TaskTrackr() {
         }
         .tt-side-link {
           display: flex; justify-content: space-between; align-items: center;
-          padding: 0.4rem 0.6rem; border-radius: 6px;
+          padding: 0.45rem 0.7rem; border-radius: 8px;
           cursor: pointer; user-select: none;
-          color: #111827; text-decoration: none;
+          color: ${colors.textSecondary}; text-decoration: none;
+          font-family: ${fonts.body};
         }
-        .tt-side-link:hover { background: #f3f4f6; }
-        .tt-side-link.active { background: #111827; color: white; }
-        .tt-side-link .count { font-size: 0.8rem; opacity: 0.7; }
+        .tt-side-link:hover { background: ${colors.surfaceHover}; color: ${colors.text}; }
+        .tt-side-link.active {
+          background: ${colors.accentMuted};
+          color: ${colors.accent};
+          border: 1px solid ${colors.accentBorder};
+        }
+        .tt-side-link .count {
+          font-size: 0.75rem; opacity: 0.85;
+          font-family: ${fonts.mono};
+        }
       `}</style>
-
-      <h1 style={{ marginTop: 0 }}>TaskTrackr</h1>
-      <p style={{ color: '#6b7280' }}>
-        Tasks organized by category, with auto-saving edits and due-date
-        tracking.
-      </p>
 
       <div className="tt-grid">
         {/* ------------------------------ Sidebar ------------------------------ */}
@@ -401,7 +456,7 @@ export default function TaskTrackr() {
                 fontSize: '0.75rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                color: '#6b7280',
+                color: colors.textMuted,
                 margin: '0.5rem 0.6rem'
               }}
             >
@@ -435,11 +490,11 @@ export default function TaskTrackr() {
         <main>
           <section
             style={{
-              border: '1px solid #d1d5db',
+              border: `1px solid ${colors.border}`,
               borderRadius: 8,
               padding: '1rem',
               marginBottom: '1rem',
-              background: '#f9fafb'
+              background: colors.surfaceMuted
             }}
           >
             <form
@@ -535,8 +590,8 @@ export default function TaskTrackr() {
           )}
         </main>
       </div>
-
-    </div>
+      </Container>
+    </>
   )
 }
 
@@ -600,11 +655,11 @@ function TaskRow({
   return (
     <li
       style={{
-        border: '1px solid #d1d5db',
+        border: `1px solid ${colors.border}`,
         borderRadius: 8,
         padding: '0.75rem 1rem',
         marginBottom: '0.5rem',
-        background: 'white'
+        background: colors.surface
       }}
     >
       {/* ---- collapsed header row (always visible) ---- */}
@@ -637,7 +692,7 @@ function TaskRow({
           <span
             style={{
               fontSize: '0.75rem',
-              color: task.completed ? '#15803d' : '#6b7280',
+              color: task.completed ? colors.success : colors.textMuted,
               whiteSpace: 'nowrap'
             }}
           >
@@ -662,7 +717,7 @@ function TaskRow({
               style={{
                 fontWeight: 'bold',
                 textDecoration: task.completed ? 'line-through' : 'none',
-                color: task.completed ? '#6b7280' : '#111827',
+                color: task.completed ? colors.textMuted : colors.text,
                 wordBreak: 'break-word'
               }}
             >
@@ -671,7 +726,7 @@ function TaskRow({
             <div
               style={{
                 fontSize: '0.8rem',
-                color: '#6b7280',
+                color: colors.textMuted,
                 marginTop: '0.15rem',
                 display: 'flex',
                 gap: '0.5rem',
@@ -683,10 +738,10 @@ function TaskRow({
                   style={{
                     color:
                       dueLabel.startsWith('Overdue')
-                        ? '#b91c1c'
+                        ? colors.danger
                         : dueLabel === 'Due today'
-                        ? '#b45309'
-                        : '#6b7280'
+                        ? colors.warning
+                        : colors.textMuted
                   }}
                 >
                   {dueLabel}
@@ -694,8 +749,8 @@ function TaskRow({
               )}
               <span
                 style={{
-                  background: '#e5e7eb',
-                  color: '#374151',
+                  background: colors.surfaceHover,
+                  color: colors.text,
                   padding: '0.05rem 0.45rem',
                   borderRadius: 999,
                   fontSize: '0.75rem'
@@ -708,7 +763,7 @@ function TaskRow({
           <span
             style={{
               fontSize: '0.75rem',
-              color: '#9ca3af',
+              color: colors.textMuted,
               flex: '0 0 auto',
               whiteSpace: 'nowrap'
             }}
@@ -724,14 +779,14 @@ function TaskRow({
           style={{
             marginTop: '0.75rem',
             paddingTop: '0.75rem',
-            borderTop: '1px dashed #d1d5db'
+            borderTop: `1px dashed ${colors.border}`
           }}
         >
           <label style={{ display: 'block', marginBottom: '0.5rem' }}>
             <span
               style={{
                 fontSize: '0.75rem',
-                color: '#6b7280',
+                color: colors.textMuted,
                 display: 'block'
               }}
             >
@@ -753,7 +808,7 @@ function TaskRow({
             <span
               style={{
                 fontSize: '0.75rem',
-                color: '#6b7280',
+                color: colors.textMuted,
                 display: 'block'
               }}
             >
@@ -783,7 +838,7 @@ function TaskRow({
               <span
                 style={{
                   fontSize: '0.75rem',
-                  color: '#6b7280',
+                  color: colors.textMuted,
                   display: 'block'
                 }}
               >
@@ -800,7 +855,7 @@ function TaskRow({
               <span
                 style={{
                   fontSize: '0.75rem',
-                  color: '#6b7280',
+                  color: colors.textMuted,
                   display: 'block'
                 }}
               >
@@ -838,10 +893,10 @@ function TaskRow({
                 fontSize: '0.75rem',
                 color:
                   saveStatus === 'saving'
-                    ? '#b45309'
+                    ? colors.warning
                     : saveStatus === 'saved'
-                    ? '#15803d'
-                    : '#9ca3af'
+                    ? colors.success
+                    : colors.textMuted
               }}
             >
               {saveStatus === 'saving'
@@ -855,8 +910,8 @@ function TaskRow({
               onClick={onDelete}
               style={{
                 background: 'transparent',
-                border: '1px solid #b91c1c',
-                color: '#b91c1c',
+                border: `1px solid ${colors.danger}`,
+                color: colors.danger,
                 padding: '0.25rem 0.6rem',
                 borderRadius: 4,
                 cursor: 'pointer',
@@ -872,7 +927,7 @@ function TaskRow({
             style={{
               marginTop: '1rem',
               paddingTop: '1rem',
-              borderTop: '1px dashed #d1d5db'
+              borderTop: `1px dashed ${colors.border}`
             }}
           >
             <div
@@ -880,7 +935,7 @@ function TaskRow({
                 fontSize: '0.75rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                color: '#6b7280',
+                color: colors.textMuted,
                 marginBottom: '0.5rem'
               }}
             >
@@ -890,8 +945,8 @@ function TaskRow({
             <form
               onSubmit={onPostUpdate}
               style={{
-                background: '#f9fafb',
-                border: '1px solid #d1d5db',
+                background: colors.surfaceMuted,
+                border: `1px solid ${colors.border}`,
                 borderRadius: 6,
                 padding: '0.5rem',
                 marginBottom: '0.75rem'
@@ -907,7 +962,7 @@ function TaskRow({
                   padding: '0.4rem',
                   boxSizing: 'border-box',
                   fontFamily: 'inherit',
-                  border: '1px solid #d1d5db',
+                  border: `1px solid ${colors.border}`,
                   borderRadius: 4,
                   marginBottom: '0.5rem'
                 }}
@@ -935,7 +990,7 @@ function TaskRow({
                   <span
                     style={{
                       fontSize: '0.75rem',
-                      color: '#6b7280',
+                      color: colors.textMuted,
                       whiteSpace: 'nowrap'
                     }}
                   >
@@ -955,11 +1010,11 @@ function TaskRow({
             </form>
 
             {updatesLoading ? (
-              <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+              <p style={{ fontSize: '0.85rem', color: colors.textMuted }}>
                 Loading updates…
               </p>
             ) : updates.length === 0 ? (
-              <p style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+              <p style={{ fontSize: '0.85rem', color: colors.textMuted }}>
                 No updates yet. Post the first one above.
               </p>
             ) : (
@@ -968,11 +1023,11 @@ function TaskRow({
                   <li
                     key={u.id}
                     style={{
-                      border: '1px solid #e5e7eb',
+                      border: `1px solid ${colors.borderSubtle}`,
                       borderRadius: 6,
                       padding: '0.6rem',
                       marginBottom: '0.5rem',
-                      background: 'white'
+                      background: colors.surface
                     }}
                   >
                     <div
@@ -986,7 +1041,7 @@ function TaskRow({
                       <span
                         style={{
                           fontSize: '0.75rem',
-                          color: '#6b7280'
+                          color: colors.textMuted
                         }}
                       >
                         {new Date(u.created_at).toLocaleString()}
@@ -997,7 +1052,7 @@ function TaskRow({
                         style={{
                           background: 'transparent',
                           border: 'none',
-                          color: '#9ca3af',
+                          color: colors.textMuted,
                           cursor: 'pointer',
                           fontSize: '0.85rem'
                         }}
@@ -1028,7 +1083,7 @@ function TaskRow({
                             maxHeight: 360,
                             borderRadius: 4,
                             display: 'block',
-                            background: '#000'
+                            background: colors.bg
                           }}
                         />
                       ) : (

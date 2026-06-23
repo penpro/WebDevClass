@@ -2,6 +2,19 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
+import Container from '../components/Container.jsx'
+import Card from '../components/Card.jsx'
+import Button from '../components/Button.jsx'
+import HudLabel from '../components/HudLabel.jsx'
+import CornerBrackets from '../components/CornerBrackets.jsx'
+import {
+  colors,
+  fonts,
+  fontSizes,
+  fontWeights,
+  radii,
+  space
+} from '../theme.js'
 
 export default function MoodBoards() {
   const { user, loading } = useAuth()
@@ -32,7 +45,13 @@ export default function MoodBoards() {
     }
   }, [loading, user])
 
-  if (loading) return <p>Loading…</p>
+  if (loading) {
+    return (
+      <Container narrow style={{ paddingTop: space['3xl'] }}>
+        <p style={{ color: colors.textSecondary }}>Loading…</p>
+      </Container>
+    )
+  }
   if (!user) {
     return <Navigate to="/login" state={{ from: '/moodboard' }} replace />
   }
@@ -69,102 +88,174 @@ export default function MoodBoards() {
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1>MoodBoard</h1>
-      <p style={{ color: '#6b7280' }}>
-        Create a board, paste image URLs, share the link with anyone. No photos
-        are uploaded or stored on the server — tiles load directly from their
-        original hosts.
-      </p>
-
+    <>
       <section
         style={{
-          border: '1px solid #d1d5db',
-          borderRadius: 8,
-          padding: '1rem',
-          marginBottom: '2rem',
-          background: '#f9fafb'
+          position: 'relative',
+          overflow: 'hidden',
+          paddingTop: space['2xl'],
+          paddingBottom: space.lg,
+          borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <h2 style={{ marginTop: 0, fontSize: '1.1rem' }}>New board</h2>
-        <form
-          onSubmit={handleCreate}
-          style={{ display: 'flex', gap: '0.5rem' }}
-        >
-          <input
-            type="text"
-            placeholder="Board name (e.g. Autumn photoshoot)"
-            value={newName}
-            onChange={(event) => setNewName(event.target.value)}
-            maxLength={255}
+        <CornerBrackets size={28} inset={24} />
+        <Container narrow style={{ position: 'relative', zIndex: 1 }}>
+          <HudLabel tone="magenta">MoodBoard</HudLabel>
+          <h1 style={pageTitleStyle}>Image-URL boards, public share links.</h1>
+          <p
             style={{
-              flex: 1,
-              padding: '0.5rem',
-              boxSizing: 'border-box'
+              margin: `${space.md} 0 0`,
+              color: colors.textSecondary,
+              fontSize: fontSizes.md,
+              lineHeight: 1.6,
+              maxWidth: '60ch'
             }}
-          />
-          <button type="submit" disabled={creating || !newName.trim()}>
-            {creating ? 'Creating…' : 'Create'}
-          </button>
-        </form>
+          >
+            Create a board, paste image URLs, share the link. No photos
+            are uploaded or stored on the server — tiles load directly
+            from their original hosts.
+          </p>
+        </Container>
       </section>
 
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-
-      {listLoading ? (
-        <p>Loading boards…</p>
-      ) : boards.length === 0 ? (
-        <p>No boards yet. Create your first one above.</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {boards.map((board) => (
-            <li
-              key={board.id}
+      <Container narrow style={{ paddingTop: space.xl, paddingBottom: space['3xl'] }}>
+        <Card style={{ marginBottom: space.lg }}>
+          <h2
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: fontSizes.lg,
+              fontWeight: fontWeights.semibold,
+              color: colors.text,
+              margin: `0 0 ${space.md}`
+            }}
+          >
+            New board
+          </h2>
+          <form
+            onSubmit={handleCreate}
+            style={{ display: 'flex', gap: space.sm, flexWrap: 'wrap' }}
+          >
+            <input
+              type="text"
+              placeholder="Board name (e.g. Autumn photoshoot)"
+              value={newName}
+              onChange={(event) => setNewName(event.target.value)}
+              maxLength={255}
               style={{
-                border: '1px solid #d1d5db',
-                borderRadius: 8,
-                padding: '1rem',
-                marginBottom: '0.75rem',
-                background: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem'
+                flex: 1,
+                minWidth: '12rem',
+                padding: '0.6rem 0.75rem',
+                background: colors.bg,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
+                borderRadius: radii.md,
+                fontFamily: fonts.body,
+                fontSize: fontSizes.base,
+                outline: 'none'
               }}
+            />
+            <Button
+              type="submit"
+              disabled={creating || !newName.trim()}
             >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <Link
-                  to={`/moodboard/${board.share_token}`}
+              {creating ? 'Creating…' : 'Create →'}
+            </Button>
+          </form>
+        </Card>
+
+        {error && (
+          <p
+            style={{
+              color: colors.danger,
+              background: colors.dangerMuted,
+              border: `1px solid ${colors.danger}`,
+              borderRadius: radii.md,
+              padding: `${space.sm} ${space.md}`,
+              fontSize: fontSizes.sm,
+              margin: `0 0 ${space.lg}`
+            }}
+          >
+            {error}
+          </p>
+        )}
+
+        {listLoading ? (
+          <p style={{ color: colors.textSecondary }}>Loading boards…</p>
+        ) : boards.length === 0 ? (
+          <p style={{ color: colors.textSecondary }}>
+            No boards yet. Create your first one above.
+          </p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {boards.map((board) => (
+              <li key={board.id} style={{ marginBottom: space.md }}>
+                <Card
                   style={{
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    textDecoration: 'none',
-                    color: '#111827'
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: space.md,
+                    flexWrap: 'wrap'
                   }}
                 >
-                  {board.name}
-                </Link>
-                <div
-                  style={{
-                    fontSize: '0.85rem',
-                    color: '#6b7280',
-                    marginTop: '0.25rem'
-                  }}
-                >
-                  {board.image_count}{' '}
-                  {board.image_count === 1 ? 'image' : 'images'} · Updated{' '}
-                  {new Date(board.updated_at).toLocaleString()}
-                </div>
-              </div>
-              <Link to={`/moodboard/${board.share_token}`}>
-                <button type="button">Open</button>
-              </Link>
-              <button type="button" onClick={() => handleDelete(board)}>
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Link
+                      to={`/moodboard/${board.share_token}`}
+                      style={{
+                        fontFamily: fonts.heading,
+                        fontSize: fontSizes.md,
+                        fontWeight: fontWeights.semibold,
+                        textDecoration: 'none',
+                        color: colors.text
+                      }}
+                    >
+                      {board.name}
+                    </Link>
+                    <div
+                      style={{
+                        fontSize: fontSizes.xs,
+                        color: colors.textMuted,
+                        marginTop: space.xs,
+                        fontFamily: fonts.mono
+                      }}
+                    >
+                      {board.image_count}{' '}
+                      {board.image_count === 1 ? 'image' : 'images'} ·
+                      updated{' '}
+                      {new Date(board.updated_at).toLocaleString()}
+                    </div>
+                  </div>
+                  <Button
+                    as={Link}
+                    to={`/moodboard/${board.share_token}`}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    Open
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(board)}
+                    style={{ color: colors.danger }}
+                  >
+                    Delete
+                  </Button>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Container>
+    </>
   )
+}
+
+const pageTitleStyle = {
+  fontFamily: fonts.heading,
+  fontSize: 'clamp(2rem, 4vw, 3rem)',
+  fontWeight: fontWeights.bold,
+  lineHeight: 1.1,
+  letterSpacing: '-0.02em',
+  margin: `${space.md} 0 0`,
+  color: colors.text
 }

@@ -9,6 +9,7 @@ import {
 } from '@stripe/react-stripe-js'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
+import { colors, fonts, fontSizes, fontWeights, radii, space } from '../theme.js'
 
 // loadStripe must be called outside any component because it returns a
 // Promise we want to keep stable across renders. We populate it lazily
@@ -140,7 +141,7 @@ export default function Subscribe() {
     return (
       <div style={PAGE_STYLE}>
         <h1>Premium subscription</h1>
-        <p style={{ color: '#b45309' }}>
+        <p style={{ color: colors.warning }}>
           Payments are not configured on this server yet. The site
           administrator needs to set <code>STRIPE_PUBLISHABLE_KEY</code>,{' '}
           <code>STRIPE_SECRET_KEY</code>, <code>STRIPE_PRICE_ID</code>,
@@ -204,7 +205,7 @@ export default function Subscribe() {
           signal to land on our side — this usually takes a couple of
           seconds.
         </p>
-        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+        <p style={{ color: colors.textMuted, fontSize: '0.9rem' }}>
           Don't refresh the page; it'll update on its own as soon as
           activation completes.
         </p>
@@ -227,7 +228,7 @@ export default function Subscribe() {
           the page in a moment, or check the Stripe dashboard if it
           persists.
         </p>
-        <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+        <p style={{ color: colors.textMuted, fontSize: '0.85rem' }}>
           Current status: <code>{subStatus?.status || 'unknown'}</code>
         </p>
         <button
@@ -235,8 +236,8 @@ export default function Subscribe() {
           onClick={() => window.location.reload()}
           style={{
             padding: '0.5rem 1rem',
-            background: '#111827',
-            color: 'white',
+            background: colors.accent,
+            color: '#04221b',
             border: 'none',
             borderRadius: 4,
             cursor: 'pointer'
@@ -258,8 +259,8 @@ export default function Subscribe() {
           <p
             style={{
               padding: '0.75rem 1rem',
-              background: '#d1fae5',
-              borderLeft: '4px solid #15803d',
+              background: colors.successMuted,
+              borderLeft: `4px solid ${colors.success}`,
               borderRadius: 4,
               marginBottom: '1.5rem'
             }}
@@ -274,7 +275,7 @@ export default function Subscribe() {
           <strong>{subStatus.status}</strong>.
         </p>
         {subStatus.current_period_end && (
-          <p style={{ color: '#6b7280' }}>
+          <p style={{ color: colors.textMuted }}>
             {subStatus.cancel_at_period_end
               ? `Your subscription ends on ${new Date(
                   subStatus.current_period_end
@@ -294,8 +295,8 @@ export default function Subscribe() {
             disabled={cancelling}
             style={{
               background: 'transparent',
-              border: '1px solid #b91c1c',
-              color: '#b91c1c',
+              border: `1px solid ${colors.danger}`,
+              color: colors.danger,
               padding: '0.5rem 1rem',
               borderRadius: 4,
               cursor: 'pointer'
@@ -344,13 +345,13 @@ export default function Subscribe() {
         recurring charge, cancel anytime.
       </p>
 
-      <ul style={{ color: '#374151' }}>
+      <ul style={{ color: colors.textSecondary }}>
         <li>Image and video uploads on task progress posts</li>
         <li>100 MB per file (vs 10 MB for free accounts)</li>
         <li>All future Premium-only features automatically</li>
       </ul>
 
-      <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+      <p style={{ color: colors.textMuted, fontSize: '0.9rem' }}>
         We use Stripe in test mode — your real card is never charged. Use the
         Stripe test card number <code>4242 4242 4242 4242</code> with any
         future expiry, any 3-digit CVC, and any ZIP.
@@ -364,8 +365,8 @@ export default function Subscribe() {
         disabled={creating}
         style={{
           padding: '0.6rem 1.2rem',
-          background: '#111827',
-          color: 'white',
+          background: colors.accent,
+          color: '#04221b',
           border: 'none',
           borderRadius: 4,
           cursor: 'pointer',
@@ -419,8 +420,8 @@ function SubscribeForm() {
         style={{
           marginTop: '1rem',
           padding: '0.6rem 1.2rem',
-          background: '#111827',
-          color: 'white',
+          background: colors.accent,
+          color: '#04221b',
           border: 'none',
           borderRadius: 4,
           cursor: 'pointer',
@@ -433,7 +434,7 @@ function SubscribeForm() {
       <p
         style={{
           fontSize: '0.8rem',
-          color: '#6b7280',
+          color: colors.textMuted,
           marginTop: '0.75rem',
           textAlign: 'center'
         }}
