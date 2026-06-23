@@ -21,13 +21,14 @@ import HudLabel from '../components/HudLabel.jsx';
 const PROJECTS = [
   {
     to: '/projects/diagnostics',
-    fallback: '/admin-portal/diagnostics',
+    // No fallback to the admin route — the case study at /projects/diagnostics
+    // is the public-facing page. The live admin dashboard stays behind auth.
     badge: 'Performance engineering',
     title: 'Diagnostics & load-testing dashboard',
     summary:
       'A live k6 test runner exposed as a GUI: button-driven runs, SSE-streamed charts (req/s, latency percentiles, CPU+memory), runtime rate-limiter and maintenance toggles, and a 128-bit per-run bypass token. Built to measure the actual ceiling of a production stack.',
     stack: ['Node.js', 'Express', 'SSE', 'k6', 'MySQL', 'PM2'],
-    auth: 'super_admin only — visible to me'
+    auth: 'Case study (live tool is super_admin only)'
   },
   {
     to: '/projects/tasktrackr',

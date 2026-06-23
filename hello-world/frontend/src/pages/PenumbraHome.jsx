@@ -63,7 +63,7 @@ const SERVICES = [
 
 const FEATURED = [
   {
-    to: '/admin-portal/diagnostics',
+    to: '/projects/diagnostics',
     badge: 'Performance engineering',
     title: 'Diagnostics & load-testing dashboard',
     body:
@@ -273,11 +273,11 @@ export default function PenumbraHome() {
               <div style={{ marginTop: space.lg, display: 'flex', gap: space.md, flexWrap: 'wrap' }}>
                 <Button
                   as={Link}
-                  to="/admin-portal/diagnostics"
+                  to="/projects/diagnostics"
                   variant="secondary"
                   size="sm"
                 >
-                  Open the live dashboard →
+                  Read the case study →
                 </Button>
                 <Button
                   as="a"
