@@ -18,6 +18,8 @@ import Projects from './pages/Projects.jsx'
 import DiagnosticsCase from './pages/projects/DiagnosticsCase.jsx'
 import TheoryOfComputationCase from './pages/projects/TheoryOfComputationCase.jsx'
 import Repair360Case from './pages/projects/Repair360Case.jsx'
+import TrigonometryToolsCase from './pages/projects/TrigonometryToolsCase.jsx'
+import MetaverseOriginsCase from './pages/projects/MetaverseOriginsCase.jsx'
 
 // Existing pages preserved. The old `Home.jsx` is gone from the route
 // table (PenumbraHome is the new landing). The mini-apps below will move
@@ -53,6 +55,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               element={<TheoryOfComputationCase />}
             />
             <Route path="projects/repair360-auto" element={<Repair360Case />} />
+            <Route
+              path="projects/trigonometry-tools"
+              element={<TrigonometryToolsCase />}
+            />
+            <Route
+              path="projects/metaverse-origins"
+              element={<MetaverseOriginsCase />}
+            />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
 
