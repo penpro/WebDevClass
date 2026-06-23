@@ -185,11 +185,15 @@ export default function PenumbraHome() {
                 color: colors.textSecondary
               }}
             >
-              Penumbra Tech is a one-person consultancy that helps
-              freelancers and small businesses turn complex problems into
-              clean software and reliable systems. Web apps, cloud
-              infrastructure, game development, and the operational glue
-              that keeps it all working.
+              Penumbra Tech is the single-engineer practice of Wesley
+              Weaver Jr.{' '}
+              <strong style={{ color: colors.text }}>
+                I build across the seams
+              </strong>{' '}
+              — software, infrastructure, data, operations, and the
+              human process around them. Web apps, AWS, Unreal Engine
+              systems, and the reliability work that keeps everything
+              from quietly falling over.
             </p>
 
             <div

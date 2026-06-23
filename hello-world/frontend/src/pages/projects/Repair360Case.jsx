@@ -1,14 +1,15 @@
-// Repair360Auto case study.
+// Repair360 Auto — case study.
 //
-// The client wanted to keep their existing Wix-hosted site, which meant
-// the entire build had to live inside a Wix HTML/Iframe panel and look
-// like part of the page. The real engineering challenge was making a
-// proper modern React app behave responsively inside a third-party
-// CMS's iframe — Wix doesn't propagate viewport changes to the embed,
-// and the embed has no implicit way to ask the parent for height. So
-// the layout had to negotiate its size manually via postMessage and
-// stay readable across phone / tablet / desktop with no help from the
-// host.
+// The visible work is a custom auto-repair-shop site living inside a
+// Wix HTML/Iframe panel. The interesting work is everything that had
+// to be solved to make a hand-built page behave inside someone else's
+// no-code host without losing the brand or its search visibility.
+//
+// Stack note: hand-written dependency-free HTML/CSS/vanilla JS, a
+// single ~160 KB file, no framework, no build step. Earlier drafts of
+// this case study claimed React and an active postMessage size-
+// negotiation layer; both were wrong. This version is honest about
+// what shipped — the actual story is more interesting anyway.
 
 import { Link } from 'react-router-dom';
 import {
@@ -29,29 +30,38 @@ import CodePanel from '../../components/CodePanel.jsx';
 
 const SITE_URL = 'https://www.repair360auto.com/';
 
-// Real shape of the size-negotiation script. Stripped of project-
-// specific selectors so it reads cleanly as a teaching snippet.
-const RESIZE_CODE = `// Iframe-to-parent size negotiation.
-// Wix doesn't reflow the iframe when our content changes height, so
-// we measure ourselves on every layout change and post the new height
-// up to the parent — which Wix's editor wires through to the embed
-// container.
-const sendHeight = () => {
-  const h = Math.ceil(document.documentElement.scrollHeight);
-  parent.postMessage({ type: 'resize-embed', height: h }, '*');
-};
+// Screenshots live at public/projects/repair360/. Drop any PNG/JPG of
+// the live site in there and add an entry below — order is preserved.
+// Captions are short by design; the case study text carries the story.
+const SCREENSHOTS = [
+  { src: '/projects/repair360/desktop-hero.png', caption: 'Hero — desktop view of the live embed inside the Wix host.' },
+  { src: '/projects/repair360/services.png', caption: 'Services + detailing package — vectorized logo and brand orange against near-black.' },
+  { src: '/projects/repair360/mobile.png', caption: 'Mobile — responsive single-pager with no framework runtime.' }
+];
 
-// Watch every layout-sensitive thing that could change height:
-// content swaps, image loads, font swaps, viewport rotations.
-const ro = new ResizeObserver(sendHeight);
-ro.observe(document.documentElement);
-
-window.addEventListener('load', sendHeight);
-window.addEventListener('resize', sendHeight);
-document.fonts?.ready.then(sendHeight);
-
-// First send, before observers attach.
-sendHeight();`;
+// Real snippet — the AutoRepair JSON-LD that makes the embed visible to
+// Google despite living inside an iframe. The same shape lives in the
+// host page's <head>, not inside the iframe (the iframe doesn't carry
+// its own SEO).
+const JSONLD_CODE = `<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRepair",
+  "name": "360 Automotive",
+  "url": "https://www.repair360auto.com/",
+  "telephone": "+1-360-...",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "…",
+    "addressLocality": "Port Orchard",
+    "addressRegion": "WA",
+    "postalCode": "…",
+    "addressCountry": "US"
+  },
+  "openingHours": "Mo-Fr 08:00-17:00",
+  "priceRange": "$$"
+}
+</script>`;
 
 export default function Repair360Case() {
   return (
@@ -71,7 +81,9 @@ export default function Repair360Case() {
         <Stars density={120} heroDensity={12} colorTint="corona" />
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
-          <HudLabel tone="cyan">Case study — Client work / constraint engineering</HudLabel>
+          <HudLabel tone="cyan">
+            Case study — Client work / constraint engineering
+          </HudLabel>
           <h1
             style={{
               fontFamily: fonts.heading,
@@ -89,19 +101,20 @@ export default function Repair360Case() {
           <p
             style={{
               margin: 0,
-              maxWidth: '62ch',
+              maxWidth: '64ch',
               fontSize: fontSizes.lg,
               color: colors.textSecondary,
               lineHeight: 1.6
             }}
           >
-            The client had an existing Wix-hosted site they didn&apos;t
-            want to migrate — Wix was already wired into their booking
-            tools, their email, and their listings. So instead of telling
-            them to change hosts, I built a proper responsive React-based
-            front-end and shoehorned it into a Wix HTML/Iframe panel,
-            with a small postMessage size-negotiation layer so it
-            behaves as if it owned the page.
+            The brief that&apos;s secretly an engineering problem. The
+            client had a working Wix setup — booking app, email, business
+            listings all wired to that account — and no interest in
+            re-platforming. They wanted a better visitor experience
+            without uprooting a back office that already worked. The lazy
+            answer is &ldquo;migrate to a real stack.&rdquo; The right
+            answer is to meet them where they are and make a modern
+            front-end behave correctly inside the host they already trust.
           </p>
           <div
             style={{
@@ -111,24 +124,29 @@ export default function Repair360Case() {
               marginTop: space.lg
             }}
           >
-            {['React', 'Responsive CSS', 'postMessage', 'Wix embed', 'Client work'].map(
-              (tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    fontFamily: fonts.mono,
-                    fontSize: fontSizes.xs,
-                    padding: '0.2rem 0.6rem',
-                    background: colors.bg,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: radii.full,
-                    color: colors.textSecondary
-                  }}
-                >
-                  {tag}
-                </span>
-              )
-            )}
+            {[
+              'Vanilla JS',
+              'Responsive CSS',
+              'SVG vectorization',
+              'JSON-LD structured data',
+              'Wix embed',
+              'Client work'
+            ].map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  fontFamily: fonts.mono,
+                  fontSize: fontSizes.xs,
+                  padding: '0.2rem 0.6rem',
+                  background: colors.bg,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: radii.full,
+                  color: colors.textSecondary
+                }}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
           <div
             style={{
@@ -154,131 +172,183 @@ export default function Repair360Case() {
         </Container>
       </section>
 
-      {/* ========================== The constraint ========================== */}
-      <section
-        style={{
-          paddingTop: space['3xl'],
-          paddingBottom: space['3xl'],
-          background: colors.bgSoft,
-          borderBottom: `1px solid ${colors.borderSubtle}`
-        }}
-      >
-        <Container>
-          <div style={{ maxWidth: '60ch' }}>
-            <HudLabel tone="corona">The constraint</HudLabel>
-            <h2 style={sectionTitleStyle}>
-              &ldquo;We&apos;re not moving off Wix.&rdquo;
-            </h2>
-            <Prose>
-              <p>
-                The client&apos;s existing site was on Wix. Their booking
-                widgets, customer email, and a handful of marketing
-                integrations were all wired to the same account. They
-                didn&apos;t want a re-platform; they wanted a better
-                visitor experience without uprooting the back office that
-                already worked.
-              </p>
-              <p>
-                That&apos;s a real engineering problem dressed up as a
-                business preference. A lot of developers respond to it by
-                telling the client they&apos;re wrong — &ldquo;you should
-                migrate to a real stack&rdquo; — and then either deliver
-                a frustrated half-effort or lose the engagement. The
-                better answer is to meet the client where they are: ship
-                a modern front-end that lives <em>inside</em> the host
-                they already use, behaves correctly there, and stays
-                maintainable.
-              </p>
-            </Prose>
-          </div>
-        </Container>
-      </section>
+      {/* ============================ Screenshots =========================== */}
+      <ScreenshotStrip />
 
-      {/* =========================== The work ============================== */}
-      <section
-        style={{
-          paddingTop: space['3xl'],
-          paddingBottom: space['3xl'],
-          borderBottom: `1px solid ${colors.borderSubtle}`
-        }}
+      {/* ========================== Challenge 1 ============================ */}
+      <ChallengeSection
+        background={colors.bgSoft}
+        eyebrow="Challenge 1 — Brand reverse-engineering"
+        tone="corona"
+        title="A brand with no brand guide."
       >
-        <Container>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.15fr)',
-              gap: space['2xl'],
-              alignItems: 'center'
-            }}
-            className="repair-code-grid"
+        <p>
+          The deliverable I was handed was three social-media flyers and
+          a logo. No palette, no type spec, no copy deck, no component
+          library — just the raw artwork the client already had. So
+          before I could build the page I had to reverse-engineer the
+          brand from the artwork: extract the orange{' '}
+          <code style={inlineCodeStyle}>#F47A1F</code> against near-black,
+          identify the condensed-bold display face used in the headers
+          and the outlined-italic title treatment, and turn it all into
+          a cohesive responsive single-pager with real structure
+          (services, detailing package, value props, contact).
+        </p>
+        <p>
+          The output is a brand that <em>reads</em> consistent across
+          every section because the inputs were normalised first; the
+          page just expresses a system that didn&apos;t formally exist
+          before.
+        </p>
+      </ChallengeSection>
+
+      {/* ========================== Challenge 2 ============================ */}
+      <ChallengeSection
+        eyebrow="Challenge 2 — Logo that fought every size"
+        tone="cyan"
+        title="A muddy JPEG with a baked-in black background."
+      >
+        <p>
+          The supplied logo was a JPEG, not an SVG, and it had a baked-in
+          black background — lossy compression artefacts around every
+          edge and no transparency, so it sat in an ugly opaque box on a
+          dark page.
+        </p>
+        <p>
+          The fix was two passes. First, key the black out to recover a
+          clean transparent PNG — treating the image as
+          premultiplied-over-black so the alpha channel could be
+          extracted properly rather than hard-edge keying every pixel.
+          Then vectorise to SVG: posterise the result to flat brand
+          colours to kill the JPEG noise, trace the shapes, and strip
+          the background. The final logo is razor-sharp from a 16 px
+          favicon to a billboard, and lives inline in the HTML so there
+          isn&apos;t even a separate asset request to fail.
+        </p>
+      </ChallengeSection>
+
+      {/* ========================== Challenge 3 ============================ */}
+      <ChallengeSection
+        background={colors.bgSoft}
+        eyebrow="Challenge 3 — Behave inside a Wix panel"
+        tone="magenta"
+        title="One self-contained file, no framework, no build step."
+      >
+        <p>
+          The whole front-end ships as a single self-contained HTML file
+          — CSS and JS inlined, logo embedded as inline SVG, fonts from
+          a CDN — and gets dropped into a Wix HTML/Iframe panel. No
+          React, no Vue, no bundler, no build step. About 160 KB,
+          paste-anywhere, framework-free.
+        </p>
+        <p>
+          That&apos;s a stronger answer for an embed than React would have
+          been. The framework runtime would have been pure tax — the
+          page has no state to model, no client-side routing, no
+          re-render cycle. Mobile-first CSS handles the responsiveness;
+          the panel is sized to fit the content.
+        </p>
+        <p>
+          One known limitation worth naming: an iframe&apos;s in-page
+          anchor nav can&apos;t scroll its <em>parent</em>, so I dropped
+          the section links for a tagline and routed the primary CTA
+          straight to the client&apos;s external booking app in a new
+          tab. The pragmatic call beat the clever one.
+        </p>
+      </ChallengeSection>
+
+      {/* ========================== Challenge 4 ============================ */}
+      <ChallengeSection
+        eyebrow="Challenge 4 — Mojibake nobody warns you about"
+        tone="cyan"
+        title="UTF-8 turned to soup somewhere between editor and clipboard."
+      >
+        <p>
+          First paste into Wix came out full of garbage characters — em
+          dashes, degree signs, and icons all corrupted. The root cause
+          wasn&apos;t in the code; it was in the delivery pipeline.
+          PowerShell was reading a UTF-8 file as Windows-1252 on its way
+          to the clipboard, so every multi-byte UTF-8 sequence was being
+          interpreted one byte at a time. The tell was that the
+          clipboard&apos;s character count exactly equalled the file&apos;s
+          byte count — a giveaway that the encoding step had collapsed.
+        </p>
+        <p>
+          The fix wasn&apos;t to harden the pipeline — I don&apos;t own
+          the Wix paste path. The fix was to make the artefact immune to
+          its own delivery: compile the entire embed to pure ASCII. HTML
+          numeric entities in the markup, unicode escapes in the CSS, so
+          no encoding step in PowerShell, the clipboard, or Wix can
+          corrupt it again. Robust to a channel I don&apos;t control.
+        </p>
+      </ChallengeSection>
+
+      {/* ========================== Challenge 5 ============================ */}
+      <ChallengeSection
+        background={colors.bgSoft}
+        eyebrow="Challenge 5 — The invisible-website trap"
+        tone="magenta"
+        title="Pixel-perfect, and effectively unindexable."
+      >
+        <p>
+          This is the one most builders miss, and it&apos;s the most
+          consequential for a small business. An embed has a hidden cost:
+          content inside an iframe is a <em>separate document</em>, and
+          Google doesn&apos;t credit it to the host page. I audited the
+          live site the way a crawler sees it and the worst case was
+          confirmed — the host page had zero headings, no body text, a
+          default <code style={inlineCodeStyle}>Home | 360 Automotive</code>{' '}
+          title, no meta description. Pixel-perfect inside the frame,
+          invisible to search outside it.
+        </p>
+        <p>
+          Fixing it didn&apos;t require leaving Wix. The substantive,
+          visible content went into <strong>native host elements</strong>{' '}
+          — an H1, the service list, and the full name/address/phone (the
+          NAP triple every local-search algorithm wants) — and the host
+          page got{' '}
+          <a
+            href="https://schema.org/AutoRepair"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={inlineLinkStyle}
           >
-            <div>
-              <HudLabel tone="cyan">The work</HudLabel>
-              <h2 style={sectionTitleStyle}>
-                Iframe size negotiation, done right.
-              </h2>
-              <Prose>
-                <p>
-                  Wix renders embedded HTML panels at a height the editor
-                  guesses on insertion and then leaves alone. That breaks
-                  every responsive technique that depends on the parent
-                  reflowing — CSS media queries inside the iframe see
-                  their <em>own</em> viewport, not the host&apos;s, and
-                  the parent has no idea when the embed&apos;s content
-                  grew or shrank.
-                </p>
-                <p>
-                  The fix is a small postMessage handshake. The embed
-                  observes its own document height with a{' '}
-                  <code style={inlineCodeStyle}>ResizeObserver</code>,
-                  posts the new value up to the parent on every change,
-                  and the parent forwards it to the iframe container.
-                  Combined with mobile-first responsive CSS inside the
-                  embed, the result is a panel that looks correct at any
-                  width and never clips its own content vertically.
-                </p>
-                <p>
-                  The snippet on the right is roughly what runs on every
-                  page of the live site — observe height, post height,
-                  retry on load and resize and font-ready, done.
-                </p>
-              </Prose>
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <CodePanel
-                filename="embed-resize.js"
-                language="js"
-                code={RESIZE_CODE}
-                status="LIVE"
-                maxHeight="460px"
-              />
-            </div>
-          </div>
-          <style>{`
-            @media (max-width: 900px) {
-              .repair-code-grid {
-                grid-template-columns: 1fr !important;
-                gap: 2rem !important;
-              }
-            }
-          `}</style>
-        </Container>
-      </section>
+            <code style={inlineCodeStyle}>AutoRepair</code> JSON-LD
+            structured data
+          </a>{' '}
+          plus a real title and meta description. The site went from
+          invisible-to-Google to fully crawlable — same host, same
+          design, dramatically different findability.
+        </p>
+        <p style={{ marginTop: space.lg, marginBottom: 0 }}>
+          A trimmed version of the JSON-LD block that lives in the host
+          page&apos;s{' '}
+          <code style={inlineCodeStyle}>&lt;head&gt;</code>:
+        </p>
+        <div style={{ marginTop: space.md }}>
+          <CodePanel
+            filename="head.html"
+            language="js"
+            code={JSONLD_CODE}
+            status="DEPLOYED"
+            maxHeight="360px"
+          />
+        </div>
+      </ChallengeSection>
 
       {/* ============================== Lessons ============================== */}
       <section
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
-          background: colors.bgSoft
+          background: colors.surface,
+          borderTop: `1px solid ${colors.border}`
         }}
       >
         <Container>
           <div style={{ maxWidth: '60ch', marginBottom: space['2xl'] }}>
-            <HudLabel tone="magenta">Lessons that travel</HudLabel>
-            <h2 style={sectionTitleStyle}>
-              Meet the client where they are.
-            </h2>
+            <HudLabel tone="corona">Lessons that travel</HudLabel>
+            <h2 style={sectionTitleStyle}>Patterns worth keeping.</h2>
           </div>
 
           <div
@@ -290,15 +360,19 @@ export default function Repair360Case() {
           >
             <PitchCard
               title="Hosting choices are business decisions"
-              body="A client who's productive on a no-code platform isn't wrong to stay there. They've already built workflows around it. Adding a custom front-end as a panel inside their existing host is almost always cheaper, faster, and lower-risk than migrating."
+              body="A client who's productive on a no-code platform isn't wrong to stay there. A custom front-end inside their host is usually cheaper, faster, and lower-risk than a migration."
             />
             <PitchCard
-              title="Iframes are still useful — when you treat them right"
-              body="The web has frame-ancestors policies and X-Frame-Options for good reasons, but inside your own embed inside your own host, the iframe is a perfectly fine isolation boundary. The trick is the size negotiation — once that works, everything else falls into place."
+              title='"Looks done" isn&apos;t "gets found"'
+              body="An embedded site can be pixel-perfect and still invisible to search — the frame doesn't carry your SEO. Verify crawlability and solve it natively in the host: headings, NAP, structured data. Never assume."
             />
             <PitchCard
-              title="Responsive ≠ media-queries-only"
-              body="Inside an embed your media queries don't see the host viewport. Mobile-first layouts plus container queries (or postMessage-driven width hints) carry you further. The point isn't to be clever; it's to make the site look right when the host shoves it into a column."
+              title="The delivery pipeline is part of the product"
+              body="A file that's correct in your editor can be corrupted by the channel that carries it. When you don't control the pipe, ship something robust to it — pure ASCII travels everywhere intact."
+            />
+            <PitchCard
+              title="Know when not to over-engineer"
+              body="Manual full-height panel sizing and a tagline-instead-of-nav held up fine. I spent the effort where it actually mattered — encoding, SEO, brand consistency — not on machinery the project didn't need."
             />
           </div>
 
@@ -352,19 +426,121 @@ function BackLink() {
   );
 }
 
-function Prose({ children }) {
+function ScreenshotStrip() {
   return (
-    <div
+    <section
       style={{
-        fontSize: fontSizes.md,
-        lineHeight: 1.7,
-        color: colors.textSecondary,
-        fontFamily: fonts.body,
-        marginTop: space.md
+        paddingTop: space['2xl'],
+        paddingBottom: space['2xl'],
+        borderBottom: `1px solid ${colors.borderSubtle}`
       }}
     >
-      {children}
-    </div>
+      <Container>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: space.lg
+          }}
+        >
+          {SCREENSHOTS.map((shot) => (
+            <a
+              key={shot.src}
+              href={shot.src}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'block',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <Card padding={0} interactive style={{ overflow: 'hidden' }}>
+                <img
+                  src={shot.src}
+                  alt={shot.caption}
+                  loading="lazy"
+                  onError={(e) => {
+                    // While screenshots aren't on disk yet, swap to a
+                    // neutral placeholder caption so the layout doesn't
+                    // shift around a broken image.
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement.querySelector(
+                      '.shot-placeholder'
+                    ).style.display = 'flex';
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    height: 'auto',
+                    background: colors.bg
+                  }}
+                />
+                <div
+                  className="shot-placeholder"
+                  style={{
+                    display: 'none',
+                    width: '100%',
+                    aspectRatio: '16 / 10',
+                    background: colors.bg,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: colors.textMuted,
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    textAlign: 'center',
+                    padding: space.md
+                  }}
+                >
+                  Screenshot pending
+                </div>
+                <div
+                  style={{
+                    padding: `${space.sm} ${space.md}`,
+                    fontSize: fontSizes.xs,
+                    color: colors.textSecondary,
+                    background: colors.surfaceMuted,
+                    borderTop: `1px solid ${colors.borderSubtle}`
+                  }}
+                >
+                  {shot.caption}
+                </div>
+              </Card>
+            </a>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function ChallengeSection({ eyebrow, tone, title, background, children }) {
+  return (
+    <section
+      style={{
+        background: background || 'transparent',
+        paddingTop: space['3xl'],
+        paddingBottom: space['3xl'],
+        borderBottom: `1px solid ${colors.borderSubtle}`
+      }}
+    >
+      <Container>
+        <div style={{ maxWidth: '64ch' }}>
+          <HudLabel tone={tone}>{eyebrow}</HudLabel>
+          <h2 style={sectionTitleStyle}>{title}</h2>
+          <div
+            style={{
+              marginTop: space.md,
+              color: colors.textSecondary,
+              fontSize: fontSizes.md,
+              lineHeight: 1.7
+            }}
+          >
+            {children}
+          </div>
+        </div>
+      </Container>
+    </section>
   );
 }
 
@@ -380,9 +556,9 @@ function PitchCard({ title, body }) {
           marginBottom: space.sm,
           color: colors.text
         }}
-      >
-        {title}
-      </h3>
+        // dangerouslySetInnerHTML so `&apos;` decodes in the title.
+        dangerouslySetInnerHTML={{ __html: title }}
+      />
       <p
         style={{
           margin: 0,
@@ -415,4 +591,9 @@ const inlineCodeStyle = {
   padding: '0.1rem 0.4rem',
   borderRadius: radii.sm,
   border: `1px solid ${colors.borderSubtle}`
+};
+
+const inlineLinkStyle = {
+  color: colors.accent,
+  textDecoration: 'none'
 };

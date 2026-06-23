@@ -44,8 +44,8 @@ const PROJECTS = [
     badge: 'Client work',
     title: 'Repair360 Auto — modern site inside a Wix panel',
     summary:
-      "Client wanted to keep their Wix host because their booking, email, and listings were already wired to it. Built them a responsive React-based front-end and shoehorned it into a Wix HTML/Iframe panel, with a small postMessage size-negotiation layer so the embed reflows correctly inside Wix's static iframe container. Sometimes the engineering work is meeting the client's constraints.",
-    stack: ['React', 'postMessage', 'Responsive CSS', 'Wix embed'],
+      "Client kept their Wix host because their booking app, email, and listings were already wired to it. Built a hand-written dependency-free single-file front-end (~160 KB, no framework, no build step) embedded in a Wix HTML/Iframe panel — plus the harder hidden work: reverse-engineering the brand from social-media flyers, JPEG-to-SVG logo recovery, defeating a UTF-8 mojibake bug in the delivery pipeline, and fixing the iframe SEO-invisibility trap with AutoRepair JSON-LD and native host elements.",
+    stack: ['Vanilla JS', 'Responsive CSS', 'SVG vectorization', 'JSON-LD', 'Wix embed'],
     auth: 'Live site link inside the case study'
   },
   {
