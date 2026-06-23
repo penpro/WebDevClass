@@ -72,12 +72,13 @@ export default function MetaverseOriginsCase() {
           >
             An open-world sandbox survival game in pre-alpha early
             access on Steam since May 2021, published under the
-            Penumbra.tech studio name. The premise is the unglamorous
-            part of the survival genre done with real depth: detailed
-            resource gathering and crafting, multiple AI companion
-            characters trained across skill trees, and cooperative
-            play where the goal is civilisation growth rather than
-            grinding the same node ten thousand times.
+            Penumbra.tech studio name. Voxel terrain you can dig and
+            build, a medical and metabolism simulation, AI companions
+            on skill trees, save/load that has to survive years of
+            schema changes — a studio-sized codebase being run on
+            indie headcount. The interesting story isn&apos;t the game;
+            it&apos;s the pipeline I built around it to make that
+            possible.
           </p>
 
           <div
@@ -167,63 +168,163 @@ export default function MetaverseOriginsCase() {
         </p>
       </ChallengeSection>
 
-      {/* =========================== Design idea ============================= */}
+      {/* ====================== The real project ============================ */}
       <ChallengeSection
         background={colors.bgSoft}
-        eyebrow="The design idea"
+        eyebrow="The real project isn&apos;t the game"
         tone="corona"
-        title="Granular, not grindy."
+        title="A studio-sized codebase, run on an indie headcount."
       >
         <p>
-          Most sandbox survival games shortcut to the same loop: chop
-          tree, mine rock, build wall, repeat for hours, watch the
-          progress bar climb. The design pitch behind Origins is the
-          opposite — keep the granularity of resource gathering and
-          crafting (real materials, real workflow, real time) but
-          remove the player&apos;s obligation to be the one mining
-          every rock by hand.
+          Origins is bigger than it looks from the store page. Voxel
+          terrain you can dig and build, a medical and metabolism
+          simulation, AI companions on skill trees, save/load that has
+          to survive years of schema changes — that adds up to{' '}
+          <strong style={{ color: colors.text }}>
+            more than 150,000 lines across 500-plus files and fifteen
+            interlocking subsystems
+          </strong>
+          . The honest problem for a solo developer isn&apos;t writing
+          any one feature. It&apos;s that the infrastructure a studio
+          takes for granted — a QA team, an automation engineer, a
+          tools team, a release process — doesn&apos;t exist when
+          there&apos;s one of you.
         </p>
         <p>
-          The mechanism is multiple controllable AI characters, each
-          trained across skill trees. The player&apos;s job becomes
-          assigning the right AI to the right task — the woodcutter
-          who&apos;s actually leveled in axe work, the builder who
-          knows the schematics — and watching a small civilisation
-          take shape. Cooperative multiplayer extends that model:
-          multiple human players coordinating multiple AI agents
-          across a shared world.
-        </p>
-        <p>
-          It&apos;s a hard design to land — easy to describe, hard to
-          balance — which is why the development arc has been long and
-          the early-access framing is honest about it.
+          So I built that part too. Not just the game&apos;s features —
+          the apparatus around them. Over the last stretch I&apos;ve
+          been using Claude Code less as an autocomplete and more as
+          an engineering org I direct: a fleet of agents pointed at
+          the work that normally needs headcount, wrapped in tooling I
+          wrote myself to make their output trustworthy, not merely
+          fast. The game is the visible artefact. The pipeline that
+          builds it is the real one.
         </p>
       </ChallengeSection>
 
-      {/* ===================== What the work demonstrates ===================== */}
+      {/* ============================ The toolset ============================ */}
+      <section
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <Container>
+          <div style={{ maxWidth: '64ch', marginBottom: space.xl }}>
+            <HudLabel tone="cyan">The toolset</HudLabel>
+            <h2 style={sectionTitleStyle}>
+              What &ldquo;agents as engineering org&rdquo; actually looks like.
+            </h2>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: space.lg
+            }}
+          >
+            <ToolEntry title="An agent that drives the live engine.">
+              <p>
+                Most game bugs only exist at runtime — in the editor,
+                with the game actually playing — so verifying a fix
+                usually means a human booting the build and clicking
+                through it. I built a file-driven bridge that lets an
+                agent drive the running engine directly: boot a fresh
+                save in about ten seconds, open and close menus, fire
+                game events, read live state straight out of the
+                simulation&apos;s components, and run multi-frame UI
+                test sequences that report pass or fail. No human in
+                the loop, no screenshots. It turns &ldquo;I think this
+                fixes it&rdquo; into &ldquo;here&apos;s the green
+                verification run,&rdquo; at one-person speed. That
+                change-build-boot-verify-commit loop is precisely what
+                a studio hires an automation engineer to own.
+              </p>
+            </ToolEntry>
+
+            <ToolEntry title="A standing audit pipeline.">
+              <p>
+                Every so often I fan a fleet of agents across the
+                entire codebase hunting the bugs that don&apos;t
+                announce themselves: memory-safety crashes,
+                use-after-frees, save/load data-loss holes, places
+                where the server trusts a client it shouldn&apos;t.
+                The catch with machine-found bugs is false positives —
+                so nothing is trusted on the first pass. Each finding
+                is handed to independent agents whose only job is to
+                try to <em>refute</em> it, and only the survivors get
+                filed, with a severity code and a test plan attached.
+                The last full pass was{' '}
+                <strong style={{ color: colors.text }}>
+                  seventeen agents plus forty adversarial verifications
+                  across 500-plus files
+                </strong>
+                ; it surfaced{' '}
+                <strong style={{ color: colors.text }}>
+                  nine critical and forty-eight high-severity defects
+                </strong>
+                . A studio calls that QA plus a security review plus a
+                tools team. Here it&apos;s a repeatable afternoon —
+                and every critical it found has since been fixed and
+                verified through the harness above.
+              </p>
+            </ToolEntry>
+
+            <ToolEntry title="The unglamorous tooling underneath.">
+              <p>
+                The same instinct shows up in the boring places. Game
+                data — a couple of hundred items, recipes, skill
+                curves — lives in spreadsheet-shaped tables that are
+                miserable to hand-edit safely, so I built a
+                SQLite-backed utility that queries, transforms,
+                validates and round-trips them with schema migration
+                and drift detection. Project knowledge — engineering
+                standards, architecture decisions, the running list of
+                known defects — lives in a structured memory the
+                agents read every session, so the reasoning behind a
+                decision survives across months and the work stays
+                coherent instead of drifting. None of it is glamorous.
+                All of it is the difference between a project that
+                compounds and one that rots.
+              </p>
+            </ToolEntry>
+          </div>
+        </Container>
+      </section>
+
+      {/* ======================= Where the leverage ends ====================== */}
       <ChallengeSection
-        eyebrow="What this demonstrates for the consulting work"
+        background={colors.bgSoft}
+        eyebrow="Where the leverage ends"
         tone="magenta"
-        title="Long-arc projects, in public."
+        title="Tools make you fast. Judgement is still the job."
       >
         <p>
-          A four-plus-year project on a public storefront with paying
-          customers is a different artefact from a side-project repo.
-          You don&apos;t get to pretend the rough patches didn&apos;t
-          happen; you have to keep the build pipeline working, the
-          store page coherent, the patch notes honest, and the
-          development direction recognisable across years of changes.
-          That&apos;s the kind of stewardship the better contracts
-          want — engineers who can carry a system past its honeymoon
-          phase and through the long part.
+          It&apos;s worth being precise about where the automation
+          stops, because that line is the whole point. The agents
+          don&apos;t decide anything. Architecture, scope, the call on
+          whether a reported bug is even real, the gate where nothing
+          gets committed until it builds and verifies — that&apos;s
+          mine, and it has to be.
         </p>
         <p>
-          The same instincts apply outside games: keep the
-          architecture explainable, ship incrementally without
-          breaking installed copies, communicate scope honestly,
-          accept that the &ldquo;final&rdquo; version is always two
-          patches away. Origins is where I&apos;ve been practicing
-          those muscles since 2021.
+          The clearest example from recent work: one audit finding was
+          a key-rebinding bug I could have &ldquo;fixed&rdquo; in five
+          minutes, and I deliberately didn&apos;t. The only honest way
+          to verify a rebinding change is to exercise the live input
+          system; my test harness can&apos;t reach that path; and
+          shipping an unverified change to something that could break
+          all input is exactly the AI-assisted carelessness that earns
+          the skepticism. So it&apos;s flagged and deferred to a
+          session where it can be done properly. Anyone can prompt a
+          model into producing code.{' '}
+          <strong style={{ color: colors.text }}>
+            The discipline worth paying for is knowing which output
+            you&apos;re not yet allowed to trust — and building the
+            verification that decides.
+          </strong>
         </p>
       </ChallengeSection>
 
@@ -237,7 +338,7 @@ export default function MetaverseOriginsCase() {
         }}
       >
         <Container narrow style={{ textAlign: 'center' }}>
-          <HudLabel tone="corona">Long-arc work</HudLabel>
+          <HudLabel tone="corona">Hire the pipeline, not just the prompts</HudLabel>
           <h2
             style={{
               fontFamily: fonts.heading,
@@ -247,7 +348,7 @@ export default function MetaverseOriginsCase() {
               color: colors.text
             }}
           >
-            See the store page, read the early-access framing.
+            Same instincts on your codebase.
           </h2>
           <p
             style={{
@@ -257,11 +358,15 @@ export default function MetaverseOriginsCase() {
               lineHeight: 1.6
             }}
           >
-            The Steam page is the canonical source of truth for the
-            current state: roadmap, patch notes, reviews, screenshots.
-            Read it the way you&apos;d read a consulting reference —
-            what&apos;s been live, for how long, and how the
-            communication around it has held up.
+            If your team is interested in agent-assisted development
+            but wary — for good reason — about the carelessness it
+            can produce, this is the engagement to ask about. The
+            harness, the audit pipeline, the verification discipline
+            all generalise; they aren&apos;t game-specific. The Steam
+            page is the canonical source of truth for the game&apos;s
+            current state — roadmap, patch notes, reviews — and a
+            useful reference for how long this project has actually
+            been live in public.
           </p>
           <div
             style={{
@@ -357,6 +462,35 @@ function SteamHeader({ src, alt }) {
         </a>
       </Container>
     </section>
+  );
+}
+
+function ToolEntry({ title, children }) {
+  return (
+    <Card variant="accent" padding={space.lg}>
+      <h3
+        style={{
+          fontFamily: fonts.heading,
+          fontSize: fontSizes.lg,
+          fontWeight: fontWeights.semibold,
+          color: colors.text,
+          margin: 0,
+          marginBottom: space.sm,
+          letterSpacing: '-0.005em'
+        }}
+      >
+        {title}
+      </h3>
+      <div
+        style={{
+          color: colors.textSecondary,
+          fontSize: fontSizes.md,
+          lineHeight: 1.7
+        }}
+      >
+        {children}
+      </div>
+    </Card>
   );
 }
 

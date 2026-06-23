@@ -53,8 +53,15 @@ const PROJECTS = [
     badge: 'Published software · Steam Early Access',
     title: 'Metaverse: Origins',
     summary:
-      "An open-world sandbox survival game in pre-alpha early access on Steam since May 2021 under the Penumbra.tech studio name. Design pitch: keep the granular crafting and resource loop, lose the player's obligation to be the one mining every rock — multiple controllable AI characters trained across skill trees handle the grind. Long-arc project with a public storefront and paying customers since launch.",
-    stack: ['Steam Early Access', 'Sandbox / Survival', 'Multiplayer', 'AI skill trees', 'Penumbra.tech'],
+      "Steam Early Access since May 2021 under the Penumbra.tech studio name. 150K+ lines across 500+ files and 15 subsystems — a studio-sized codebase run on indie headcount. The interesting story isn't the game; it's the pipeline I built around it: a live-engine test harness an agent can drive, a standing audit pipeline with adversarial verification (last pass surfaced 9 critical + 48 high-severity defects), and a structured agent memory that keeps the work coherent across months.",
+    stack: [
+      'Steam Early Access',
+      'Agent-driven CI',
+      'Adversarial audit',
+      'Live-engine harness',
+      '150K+ LOC',
+      'Penumbra.tech'
+    ],
     auth: 'Live on Steam — paid, pre-alpha (read the EA framing)'
   },
   {
