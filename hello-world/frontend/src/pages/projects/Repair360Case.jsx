@@ -34,9 +34,16 @@ const SITE_URL = 'https://www.repair360auto.com/';
 // the live site in there and add an entry below — order is preserved.
 // Captions are short by design; the case study text carries the story.
 const SCREENSHOTS = [
-  { src: '/projects/repair360/desktop-hero.png', caption: 'Hero — desktop view of the live embed inside the Wix host.' },
-  { src: '/projects/repair360/services.png', caption: 'Services + detailing package — vectorized logo and brand orange against near-black.' },
-  { src: '/projects/repair360/mobile.png', caption: 'Mobile — responsive single-pager with no framework runtime.' }
+  {
+    src: '/projects/repair360/desktop-hero.png',
+    caption:
+      'Hero — "Covering 360° of your vehicle." Brand orange against near-black, vectorised logo, condensed-bold display type reverse-engineered from the client\'s flyers.'
+  },
+  {
+    src: '/projects/repair360/services.png',
+    caption:
+      'Full Detailing Service section — Exterior / Interior / Extras lists with a $249 starting-at price card. All the brand work (palette, type, hierarchy) lands here.'
+  }
 ];
 
 // Real snippet — the AutoRepair JSON-LD that makes the embed visible to
