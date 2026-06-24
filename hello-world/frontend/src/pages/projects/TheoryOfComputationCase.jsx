@@ -22,6 +22,17 @@ import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import CodePanel from '../../components/CodePanel.jsx';
+import SectionRail from '../../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero',     num: '00', label: 'Intro' },
+  { id: 'why',      num: '01', label: 'Why I built it' },
+  { id: 'coverage', num: '02', label: 'Coverage' },
+  { id: 'learning', num: '03', label: 'Learning algo' },
+  { id: 'practice', num: '04', label: 'Hands-on' },
+  { id: 'builds',   num: '05', label: 'Live vs offline' },
+  { id: 'cta',      num: '06', label: 'Book' }
+];
 
 // Coverage table — mirrors the README. Real numbers, not invented.
 const CHAPTERS = [
@@ -64,10 +75,12 @@ function weight(question, now) {
 export default function TheoryOfComputationCase() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <BackLink />
 
       {/* ============================== Hero ============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -197,6 +210,7 @@ export default function TheoryOfComputationCase() {
 
       {/* ====================== Why I built it ============================ */}
       <section
+        id="why"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -247,6 +261,7 @@ export default function TheoryOfComputationCase() {
 
       {/* ============================ Coverage ============================ */}
       <section
+        id="coverage"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -376,6 +391,7 @@ export default function TheoryOfComputationCase() {
 
       {/* ===================== Learning algorithm ========================= */}
       <section
+        id="learning"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -458,6 +474,7 @@ export default function TheoryOfComputationCase() {
 
       {/* ====================== Hands-on practice ========================= */}
       <section
+        id="practice"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -503,6 +520,7 @@ export default function TheoryOfComputationCase() {
 
       {/* ===================== Live vs offline ============================= */}
       <section
+        id="builds"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -618,6 +636,7 @@ export default function TheoryOfComputationCase() {
 
       {/* =========================== Closing CTA =========================== */}
       <section
+        id="cta"
         style={{
           background: colors.surface,
           borderTop: `1px solid ${colors.border}`,

@@ -27,6 +27,15 @@ import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import CodePanel from '../../components/CodePanel.jsx';
+import SectionRail from '../../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero',        num: '00', label: 'Intro' },
+  { id: 'testimonial', num: '01', label: 'Client quote' },
+  { id: 'screenshots', num: '02', label: 'The site' },
+  { id: 'challenges',  num: '03', label: 'The five fights' },
+  { id: 'lessons',     num: '04', label: 'Lessons' }
+];
 
 const SITE_URL = 'https://www.repair360auto.com/';
 
@@ -73,10 +82,12 @@ const JSONLD_CODE = `<script type="application/ld+json">
 export default function Repair360Case() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <BackLink />
 
       {/* ============================== Hero ============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -181,6 +192,7 @@ export default function Repair360Case() {
 
       {/* ============================ Testimonial =========================== */}
       <section
+        id="testimonial"
         style={{
           paddingTop: space['2xl'],
           paddingBottom: space['2xl'],
@@ -232,8 +244,11 @@ export default function Repair360Case() {
       </section>
 
       {/* ============================ Screenshots =========================== */}
-      <ScreenshotStrip />
+      <div id="screenshots">
+        <ScreenshotStrip />
+      </div>
 
+      <div id="challenges">
       {/* ========================== Challenge 1 ============================ */}
       <ChallengeSection
         background={colors.bgSoft}
@@ -395,8 +410,11 @@ export default function Repair360Case() {
         </div>
       </ChallengeSection>
 
+      </div>
+
       {/* ============================== Lessons ============================== */}
       <section
+        id="lessons"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],

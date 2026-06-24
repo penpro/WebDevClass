@@ -17,6 +17,12 @@ import Button from '../components/Button.jsx';
 import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
+import SectionRail from '../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero',     num: '00', label: 'Intro' },
+  { id: 'services', num: '01', label: 'The work' }
+];
 
 const SERVICES = [
   {
@@ -80,7 +86,9 @@ const SERVICES = [
 export default function Services() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -123,6 +131,7 @@ export default function Services() {
       </section>
 
       <section
+        id="services"
         style={{
           paddingTop: space['2xl'],
           paddingBottom: space['3xl']

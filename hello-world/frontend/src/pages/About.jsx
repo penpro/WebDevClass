@@ -24,6 +24,15 @@ import Stars from '../components/Stars.jsx'
 import CornerBrackets from '../components/CornerBrackets.jsx'
 import HudLabel from '../components/HudLabel.jsx'
 import Eclipse from '../components/Eclipse.jsx'
+import SectionRail from '../components/SectionRail.jsx'
+
+const SECTIONS = [
+  { id: 'hero',        num: '00', label: 'Intro' },
+  { id: 'story',       num: '01', label: 'Story' },
+  { id: 'proof',       num: '02', label: 'Proof strip' },
+  { id: 'how-i-think', num: '03', label: 'How I think' },
+  { id: 'working',     num: '04', label: 'Working with me' }
+];
 
 const PILLARS = [
   {
@@ -75,6 +84,8 @@ const PROOFS = [
 
 export default function About() {
   return (
+    <>
+    <SectionRail sections={SECTIONS} />
     <section
       style={{
         position: 'relative',
@@ -109,6 +120,7 @@ export default function About() {
       <Container narrow style={{ position: 'relative', zIndex: 1 }}>
         <HudLabel tone="magenta">About</HudLabel>
         <div
+          id="hero"
           className="penumbra-about-hero"
           style={{
             display: 'grid',
@@ -160,6 +172,7 @@ export default function About() {
           }
         `}</style>
 
+        <div id="story">
         <Prose>
           <p>
             Penumbra Tech is the single-engineer consulting and software
@@ -240,9 +253,11 @@ export default function About() {
             points, improve the loop.
           </p>
         </Prose>
+        </div>
 
         {/* ------------ Proof strip ------------ */}
         <Card
+          id="proof"
           variant="accent"
           padding={space.lg}
           style={{ marginTop: space['2xl'] }}
@@ -313,6 +328,7 @@ export default function About() {
 
         {/* ------------ Pillars ------------ */}
         <div
+          id="how-i-think"
           style={{
             display: 'grid',
             gridTemplateColumns:
@@ -351,6 +367,7 @@ export default function About() {
 
         {/* ------------ Working with me ------------ */}
         <Card
+          id="working"
           variant="accent"
           padding={space.xl}
           style={{
@@ -402,6 +419,7 @@ export default function About() {
         </Card>
       </Container>
     </section>
+    </>
   )
 }
 

@@ -23,8 +23,19 @@ import Card from '../components/Card.jsx';
 import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
+import SectionRail from '../components/SectionRail.jsx';
 
 const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
+
+const SECTIONS = [
+  { id: 'hero',       num: '00', label: 'Intro' },
+  { id: 'bill',       num: '01', label: 'The bill' },
+  { id: 'comparison', num: '02', label: 'Vs platforms' },
+  { id: 'opaque',     num: '03', label: 'Why it costs more' },
+  { id: 'security',   num: '04', label: 'Security blast' },
+  { id: 'ownership',  num: '05', label: 'What you get' },
+  { id: 'cta',        num: '06', label: 'Book' }
+];
 
 // All numbers in USD, current as of 2026 us-east-2 list pricing.
 // Conservative end of the realistic range — actual bill at current
@@ -147,8 +158,11 @@ const monoNumberStyle = {
 export default function Stack() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
+
       {/* =============================== Hero =============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -198,6 +212,7 @@ export default function Stack() {
 
       {/* ========================== Itemised bill ========================== */}
       <section
+        id="bill"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl']
@@ -316,6 +331,7 @@ export default function Stack() {
 
       {/* ==================== Comparison vs managed platforms ==================== */}
       <section
+        id="comparison"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -407,6 +423,7 @@ export default function Stack() {
 
       {/* ==================== Why platforms are opaque ==================== */}
       <section
+        id="opaque"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl']
@@ -481,6 +498,7 @@ export default function Stack() {
 
       {/* ==================== The security blast radius ==================== */}
       <section
+        id="security"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -579,6 +597,7 @@ export default function Stack() {
 
       {/* ==================== What you get when I build it ==================== */}
       <section
+        id="ownership"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -641,6 +660,7 @@ export default function Stack() {
 
       {/* =========================== Closing CTA =========================== */}
       <section
+        id="cta"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl']

@@ -22,6 +22,15 @@ import Button from '../../components/Button.jsx';
 import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
+import SectionRail from '../../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero',        num: '00', label: 'Intro' },
+  { id: 'why',         num: '01', label: 'Why it matters' },
+  { id: 'design',      num: '02', label: 'Design idea' },
+  { id: 'engineering', num: '03', label: 'Engineering note' },
+  { id: 'cta',         num: '04', label: 'Book' }
+];
 
 const STEAM_URL = 'https://store.steampowered.com/app/3622460/Trigonometry_Tools/';
 const STEAM_HEADER =
@@ -30,10 +39,12 @@ const STEAM_HEADER =
 export default function TrigonometryToolsCase() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <BackLink />
 
       {/* ============================== Hero ============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -142,6 +153,7 @@ export default function TrigonometryToolsCase() {
       <SteamHeader src={STEAM_HEADER} alt="Trigonometry Tools — Steam header image" />
 
       {/* ===================== Why this is on the portfolio =================== */}
+      <div id="why">
       <ChallengeSection
         eyebrow="Why it matters"
         tone="cyan"
@@ -166,8 +178,10 @@ export default function TrigonometryToolsCase() {
           install it right now.
         </p>
       </ChallengeSection>
+      </div>
 
       {/* =========================== Design notes ============================ */}
+      <div id="design">
       <ChallengeSection
         background={colors.bgSoft}
         eyebrow="The design idea"
@@ -195,8 +209,10 @@ export default function TrigonometryToolsCase() {
           the reflex until the values are cached.
         </p>
       </ChallengeSection>
+      </div>
 
       {/* ========================= Engineering note ========================== */}
+      <div id="engineering">
       <ChallengeSection
         eyebrow="Engineering note"
         tone="magenta"
@@ -217,9 +233,11 @@ export default function TrigonometryToolsCase() {
           on something I owned end-to-end.
         </p>
       </ChallengeSection>
+      </div>
 
       {/* =========================== Closing CTA =========================== */}
       <section
+        id="cta"
         style={{
           background: colors.surface,
           borderTop: `1px solid ${colors.border}`,

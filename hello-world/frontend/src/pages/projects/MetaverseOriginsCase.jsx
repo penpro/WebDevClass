@@ -21,6 +21,16 @@ import Button from '../../components/Button.jsx';
 import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
+import SectionRail from '../../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero',         num: '00', label: 'Intro' },
+  { id: 'status',       num: '01', label: 'What you’re buying' },
+  { id: 'real-project', num: '02', label: 'The real project' },
+  { id: 'toolset',      num: '03', label: 'The toolset' },
+  { id: 'leverage',     num: '04', label: 'Leverage limit' },
+  { id: 'cta',          num: '05', label: 'Book' }
+];
 
 const STEAM_URL = 'https://store.steampowered.com/app/1602810/Metaverse_Origins/';
 const STEAM_HEADER =
@@ -29,10 +39,12 @@ const STEAM_HEADER =
 export default function MetaverseOriginsCase() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <BackLink />
 
       {/* ============================== Hero ============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -143,6 +155,7 @@ export default function MetaverseOriginsCase() {
       <SteamHeader src={STEAM_HEADER} alt="Metaverse: Origins — Steam header image" />
 
       {/* =========================== Honest status =========================== */}
+      <div id="status">
       <ChallengeSection
         eyebrow="What you're buying"
         tone="cyan"
@@ -167,8 +180,10 @@ export default function MetaverseOriginsCase() {
           Tools is the shorter one, fully released).
         </p>
       </ChallengeSection>
+      </div>
 
       {/* ====================== The real project ============================ */}
+      <div id="real-project">
       <ChallengeSection
         background={colors.bgSoft}
         eyebrow="The real project isn&apos;t the game"
@@ -201,9 +216,11 @@ export default function MetaverseOriginsCase() {
           builds it is the real one.
         </p>
       </ChallengeSection>
+      </div>
 
       {/* ============================ The toolset ============================ */}
       <section
+        id="toolset"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -295,6 +312,7 @@ export default function MetaverseOriginsCase() {
       </section>
 
       {/* ======================= Where the leverage ends ====================== */}
+      <div id="leverage">
       <ChallengeSection
         background={colors.bgSoft}
         eyebrow="Where the leverage ends"
@@ -327,9 +345,11 @@ export default function MetaverseOriginsCase() {
           </strong>
         </p>
       </ChallengeSection>
+      </div>
 
       {/* =========================== Closing CTA =========================== */}
       <section
+        id="cta"
         style={{
           background: colors.surface,
           borderTop: `1px solid ${colors.border}`,

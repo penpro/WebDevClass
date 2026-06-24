@@ -23,8 +23,16 @@ import Card from '../components/Card.jsx';
 import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
+import SectionRail from '../components/SectionRail.jsx';
 
 const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
+
+const SECTIONS = [
+  { id: 'hero',      num: '00', label: 'Intro' },
+  { id: 'incidents', num: '01', label: 'Incidents' },
+  { id: 'adds',      num: '02', label: 'What I add' },
+  { id: 'cta',       num: '03', label: 'Book' }
+];
 
 const INCIDENTS = [
   {
@@ -97,8 +105,11 @@ const ADDS = [
 export default function Judgment() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
+
       {/* =============================== Hero =============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -180,6 +191,7 @@ export default function Judgment() {
 
       {/* ============================ Incidents ============================ */}
       <section
+        id="incidents"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl']
@@ -248,6 +260,7 @@ export default function Judgment() {
 
       {/* ====================== What the engineer adds ====================== */}
       <section
+        id="adds"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -310,6 +323,7 @@ export default function Judgment() {
 
       {/* =========================== Closing CTA =========================== */}
       <section
+        id="cta"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl']

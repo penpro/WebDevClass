@@ -30,6 +30,13 @@ import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import LineChart from '../../components/LineChart.jsx';
+import SectionRail from '../../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero',  num: '00', label: 'Intro' },
+  { id: 'runs',  num: '01', label: 'The two runs' },
+  { id: 'pitch', num: '02', label: 'The point' }
+];
 
 // ----------------------- Sample data generation ------------------------ //
 // All curves below are deterministic functions over a fake clock so the
@@ -176,10 +183,12 @@ const BLOCK_SUMMARY = {
 export default function DiagnosticsCase() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <BackLink />
 
       {/* ============================== Hero ============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -250,6 +259,7 @@ export default function DiagnosticsCase() {
         </Container>
       </section>
 
+      <div id="runs">
       {/* ============================= Run 1 ============================== */}
       <RunSection
         eyebrow="Run 1: API overload"
@@ -278,9 +288,11 @@ linearly with the queue depth and reaches ~12 seconds.`}
         summary={BLOCK_SUMMARY}
         background={colors.surface}
       />
+      </div>
 
       {/* ============================== Pitch ============================== */}
       <section
+        id="pitch"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],

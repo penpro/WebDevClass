@@ -26,7 +26,15 @@ import Button from '../components/Button.jsx';
 import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
+import SectionRail from '../components/SectionRail.jsx';
 import { apiFetch } from '../lib/api.js';
+
+const SECTIONS = [
+  { id: 'hero',          num: '00', label: 'Intro' },
+  { id: 'book',          num: '01', label: 'Book a call' },
+  { id: 'brief-builder', num: '02', label: 'Brief builder' },
+  { id: 'form',          num: '03', label: 'Written brief' }
+];
 
 // Mirrors PenumbraHome.jsx — keep both in sync if the booking event slug
 // changes. (Worth extracting to a shared site.config.js if we add a
@@ -120,6 +128,8 @@ export default function Contact() {
   }
 
   return (
+    <>
+    <SectionRail sections={SECTIONS} />
     <section
       style={{
         position: 'relative',
@@ -131,6 +141,7 @@ export default function Contact() {
       <Stars density={100} heroDensity={10} colorTint="corona" />
       <CornerBrackets size={28} inset={24} />
       <Container narrow style={{ position: 'relative', zIndex: 1 }}>
+        <div id="hero">
         <HudLabel tone="cyan" live>Contact</HudLabel>
         <h1
           style={{
@@ -187,8 +198,10 @@ export default function Contact() {
           </a>{' '}
           · calls and texts both fine during Pacific business hours
         </p>
+        </div>
 
         <div
+          id="book"
           style={{
             marginTop: space.xl,
             padding: `${space.lg} ${space.xl}`,
@@ -263,9 +276,12 @@ export default function Contact() {
           · or send a written brief ·
         </p>
 
+        <div id="brief-builder">
         <BriefBuilder />
+        </div>
 
         <Card
+          id="form"
           variant="accent"
           padding={space.xl}
           style={{ marginTop: 0 }}
@@ -406,6 +422,7 @@ export default function Contact() {
         </Card>
       </Container>
     </section>
+    </>
   );
 }
 

@@ -17,6 +17,12 @@ import Card from '../components/Card.jsx';
 import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
+import SectionRail from '../components/SectionRail.jsx';
+
+const SECTIONS = [
+  { id: 'hero', num: '00', label: 'Intro' },
+  { id: 'grid', num: '01', label: 'Projects' }
+];
 
 const PROJECTS = [
   {
@@ -147,7 +153,9 @@ const EXTERNAL = [
 export default function Projects() {
   return (
     <>
+      <SectionRail sections={SECTIONS} />
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -191,6 +199,7 @@ export default function Projects() {
       </section>
 
       <section
+        id="grid"
         style={{
           paddingTop: space['2xl'],
           paddingBottom: space['3xl']
