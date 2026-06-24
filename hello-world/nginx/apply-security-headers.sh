@@ -4,6 +4,12 @@ set -euo pipefail
 # Adds an `include` line for security-headers.conf to the nginx HTTPS
 # server block if it is not already present, then tests and reloads nginx.
 #
+# Despite the name, the include file now carries more than just headers:
+# it also defines compression, immutable-cache rules for /assets/,
+# no-cache for the SPA shell, and a /toc/ location block for the
+# statically-hosted Theory of Computation tool. Re-run after pulling
+# changes to security-headers.conf so the new rules take effect.
+#
 # Safe to re-run: the grep guard means the include line is only added once.
 #
 # Usage (on the EC2 server, after git pull):
