@@ -51,7 +51,7 @@ const SERVICES = [
     icon: GamepadIcon,
     title: 'Game development',
     body:
-      'Unreal Engine builds, multiplayer systems, AI behaviour, web portals for live games — see the case study under Projects.'
+      'Unreal Engine builds, multiplayer systems, AI behaviour, web portals for live games. See the case study under Projects.'
   },
   {
     icon: ShieldIcon,
@@ -81,7 +81,7 @@ const FEATURED = [
     badge: 'Web app + canvas',
     title: 'MoodBoard',
     body:
-      'Image-URL boards with public share links and a client-side collage generator — seeded layouts, cover-crop drawing, and pastel accent fills computed from neighbouring images.'
+      'Image-URL boards with public share links and a client-side collage generator: seeded layouts, cover-crop drawing, and pastel accent fills computed from neighbouring images.'
   }
 ];
 
@@ -150,7 +150,7 @@ export default function PenumbraHome() {
         <Container style={{ position: 'relative', zIndex: 1, width: '100%' }}>
           <div style={{ maxWidth: '36rem' }}>
             <HudLabel tone="cyan" live>
-              Now booking — Q3 2026
+              Now booking: Q3 2026
             </HudLabel>
 
             <h1
@@ -189,11 +189,10 @@ export default function PenumbraHome() {
               Weaver Jr.{' '}
               <strong style={{ color: colors.text }}>
                 I build across the seams
-              </strong>{' '}
-              — software, infrastructure, data, operations, and the
-              human process around them. Web apps, AWS, Unreal Engine
-              systems, and the reliability work that keeps everything
-              from quietly falling over.
+              </strong>: software, infrastructure, data, operations,
+              and the human process around them. Web apps, AWS, Unreal
+              Engine systems, and the reliability work that keeps
+              everything from quietly falling over.
             </p>
 
             <div
@@ -268,11 +267,12 @@ export default function PenumbraHome() {
                   maxWidth: '40ch'
                 }}
               >
-                This is a real function from the diagnostics dashboard
-                — the SSE flush that lets the latency chart stream
-                cleanly even when k6 is firing 1,500 req/s. Tight,
-                documented, no framework gymnastics. That&apos;s the
-                style across every project on this site.
+                This is a real function from the diagnostics
+                dashboard: the SSE flush that lets the latency chart
+                stream cleanly even when k6 is firing 1,500 req/s.
+                Tight, documented, no framework gymnastics.
+                That&apos;s the style across every project on this
+                site.
               </p>
               <div style={{ marginTop: space.lg, display: 'flex', gap: space.md, flexWrap: 'wrap' }}>
                 <Button
@@ -500,7 +500,7 @@ export default function PenumbraHome() {
           >
             Send a quick note describing what you&apos;re building or
             what&apos;s stuck. I&apos;ll reply with whether I think I can
-            help — no commitment, no template-bot follow-up sequence.
+            help. No commitment, no template-bot follow-up sequence.
           </p>
           <div
             style={{

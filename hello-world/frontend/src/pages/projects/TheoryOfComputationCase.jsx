@@ -79,7 +79,7 @@ export default function TheoryOfComputationCase() {
         <Stars density={140} heroDensity={14} colorTint="mixed" />
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
-          <HudLabel tone="magenta">Case study — Computer science depth</HudLabel>
+          <HudLabel tone="magenta">Case study: Computer science depth</HudLabel>
           <h1
             style={{
               fontFamily: fonts.heading,

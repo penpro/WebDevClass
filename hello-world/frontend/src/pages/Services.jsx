@@ -31,7 +31,7 @@ const SERVICES = [
       'One free week of bug-fix coverage after launch'
     ],
     bestFor:
-      'Founders, freelancers, and small teams who need software shipped — not a consultancy doing "discovery."'
+      'Founders, freelancers, and small teams who need a working system shipped, not an endless discovery process.'
   },
   {
     title: 'Cloud & backend',
@@ -42,7 +42,7 @@ const SERVICES = [
       'Serverless (Lambda / API Gateway / DynamoDB / S3 / CloudFront) where it fits',
       'Database migrations, backup strategy, and schema review',
       'Security hardening: rate limiters, security headers, audit logging, sane secrets handling',
-      'Cost analysis with concrete numbers — not "it depends"'
+      'Cost analysis with concrete numbers, not "it depends"'
     ],
     bestFor:
       "Businesses tired of paying twice the EC2 bill they should because nobody's audited it in two years."
@@ -55,7 +55,7 @@ const SERVICES = [
       'Unreal C++ and Blueprint development',
       'Steam multiplayer integration via Online Subsystem Steam',
       'Web portals that talk to running game sessions (Steam OpenID + auth tickets)',
-      'Async play-while-away mechanics — players queue work for their characters via a web app',
+      'Async play-while-away mechanics: players queue work for their characters via a web app',
       'Build/CI pipelines for game projects'
     ],
     bestFor:
@@ -68,7 +68,7 @@ const SERVICES = [
     deliverables: [
       'k6-driven load testing with live dashboards and percentile reporting',
       'CPU / memory / event-loop profiling on Node.js, Python, and game backends',
-      'Identification of the actual bottleneck — usually not what the team thinks it is',
+      'Identification of the actual bottleneck (usually not what the team thinks it is)',
       'Runtime toggles for safe production experimentation (rate limiters, maintenance mode)',
       'Incident response: dropping in during a fire and getting the system stable, then a written post-mortem'
     ],
@@ -117,7 +117,7 @@ export default function Services() {
           >
             Four broad categories. Most projects span two of them.
             Pricing is by milestone or by hour depending on how
-            well-defined the scope is — happy to discuss either.
+            well-defined the scope is. Happy to discuss either.
           </p>
         </Container>
       </section>

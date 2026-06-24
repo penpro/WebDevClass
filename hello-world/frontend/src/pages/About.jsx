@@ -34,12 +34,12 @@ const PILLARS = [
   {
     title: 'Problem solver',
     body:
-      'When a system is broken, the useful question is rarely "which library should we add?" — it\'s "what constraint are we actually fighting?" I\'m comfortable in unfamiliar codebases, half-documented systems, and projects where the problem is spread across software, infrastructure, people, and process.'
+      'When a system is broken, the useful question is rarely "which library should we add?" It\'s "what constraint are we actually fighting?" I\'m comfortable in unfamiliar codebases, half-documented systems, and projects where the problem is spread across software, infrastructure, people, and process.'
   },
   {
     title: 'Maker',
     body:
-      'Software, photography, game systems, hardware tinkering, documentation, physical builds — they all train the same muscle: turn vague intent into working structure. The cross-pollination is part of the point.'
+      'Software, photography, game systems, hardware tinkering, documentation, physical builds: they all train the same muscle, turning vague intent into working structure. The cross-pollination is part of the point.'
   }
 ]
 
@@ -47,7 +47,7 @@ const PROOFS = [
   {
     signal: 'Founder / operator',
     detail:
-      'Founder of Penumbra Group, Penumbra PC, and Penumbra Productions — running customer-facing technical work since 2016.'
+      'Founder of Penumbra Group, Penumbra PC, and Penumbra Productions, running customer-facing technical work since 2016.'
   },
   {
     signal: 'Systems background',
@@ -61,7 +61,7 @@ const PROOFS = [
   },
   {
     signal: 'Recognition',
-    detail: 'Penumbra PC — Best of South Kitsap, 2017.'
+    detail: 'Penumbra PC, Best of South Kitsap 2017.'
   },
   {
     signal: 'Education',
@@ -121,9 +121,18 @@ export default function About() {
         <Prose>
           <p>
             Penumbra Tech is the single-engineer consulting and software
-            practice of Wesley Weaver Jr. I started programming because
-            something was broken and nobody else was going to fix it.
-            That mindset still drives the work I take on.
+            practice of{' '}
+            <a
+              href="https://www.linkedin.com/in/wesley-weaver-31726629/"
+              target="_blank"
+              rel="noreferrer noopener"
+              style={{ color: colors.accent, textDecoration: 'none' }}
+            >
+              Wesley Weaver Jr.
+            </a>{' '}
+            I started programming because something was broken and nobody
+            else was going to fix it. That mindset still drives the work I
+            take on.
           </p>
 
           <p>
@@ -147,9 +156,8 @@ export default function About() {
             <strong style={{ color: colors.text }}>Penumbra PC</strong>, and{' '}
             <strong style={{ color: colors.text }}>
               Penumbra Productions
-            </strong>{' '}
-            — years of hands-on technical work with real customers, real
-            deadlines, and real consequences. Before that, I spent more
+            </strong>: years of hands-on technical work with real
+            customers, real deadlines, and real consequences. Before that, I spent more
             than a decade in the U.S. Navy nuclear pipeline and related
             technical roles: power plant operations, radiological
             controls, analytical chemistry, LAN administration,
@@ -177,7 +185,7 @@ export default function About() {
             >
               projects section
             </Link>{' '}
-            includes live, exercisable examples — including a traditional
+            includes live, exercisable examples, including a traditional
             EC2 stack benchmarked head-to-head against the same idea built
             serverlessly on Lambda + DynamoDB + S3.
           </p>

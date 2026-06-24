@@ -19,7 +19,7 @@ import { useState } from 'react';
 import LogoMark from './LogoMark.jsx';
 import Container from './Container.jsx';
 
-const YEAR = 2026;
+const YEAR = new Date().getFullYear();
 
 const SOCIALS = [
   {
@@ -155,7 +155,7 @@ export default function Footer() {
           }}
         >
           <span>
-            &copy; {YEAR} Penumbra Tech — Wesley Weaver Jr. All rights
+            &copy; {YEAR} Penumbra Tech · Wesley Weaver Jr. All rights
             reserved.
           </span>
           <span

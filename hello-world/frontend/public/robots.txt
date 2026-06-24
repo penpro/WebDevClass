@@ -1,0 +1,22 @@
+# penumbra-tech.com — robots policy
+#
+# Allow general indexing of the marketing surface; disallow the demo-app
+# UIs that need a logged-in account anyway (no value in crawling a login
+# wall) and the admin / loadtest paths that should never appear in search.
+
+User-agent: *
+Allow: /
+Disallow: /admin-portal
+Disallow: /admin-portal/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /subscribe
+Disallow: /tasktrackr
+Disallow: /quicknotes
+Disallow: /moodboard
+Disallow: /moodboards
+
+Sitemap: https://penumbra-tech.com/sitemap.xml

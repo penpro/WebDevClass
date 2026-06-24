@@ -89,7 +89,7 @@ export default function Repair360Case() {
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <HudLabel tone="cyan">
-            Case study — Client work / constraint engineering
+            Case study: Client work, constraint engineering
           </HudLabel>
           <h1
             style={{
@@ -103,7 +103,7 @@ export default function Repair360Case() {
               maxWidth: '22ch'
             }}
           >
-            Repair360 Auto — a modern site inside a Wix panel.
+            Repair360 Auto: a modern site inside a Wix panel.
           </h1>
           <p
             style={{
@@ -185,7 +185,7 @@ export default function Repair360Case() {
       {/* ========================== Challenge 1 ============================ */}
       <ChallengeSection
         background={colors.bgSoft}
-        eyebrow="Challenge 1 — Brand reverse-engineering"
+        eyebrow="Challenge 1: Brand reverse-engineering"
         tone="corona"
         title="A brand with no brand guide."
       >
@@ -211,7 +211,7 @@ export default function Repair360Case() {
 
       {/* ========================== Challenge 2 ============================ */}
       <ChallengeSection
-        eyebrow="Challenge 2 — Logo that fought every size"
+        eyebrow="Challenge 2: Logo that fought every size"
         tone="cyan"
         title="A muddy JPEG with a baked-in black background."
       >
@@ -237,7 +237,7 @@ export default function Repair360Case() {
       {/* ========================== Challenge 3 ============================ */}
       <ChallengeSection
         background={colors.bgSoft}
-        eyebrow="Challenge 3 — Behave inside a Wix panel"
+        eyebrow="Challenge 3: Behave inside a Wix panel"
         tone="magenta"
         title="One self-contained file, no framework, no build step."
       >
@@ -266,7 +266,7 @@ export default function Repair360Case() {
 
       {/* ========================== Challenge 4 ============================ */}
       <ChallengeSection
-        eyebrow="Challenge 4 — Mojibake nobody warns you about"
+        eyebrow="Challenge 4: Mojibake nobody warns you about"
         tone="cyan"
         title="UTF-8 turned to soup somewhere between editor and clipboard."
       >
@@ -293,7 +293,7 @@ export default function Repair360Case() {
       {/* ========================== Challenge 5 ============================ */}
       <ChallengeSection
         background={colors.bgSoft}
-        eyebrow="Challenge 5 — The invisible-website trap"
+        eyebrow="Challenge 5: The invisible-website trap"
         tone="magenta"
         title="Pixel-perfect, and effectively unindexable."
       >

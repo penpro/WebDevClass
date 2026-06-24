@@ -54,7 +54,7 @@ export default function Contact() {
     if (form.message.trim().length < 10)
       return 'Please write at least a sentence so I have something to respond to.';
     if (form.message.length > 4000)
-      return 'Message is over the 4,000 character limit — try shortening or sending a follow-up.';
+      return 'Message is over the 4,000 character limit. Try shortening or sending a follow-up.';
     return null;
   }
 
@@ -128,6 +128,18 @@ export default function Contact() {
           how I can help. I read every message personally and reply
           within a couple of business days.
         </p>
+        <p
+          style={{
+            margin: `${space.sm} 0 0`,
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.xs,
+            letterSpacing: '0.04em',
+            color: colors.textMuted,
+            textTransform: 'uppercase'
+          }}
+        >
+          Based in Kitsap County, WA · Pacific Time
+        </p>
 
         <Card
           variant="accent"
@@ -179,7 +191,7 @@ export default function Contact() {
               <Field
                 label="Subject"
                 htmlFor="contact-subject"
-                hint="Optional — one short line if you've got one."
+                hint="Optional: one short line if you've got one."
               >
                 <Input
                   id="contact-subject"
@@ -410,7 +422,7 @@ function ThankYou({ onReset }) {
           color: colors.text
         }}
       >
-        Got it — thanks.
+        Got it. Thanks.
       </h2>
       <p
         style={{

@@ -18,11 +18,12 @@ import LogoMark from './LogoMark.jsx';
 import Button from './Button.jsx';
 import Container from './Container.jsx';
 
+// Contact lives in the primary CTA button instead of the link list so
+// the conversion path is visually distinct from the browse links.
 const PUBLIC_LINKS = [
   { to: '/services', label: 'Services' },
   { to: '/projects', label: 'Projects' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' }
+  { to: '/about', label: 'About' }
 ];
 
 export default function NavBar() {
@@ -136,12 +137,20 @@ export default function NavBar() {
               </Button>
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: space.sm }}>
-              <Button as={Link} to="/login" variant="ghost" size="sm">
+            <div style={{ display: 'flex', alignItems: 'center', gap: space.md }}>
+              <Link
+                to="/login"
+                style={{
+                  color: colors.textSecondary,
+                  textDecoration: 'none',
+                  fontFamily: fonts.body,
+                  fontSize: '0.85rem'
+                }}
+              >
                 Log in
-              </Button>
-              <Button as={Link} to="/register" variant="primary" size="sm">
-                Sign up
+              </Link>
+              <Button as={Link} to="/contact" variant="primary" size="sm">
+                Start a project →
               </Button>
             </div>
           )}
@@ -239,30 +248,35 @@ export default function NavBar() {
             <div
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 gap: space.sm,
                 paddingTop: space.md
               }}
             >
               <Button
                 as={Link}
-                to="/login"
-                variant="ghost"
-                size="sm"
-                fullWidth
-                onClick={() => setOpen(false)}
-              >
-                Log in
-              </Button>
-              <Button
-                as={Link}
-                to="/register"
+                to="/contact"
                 variant="primary"
                 size="sm"
                 fullWidth
                 onClick={() => setOpen(false)}
               >
-                Sign up
+                Start a project →
               </Button>
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  color: colors.textSecondary,
+                  textDecoration: 'none',
+                  fontSize: '0.85rem',
+                  paddingTop: space.xs
+                }}
+              >
+                Log in
+              </Link>
             </div>
           )}
         </div>

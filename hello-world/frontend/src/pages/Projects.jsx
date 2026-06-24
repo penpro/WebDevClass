@@ -1,7 +1,7 @@
 // Projects / portfolio index. Each card links to the re-themed wrapper
-// route under /projects/<slug>. Wrappers themselves arrive in task #4 —
-// for now the cards still link to the existing top-level routes
-// (quicknotes, moodboard, etc.) which keep working until they're moved.
+// route under /projects/<slug>; a few cards still fall back to the
+// legacy top-level routes (quicknotes, moodboard, etc.) for the apps
+// that don't yet have a dedicated case-study wrapper.
 
 import { Link } from 'react-router-dom';
 import {
@@ -37,23 +37,23 @@ const PROJECTS = [
     summary:
       "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Live themed build runs in the browser at /toc/; canonical offline build is on GitHub. Built to prove I can think about computability and complexity, not just stitch libraries.",
     stack: ['Vanilla JS', 'KaTeX', 'Spaced repetition', 'Offline-first'],
-    auth: 'Live + offline (GitHub) — see case study'
+    auth: 'Live + offline (GitHub); see case study'
   },
   {
     to: '/projects/trigonometry-tools',
     badge: 'Published software · Steam',
     title: 'Trigonometry Tools',
     summary:
-      "A free educational game published to Steam in April 2025 under the Penumbra Productions name. Gamifies the unit-circle drill that precalculus students need to reach fluency — radians, sine, cosine at every standard angle, on a Steam-installed PC. Small on purpose, but it went through the full Steam release process: Steamworks app, store presence, public download.",
+      "A free educational game published to Steam in April 2025 under the Penumbra Productions name. Gamifies the unit-circle drill that precalculus students need to reach fluency (radians, sine, cosine at every standard angle) on a Steam-installed PC. Small on purpose, but it went through the full Steam release process: Steamworks app, store presence, public download.",
     stack: ['Steam release', 'Education', 'Penumbra Productions'],
-    auth: 'Live on Steam — free download'
+    auth: 'Live on Steam, free download'
   },
   {
     to: '/projects/metaverse-origins',
     badge: 'Published software · Steam Early Access',
     title: 'Metaverse: Origins',
     summary:
-      "Steam Early Access since May 2021 under the Penumbra.tech studio name. 150K+ lines across 500+ files and 15 subsystems — a studio-sized codebase run on indie headcount. The interesting story isn't the game; it's the pipeline I built around it: a live-engine test harness an agent can drive, a standing audit pipeline with adversarial verification (last pass surfaced 9 critical + 48 high-severity defects), and a structured agent memory that keeps the work coherent across months.",
+      "Steam Early Access since May 2021 under the Penumbra.tech studio name. 150K+ lines across 500+ files and 15 subsystems: a studio-sized codebase run on indie headcount. The interesting story isn't the game; it's the pipeline I built around it: a live-engine test harness an agent can drive, a standing audit pipeline with adversarial verification (last pass surfaced 9 critical + 48 high-severity defects), and a structured agent memory that keeps the work coherent across months.",
     stack: [
       'Steam Early Access',
       'Agent-driven CI',
@@ -62,14 +62,14 @@ const PROJECTS = [
       '150K+ LOC',
       'Penumbra.tech'
     ],
-    auth: 'Live on Steam — paid, pre-alpha (read the EA framing)'
+    auth: 'Live on Steam: paid, pre-alpha (read the EA framing)'
   },
   {
     to: '/projects/repair360-auto',
     badge: 'Client work',
-    title: 'Repair360 Auto — modern site inside a Wix panel',
+    title: 'Repair360 Auto: modern site inside a Wix panel',
     summary:
-      "Client kept their Wix host because their booking app, email, and listings were already wired to it. Built a hand-written dependency-free single-file front-end (~160 KB, no framework, no build step) embedded in a Wix HTML/Iframe panel — plus the harder hidden work: reverse-engineering the brand from social-media flyers, JPEG-to-SVG logo recovery, defeating a UTF-8 mojibake bug in the delivery pipeline, and fixing the iframe SEO-invisibility trap with AutoRepair JSON-LD and native host elements.",
+      "Client kept their Wix host because their booking app, email, and listings were already wired to it. Built a hand-written dependency-free single-file front-end (~160 KB, no framework, no build step) embedded in a Wix HTML/Iframe panel, plus the harder hidden work: reverse-engineering the brand from social-media flyers, JPEG-to-SVG logo recovery, defeating a UTF-8 mojibake bug in the delivery pipeline, and fixing the iframe SEO-invisibility trap with AutoRepair JSON-LD and native host elements.",
     stack: ['Vanilla JS', 'Responsive CSS', 'SVG vectorization', 'JSON-LD', 'Wix embed'],
     auth: 'Live site link inside the case study'
   },
@@ -81,7 +81,7 @@ const PROJECTS = [
     summary:
       'Task manager with category sidebar, due-soon filter, auto-saving edits, and a Facebook-style progress feed per task. Free users upload images up to 10 MB; Premium users upload video up to 100 MB via a role-aware multer uploader gated on a Stripe subscription.',
     stack: ['React', 'Express', 'MySQL', 'multer', 'Stripe'],
-    auth: 'Public — sign in to try it'
+    auth: 'Public; sign in to try it'
   },
   {
     to: '/projects/moodboard',
@@ -89,9 +89,9 @@ const PROJECTS = [
     badge: 'Web app + canvas',
     title: 'MoodBoard',
     summary:
-      'Image-URL boards with public share links, broken-image fallback, inline rename, and a client-side collage generator. The collage uses seeded layouts, cover-crop drawing, and pastel accent fills computed from the dominant color of neighbouring images — all in the browser, no server-side storage of images.',
+      'Image-URL boards with public share links, broken-image fallback, inline rename, and a client-side collage generator. The collage uses seeded layouts, cover-crop drawing, and pastel accent fills computed from the dominant color of neighbouring images, all in the browser, no server-side storage of images.',
     stack: ['React', 'Express', 'MySQL', 'HTML Canvas'],
-    auth: 'Public — sign in to create, share link to view'
+    auth: 'Public; sign in to create, share link to view'
   },
   {
     to: '/projects/subscribe',
@@ -101,7 +101,7 @@ const PROJECTS = [
     summary:
       'Full Stripe Subscriptions integration with the Payment Element rendered inline (PCI scope stays out of our infra). Idempotent webhook handling via a stripe_events table, raw-body signature verification, and post-redirect polling so users see "Activating…" instead of a stale state during the webhook race window.',
     stack: ['React', 'Express', '@stripe/react-stripe-js', 'Stripe Webhooks'],
-    auth: 'Public — sign in to use'
+    auth: 'Public; sign in to use'
   },
   {
     to: '/projects/api-guide',
@@ -111,7 +111,7 @@ const PROJECTS = [
     summary:
       'Browse-anywhere reference for every endpoint on the site, including REST conventions, status codes, role requirements, and which rate-limit tier applies. Exists partly as documentation and partly as evidence that the API has been thoughtfully designed.',
     stack: ['React'],
-    auth: 'Public — no login required'
+    auth: 'Public; no login required'
   },
   {
     to: '/projects/quicknotes',
@@ -121,7 +121,7 @@ const PROJECTS = [
     summary:
       'The original mini-app: user-scoped note list with full CRUD. The smallest possible vehicle for demonstrating sessions, auth, MySQL foreign keys, and a clean React form lifecycle.',
     stack: ['React', 'Express', 'MySQL', 'express-session'],
-    auth: 'Public — sign in to try it'
+    auth: 'Public; sign in to try it'
   }
 ];
 
@@ -131,7 +131,7 @@ const EXTERNAL = [
     badge: 'Source code',
     title: 'Full repository on GitHub',
     summary:
-      'Everything visible on this site — the React frontend, the Express backend with auth and four rate-limit tiers, the MySQL migration runner, the diagnostics infrastructure, the deploy scripts, the serverless companion project on AWS Lambda — all open for reading.'
+      'Everything visible on this site (the React frontend, the Express backend with auth and four rate-limit tiers, the MySQL migration runner, the diagnostics infrastructure, the deploy scripts, the serverless companion project on AWS Lambda) all open for reading.'
   }
 ];
 
@@ -265,9 +265,8 @@ export default function Projects() {
 }
 
 function ProjectCard({ project }) {
-  // The new /projects/<slug> wrapper routes don't exist yet — task #4.
-  // Until they do, link to the working `fallback` (the old top-level
-  // route) so the cards aren't broken between commits.
+  // Prefer the per-project case-study wrapper at /projects/<slug>; fall
+  // back to the app's legacy top-level route when no wrapper exists yet.
   const href = project.fallback || project.to;
   return (
     <Card interactive padding={space.lg}>

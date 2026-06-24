@@ -46,7 +46,7 @@ export default function TrigonometryToolsCase() {
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <HudLabel tone="corona">
-            Case study — Published software · Steam
+            Case study: Published software · Steam
           </HudLabel>
           <h1
             style={{
@@ -60,7 +60,7 @@ export default function TrigonometryToolsCase() {
               maxWidth: '24ch'
             }}
           >
-            Trigonometry Tools — a gamified unit-circle trainer.
+            Trigonometry Tools: a gamified unit-circle trainer.
           </h1>
           <p
             style={{

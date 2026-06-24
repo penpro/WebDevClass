@@ -265,8 +265,8 @@ export default function Subscribe() {
               marginBottom: '1.5rem'
             }}
           >
-            Subscription activated. Your account has been upgraded to Premium —
-            you can now post videos in TaskTrackr progress updates.
+            Subscription activated. Your account has been upgraded to Premium.
+            You can now post videos in TaskTrackr progress updates.
           </p>
         )}
 
@@ -352,7 +352,7 @@ export default function Subscribe() {
       </ul>
 
       <p style={{ color: colors.textMuted, fontSize: '0.9rem' }}>
-        We use Stripe in test mode — your real card is never charged. Use the
+        We use Stripe in test mode; your real card is never charged. Use the
         Stripe test card number <code>4242 4242 4242 4242</code> with any
         future expiry, any 3-digit CVC, and any ZIP.
       </p>
@@ -439,7 +439,7 @@ function SubscribeForm() {
           textAlign: 'center'
         }}
       >
-        Powered by Stripe — your card information is sent directly to Stripe
+        Powered by Stripe. Your card information is sent directly to Stripe
         and never touches our server.
       </p>
     </form>

@@ -1,4 +1,14 @@
-# WebDev Class Deployment Notes
+# Penumbra Tech (penumbra-tech.com) + demo apps
+
+> Production source for **penumbra-tech.com** — a single-engineer
+> consulting site (React + Vite + Express + MySQL on AWS EC2) plus the
+> demo apps surfaced under `/projects/*`. The repo is named
+> `WebDevClass` for historical reasons; every commit in here is
+> production code now.
+
+---
+
+# Original deployment notes (kept verbatim below)
 
 > **Heads-up for newcomers (2026-04 rebrand).** This repository now backs
 > two related things on the same EC2 stack:

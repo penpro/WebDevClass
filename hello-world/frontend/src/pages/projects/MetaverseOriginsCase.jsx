@@ -45,7 +45,7 @@ export default function MetaverseOriginsCase() {
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <HudLabel tone="magenta">
-            Case study — Published software · Steam Early Access
+            Case study: Published software · Steam Early Access
           </HudLabel>
           <h1
             style={{
@@ -59,7 +59,7 @@ export default function MetaverseOriginsCase() {
               maxWidth: '24ch'
             }}
           >
-            Metaverse: Origins — sandbox survival, granular by design.
+            Metaverse: Origins, sandbox survival built granular by design.
           </h1>
           <p
             style={{

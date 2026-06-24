@@ -1,43 +1,44 @@
-import React from 'react'
+import React, { lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import App from './App.jsx'
 import { AuthProvider } from './AuthContext.jsx'
 
-// New Penumbra Tech marketing pages.
+// Eager: the marketing landing. Visitors hit / first, so loading it
+// statically avoids a paint-then-loader flash on the most-shared URL.
 import PenumbraHome from './pages/PenumbraHome.jsx'
-import Services from './pages/Services.jsx'
-import About from './pages/About.jsx'
-import Contact from './pages/Contact.jsx'
-import Projects from './pages/Projects.jsx'
 
-// Public project case studies. These wrap each demo with marketing
-// copy + a screenshot/sample, so the home page never links visitors
-// directly into an auth-gated admin route.
-import DiagnosticsCase from './pages/projects/DiagnosticsCase.jsx'
-import TheoryOfComputationCase from './pages/projects/TheoryOfComputationCase.jsx'
-import Repair360Case from './pages/projects/Repair360Case.jsx'
-import TrigonometryToolsCase from './pages/projects/TrigonometryToolsCase.jsx'
-import MetaverseOriginsCase from './pages/projects/MetaverseOriginsCase.jsx'
+// Lazy: every other route. Vite emits one chunk per import() call, so
+// the marketing visitor downloads PenumbraHome + the shell and nothing
+// else; admin / diagnostics / Stripe / case-study code only loads when
+// someone actually navigates to it. Suspense boundary lives in
+// Layout.jsx so NavBar + Footer stay rendered during the chunk fetch.
+const Services = lazy(() => import('./pages/Services.jsx'))
+const About = lazy(() => import('./pages/About.jsx'))
+const Contact = lazy(() => import('./pages/Contact.jsx'))
+const Projects = lazy(() => import('./pages/Projects.jsx'))
 
-// Existing pages preserved. The old `Home.jsx` is gone from the route
-// table (PenumbraHome is the new landing). The mini-apps below will move
-// under /projects/<slug> in task #4, but for now they're still reachable
-// at their original top-level paths so existing bookmarks and the
-// Projects index fallback links keep working.
-import Login from './pages/Login.jsx'
-import Register from './pages/Register.jsx'
-import ForgotPassword from './pages/ForgotPassword.jsx'
-import ResetPassword from './pages/ResetPassword.jsx'
-import QuickNotes from './pages/QuickNotes.jsx'
-import MoodBoards from './pages/MoodBoards.jsx'
-import MoodBoard from './pages/MoodBoard.jsx'
-import TaskTrackr from './pages/TaskTrackr.jsx'
-import AdminPortal from './pages/AdminPortal.jsx'
-import Diagnostics from './pages/Diagnostics.jsx'
-import ApiGuide from './pages/ApiGuide.jsx'
-import Subscribe from './pages/Subscribe.jsx'
+const DiagnosticsCase = lazy(() => import('./pages/projects/DiagnosticsCase.jsx'))
+const TheoryOfComputationCase = lazy(() => import('./pages/projects/TheoryOfComputationCase.jsx'))
+const Repair360Case = lazy(() => import('./pages/projects/Repair360Case.jsx'))
+const TrigonometryToolsCase = lazy(() => import('./pages/projects/TrigonometryToolsCase.jsx'))
+const MetaverseOriginsCase = lazy(() => import('./pages/projects/MetaverseOriginsCase.jsx'))
+
+const Login = lazy(() => import('./pages/Login.jsx'))
+const Register = lazy(() => import('./pages/Register.jsx'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword.jsx'))
+const QuickNotes = lazy(() => import('./pages/QuickNotes.jsx'))
+const MoodBoards = lazy(() => import('./pages/MoodBoards.jsx'))
+const MoodBoard = lazy(() => import('./pages/MoodBoard.jsx'))
+const TaskTrackr = lazy(() => import('./pages/TaskTrackr.jsx'))
+const AdminPortal = lazy(() => import('./pages/AdminPortal.jsx'))
+const Diagnostics = lazy(() => import('./pages/Diagnostics.jsx'))
+const ApiGuide = lazy(() => import('./pages/ApiGuide.jsx'))
+// Subscribe pulls in @stripe/react-stripe-js which is the single biggest
+// dep on the site — splitting it out is the largest single win.
+const Subscribe = lazy(() => import('./pages/Subscribe.jsx'))
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

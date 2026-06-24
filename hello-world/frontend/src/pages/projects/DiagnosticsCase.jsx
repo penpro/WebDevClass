@@ -191,7 +191,7 @@ export default function DiagnosticsCase() {
         <Stars density={120} heroDensity={14} colorTint="corona" />
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
-          <HudLabel tone="corona">Case study — Performance engineering</HudLabel>
+          <HudLabel tone="corona">Case study: Performance engineering</HudLabel>
           <h1
             style={{
               fontFamily: fonts.heading,
@@ -252,7 +252,7 @@ export default function DiagnosticsCase() {
 
       {/* ============================= Run 1 ============================== */}
       <RunSection
-        eyebrow="Run 1 — API overload"
+        eyebrow="Run 1: API overload"
         tone="cyan"
         title="Graceful degradation"
         body={`Ramping 50 → 200 → 500 concurrent VUs over four minutes against a real
@@ -266,7 +266,7 @@ slow, not broken.`}
 
       {/* ============================= Run 2 ============================== */}
       <RunSection
-        eyebrow="Run 2 — Event-loop block"
+        eyebrow="Run 2: Event-loop block"
         tone="magenta"
         title="Hard failure"
         body={`Same client load, different endpoint — one that synchronously

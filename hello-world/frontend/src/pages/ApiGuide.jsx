@@ -380,7 +380,7 @@ export default function ApiGuide() {
       <h2>Endpoints</h2>
 
       {/* messages */}
-      <h3 id="endpoints-messages">Messages — the original Hello World demo</h3>
+      <h3 id="endpoints-messages">Messages: the original Hello World demo</h3>
       <EndpointTable
         rows={[
           { method: 'GET', path: '/api/messages', auth: 'public', desc: 'Returns the seeded messages from MySQL' }
@@ -402,7 +402,7 @@ export default function ApiGuide() {
       />
 
       {/* notes */}
-      <h3 id="endpoints-notes">Notes — QuickNotes</h3>
+      <h3 id="endpoints-notes">Notes: QuickNotes</h3>
       <EndpointTable
         rows={[
           { method: 'GET', path: '/api/notes', auth: 'required', desc: "List the caller's notes, newest-edited first" },
@@ -414,7 +414,7 @@ export default function ApiGuide() {
       />
 
       {/* boards */}
-      <h3 id="endpoints-boards">Boards — MoodBoard</h3>
+      <h3 id="endpoints-boards">Boards: MoodBoard</h3>
       <EndpointTable
         rows={[
           { method: 'GET', path: '/api/boards', auth: 'required', desc: "List the caller's boards" },
@@ -428,19 +428,19 @@ export default function ApiGuide() {
       />
 
       {/* tasks */}
-      <h3 id="endpoints-tasks">Tasks — TaskTrackr</h3>
+      <h3 id="endpoints-tasks">Tasks: TaskTrackr</h3>
       <EndpointTable
         rows={[
           { method: 'GET', path: '/api/tasks', auth: 'required', desc: "List the caller's tasks. Open tasks first, then by due date, then by recently updated." },
           { method: 'GET', path: '/api/tasks/:id', auth: 'required', desc: 'Fetch one task' },
           { method: 'POST', path: '/api/tasks', auth: 'required', desc: 'Create a task. Body: { title, description, due_date, category }' },
-          { method: 'PUT', path: '/api/tasks/:id', auth: 'required', desc: 'Partial update — send only the fields that changed (used by auto-save)' },
+          { method: 'PUT', path: '/api/tasks/:id', auth: 'required', desc: 'Partial update; send only the fields that changed (used by auto-save)' },
           { method: 'DELETE', path: '/api/tasks/:id', auth: 'required', desc: 'Delete the task. Cascades to task_updates rows AND unlinks any uploaded media files from disk.' }
         ]}
       />
 
       {/* task updates */}
-      <h3 id="endpoints-task-updates">Task updates — progress posts</h3>
+      <h3 id="endpoints-task-updates">Task updates: progress posts</h3>
       <EndpointTable
         rows={[
           { method: 'GET', path: '/api/tasks/:taskId/updates', auth: 'owner', desc: 'List updates for a task, newest first' },
@@ -451,7 +451,7 @@ export default function ApiGuide() {
       />
 
       {/* payments */}
-      <h3 id="endpoints-payments">Payments — Stripe subscriptions</h3>
+      <h3 id="endpoints-payments">Payments: Stripe subscriptions</h3>
       <p style={{ fontSize: '0.9rem', color: theme.textMuted }}>
         Subscription billing for the Premium tier, integrated with Stripe.
         The frontend uses Stripe Elements (Payment Element) so card details
@@ -481,7 +481,7 @@ export default function ApiGuide() {
       </p>
 
       {/* admin */}
-      <h3 id="endpoints-admin">Admin — Customer Service</h3>
+      <h3 id="endpoints-admin">Admin: Customer Service</h3>
       <EndpointTable
         rows={[
           { method: 'GET', path: '/api/admin/users/search?q=...', auth: 'admin+', desc: 'Substring search on user emails. Returns up to 50 users with role, created_at, last_login_at. Logged to admin_actions audit table.' },
