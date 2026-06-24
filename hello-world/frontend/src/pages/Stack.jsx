@@ -479,6 +479,104 @@ export default function Stack() {
         </Container>
       </section>
 
+      {/* ==================== The security blast radius ==================== */}
+      <section
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          background: colors.surface,
+          borderTop: `1px solid ${colors.border}`,
+          borderBottom: `1px solid ${colors.border}`
+        }}
+      >
+        <Container narrow>
+          <HudLabel tone="magenta">When the platform gets popped</HudLabel>
+          <h2
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: fontSizes['2xl'],
+              fontWeight: fontWeights.bold,
+              color: colors.text,
+              letterSpacing: '-0.015em',
+              margin: `${space.md} 0 ${space.lg}`
+            }}
+          >
+            Mass platforms are mass targets. Being a small custom site is a security feature.
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: space.md }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: fontSizes.md,
+                color: colors.textSecondary,
+                lineHeight: 1.7
+              }}
+            >
+              Big managed platforms run effectively identical software for
+              millions of sites. That&apos;s economically efficient for
+              them and operationally efficient for you, right until
+              somebody finds a way in. Then it isn&apos;t. WordPress and
+              its plugin ecosystem alone have had years where a single CVE
+              quietly compromised hundreds of thousands of sites over a
+              weekend. The pattern is not exotic; it&apos;s the business
+              model of mass exploitation. One vulnerability, thousands of
+              victims, attacker ROI through the roof.
+            </p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: fontSizes.md,
+                color: colors.textSecondary,
+                lineHeight: 1.7
+              }}
+            >
+              When that happens, your site is in the blast radius
+              regardless of how careful you have been. The platform&apos;s
+              security posture is your ceiling. You can&apos;t patch what
+              you don&apos;t control, you usually can&apos;t even verify
+              what version of what runtime your tenant is running, and the
+              first you hear about the breach is when your bank starts
+              declining the cards your customers used last Tuesday.
+            </p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: fontSizes.md,
+                color: colors.textSecondary,
+                lineHeight: 1.7
+              }}
+            >
+              A bespoke site running its own stack is a one-off target.
+              Exploiting it costs an attacker the same effort as
+              exploiting a single WordPress install, but the payoff is one
+              site instead of fifty thousand. They go elsewhere. You also
+              get to make security choices that aren&apos;t available on a
+              shared tenant: rate limiters tuned to your actual traffic,
+              CSPs scoped to your actual integrations, secrets managed
+              your way, audit logs you can read, and an attack surface
+              you can list on one page.
+            </p>
+            <p
+              style={{
+                margin: 0,
+                paddingTop: space.md,
+                borderTop: `1px dashed ${colors.borderSubtle}`,
+                fontFamily: fonts.heading,
+                fontSize: fontSizes.lg,
+                color: colors.text,
+                fontWeight: fontWeights.semibold,
+                letterSpacing: '-0.005em',
+                lineHeight: 1.4
+              }}
+            >
+              Bespoke isn&apos;t an upgrade to your security. It&apos;s a
+              downgrade to your value as a target, and that&apos;s often
+              the same thing in practice.
+            </p>
+          </div>
+        </Container>
+      </section>
+
       {/* ==================== What you get when I build it ==================== */}
       <section
         style={{
