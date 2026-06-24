@@ -16,7 +16,7 @@
     "express-session": "^1.18.1",
     "multer": "^2.0.0",
     "mysql2": "^3.14.1",
-    "nodemailer": "^8.0.5",
+    "nodemailer": "^9.0.1",
     "stripe": "^17.0.0"
   }
 }
