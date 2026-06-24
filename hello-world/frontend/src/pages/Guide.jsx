@@ -1563,10 +1563,10 @@ mysqldump --defaults-extra-file="$TMP_CNF" \\
   --single-transaction --quick --routines --triggers \\
   --skip-lock-tables --set-gtid-purged=OFF --no-tablespaces \\
   "$DB_NAME" \\
-  | gzip -c > "/backups/${DB_NAME}_$(date +%F).sql.gz"
+  | gzip -c > "/backups/\${DB_NAME}_$(date +%F).sql.gz"
 
 # Keep 14 days.
-find /backups -maxdepth 1 -name "${DB_NAME}_*.sql.gz" -mtime +14 -delete
+find /backups -maxdepth 1 -name "\${DB_NAME}_*.sql.gz" -mtime +14 -delete
 echo "[$(date -Iseconds)] backup OK"`}
             </CodeBlock>
 
