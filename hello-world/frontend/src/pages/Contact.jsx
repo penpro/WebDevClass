@@ -171,6 +171,22 @@ export default function Contact() {
         >
           Based in Kitsap County, WA · Pacific Time
         </p>
+        <p
+          style={{
+            margin: `${space.xs} 0 0`,
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.sm,
+            color: colors.textSecondary
+          }}
+        >
+          <a
+            href="tel:+13608507876"
+            style={{ color: colors.accent, textDecoration: 'none' }}
+          >
+            (360) 850-7876
+          </a>{' '}
+          · calls and texts both fine during Pacific business hours
+        </p>
 
         <div
           style={{

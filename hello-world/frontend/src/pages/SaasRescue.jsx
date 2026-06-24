@@ -28,13 +28,13 @@ const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 
 const CHAPTERS = [
   { id: 'foreword', num: '0', title: 'You are not behind. You are mid-build.' },
-  { id: 'audit',    num: '1', title: 'Week 0 — the 30-minute audit' },
-  { id: 'secrets',  num: '2', title: 'Week 1 — secrets, auth, rate limits' },
-  { id: 'payments', num: '3', title: 'Week 2 — Stripe (and what comes after Stripe)' },
-  { id: 'deploys',  num: '4', title: 'Week 3 — deploys without 3am surprises' },
-  { id: 'monitor',  num: '5', title: 'Week 4 — monitoring you will actually answer' },
-  { id: 'backups',  num: '6', title: 'Week 5 — backups and the recovery test' },
-  { id: 'handover', num: '7', title: 'Week 6 — security headers and the handover' },
+  { id: 'audit',    num: '1', title: 'Week 0: the 30-minute audit' },
+  { id: 'secrets',  num: '2', title: 'Week 1: secrets, auth, rate limits' },
+  { id: 'payments', num: '3', title: 'Week 2: Stripe (and what comes after Stripe)' },
+  { id: 'deploys',  num: '4', title: 'Week 3: deploys without 3am surprises' },
+  { id: 'monitor',  num: '5', title: 'Week 4: monitoring you will actually answer' },
+  { id: 'backups',  num: '6', title: 'Week 5: backups and the recovery test' },
+  { id: 'handover', num: '7', title: 'Week 6: security headers and the handover' },
   { id: 'honest',   num: '8', title: 'The honest chapter' }
 ];
 
@@ -207,7 +207,7 @@ function Gotcha({ children, title = 'What actually goes wrong here' }) {
 // weight, different colour, different intent. Magenta dashes for
 // "warning, footgun"; corona-accent solid for "here is what hiring
 // me looks like."
-function HireReframe({ children }) {
+function HireReframe({ children, title = 'What hiring me looks like' }) {
   return (
     <aside
       className="saas-hire"
@@ -229,7 +229,7 @@ function HireReframe({ children }) {
           marginBottom: space.sm
         }}
       >
-        What hiring me looks like in this week
+        {title}
       </div>
       <div
         style={{
@@ -367,7 +367,7 @@ export default function SaasRescue() {
             For the solo founder four months into a vertical SaaS who
             is shipping features fine but losing a day or two a week to
             TLS, payments, deploys, and the stuff nobody notices until
-            it breaks. Free if you have the time. The price if you
+            it breaks. Free if you have the time. $10K–$25K if you
             don&apos;t.
           </p>
           <div
@@ -540,7 +540,7 @@ export default function SaasRescue() {
               differentiating your SaaS.
             </P>
             <P>
-              This page is what a 4-6 week sprint looks like when you
+              This page is what a 6-week sprint looks like when you
               hand the infra work to somebody whose entire job is
               this. It is also a complete recipe. If you have the time
               and want to do it yourself, read the chapters straight
@@ -566,7 +566,7 @@ export default function SaasRescue() {
                 starts being a series of 3am incident retros.
               </P>
             </Gotcha>
-            <HireReframe>
+            <HireReframe title="What the engagement actually buys">
               The 6-week Build Sprint engagement is $10K–$25K depending
               on scope (auth complexity, payment volume, third-party
               integrations). Half paid up front, half on acceptance.
@@ -637,7 +637,7 @@ find . -name "*.sh" -path "*backup*" 2>/dev/null`}
               </P>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="Week 0, hired out">
               The first week is exactly this audit, deeper. I clone
               your repo, walk through every endpoint, run the greps,
               check your DNS and TLS posture, look at your AWS bill
@@ -750,7 +750,7 @@ app.use('/api/auth/forgot-password', forgotPasswordLimiter);`}
               </P>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="Week 1 in a Build Sprint">
               Week 1 ships as a single PR against your repo: the
               fail-fast block, the bcrypt + timing fix, the four rate
               limiters, plus a short README on what each tier protects
@@ -849,7 +849,7 @@ await pool.query(
               </P>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="The Week 2 deliverable">
               Week 2 in a Build Sprint covers the full Stripe
               integration if you don&apos;t have one yet (Payment
               Element rendering, subscription state machine, webhook
@@ -938,7 +938,7 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab`}
               </CodeBlock>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="How Week 3 ships">
               Week 3 lands the versioned-deploy script, the
               pm2 reload migration, the swap file, and a 30-line
               rollback runbook posted in your repo. The total work
@@ -1044,7 +1044,7 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
               </P>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="Week 4 deliverable">
               Week 4 ships /api/health, the three error handlers, the
               UptimeRobot configuration, and pm2-logrotate. Total
               code: about 40 lines. Total time you have spent worrying
@@ -1139,7 +1139,7 @@ sudo mysql -e "DROP DATABASE recovery_test;"`}
               </P>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="Week 5, hands-on">
               Week 5 in a Build Sprint adds the backup script, the
               cron, the log path, a weekly EBS snapshot via AWS CLI
               (if you want the &ldquo;whole-disk gone&rdquo; case
@@ -1267,7 +1267,7 @@ Test restore quarterly with the script in ops/restore-drill.sh.
               </P>
             </Gotcha>
 
-            <HireReframe>
+            <HireReframe title="The handover week">
               Week 6 ships the nginx header fix, an updated CSP
               tuned to whichever third-party services your app
               actually uses (Stripe, analytics, fonts), and the
@@ -1355,7 +1355,7 @@ Test restore quarterly with the script in ops/restore-drill.sh.
               one of those for you. A senior engineer will.
             </P>
 
-            <HireReframe>
+            <HireReframe title="The intro call, if it makes sense">
               The 30-minute intro call is genuinely free of pitch.
               We walk through your stack, what you have done, what
               you are stuck on, and I tell you honestly whether
