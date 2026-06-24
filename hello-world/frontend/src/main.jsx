@@ -40,6 +40,7 @@ const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Stack = lazy(() => import('./pages/Stack.jsx'))
 const Judgment = lazy(() => import('./pages/Judgment.jsx'))
 const Guide = lazy(() => import('./pages/Guide.jsx'))
+const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 const DiagnosticsCase = lazy(() => import('./pages/projects/DiagnosticsCase.jsx'))
 const TheoryOfComputationCase = lazy(() => import('./pages/projects/TheoryOfComputationCase.jsx'))
@@ -120,6 +121,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               path="customer-service"
               element={<Navigate to="/admin-portal" replace />}
             />
+
+            {/* Catch-all: any unmatched path under / renders the
+                NotFound page. Returns HTTP 200 from nginx (SPA
+                fallback is always 200 without SSR), but the visible
+                page is an explicit 404 with links to the high-value
+                routes. */}
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </AuthProvider>

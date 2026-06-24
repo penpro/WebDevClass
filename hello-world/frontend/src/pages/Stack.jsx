@@ -31,17 +31,17 @@ const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 // traffic comes in a few dollars below this every month.
 const COST_ROWS = [
   {
-    line: 'EC2 — t3.micro, on-demand, 24/7',
+    line: 'EC2: t3.micro, on-demand, 24/7',
     note: '2 vCPU burst, 1 GB RAM. Runs nginx + Node + MySQL all in one process group.',
     monthly: '$7.59'
   },
   {
-    line: 'EBS — gp3 20 GB root volume',
+    line: 'EBS: gp3 20 GB root volume',
     note: 'SSD-backed disk. Includes app, database, build cache, ~14 days of nightly SQL dumps.',
     monthly: '$1.60'
   },
   {
-    line: 'Route 53 — hosted zone',
+    line: 'Route 53: hosted zone',
     note: 'Authoritative DNS for penumbra-tech.com. Includes per-query cost at this volume.',
     monthly: '$0.55'
   },
@@ -51,7 +51,7 @@ const COST_ROWS = [
     monthly: '$1.08'
   },
   {
-    line: 'TLS certificate — Let’s Encrypt',
+    line: 'TLS certificate: Let’s Encrypt',
     note: 'Auto-renewed via certbot. Covers apex + www + the legacy duckdns subdomain.',
     monthly: '$0.00'
   },
@@ -61,7 +61,7 @@ const COST_ROWS = [
     monthly: '$0–3'
   },
   {
-    line: 'Email — SMTP relay for contact-form notifications',
+    line: 'Email: SMTP relay for contact-form notifications',
     note: 'Currently routed through a free-tier provider. Easy to swap to SES at fractions of a cent per message.',
     monthly: '$0.00'
   }
@@ -397,7 +397,7 @@ export default function Stack() {
                     lineHeight: 1.65
                   }}
                 >
-                  ...{c.extra}
+                  {c.extra}
                 </p>
               </Card>
             ))}

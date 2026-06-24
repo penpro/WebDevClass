@@ -844,7 +844,7 @@ export default function PenumbraHome() {
                     letterSpacing: '0.12em'
                   }}
                 >
-                  &quot;Could I just do this myself?&quot;
+                  &quot;Should I just do this myself?&quot;
                 </span>
                 <h3
                   style={{

@@ -154,9 +154,10 @@ export default function Contact() {
             maxWidth: '60ch'
           }}
         >
-          Tell me what you&apos;re working on, what&apos;s stuck, and
-          how I can help. I read every message personally and reply
-          within a couple of business days.
+          Two ways in. The 30-minute call below is the fastest;
+          we&apos;ll book inside the week. The form further down is
+          for when you&apos;d rather write the problem out first, and
+          I&apos;ll reply personally within a couple of business days.
         </p>
         <p
           style={{
@@ -672,7 +673,8 @@ function ThankYou({ onReset }) {
         }}
       >
         I&apos;ll get back to you within a couple of business days. If
-        you need something faster, email is the quickest path.
+        you need something faster, grab a 30-min slot on the calendar
+        at the top of the page.
       </p>
       <Button
         variant="secondary"

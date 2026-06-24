@@ -112,7 +112,7 @@ export default function Footer() {
               (360) 850-7876
             </FooterExternal>
             <FooterExternal
-              href="https://github.com/penpro/Resume-CV"
+              href="https://github.com/penpro/WebDevClass"
               target="_blank"
               rel="noopener noreferrer"
             >
