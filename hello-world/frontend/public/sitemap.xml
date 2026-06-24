@@ -26,6 +26,16 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://penumbra-tech.com/stack</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://penumbra-tech.com/judgment</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
     <loc>https://penumbra-tech.com/projects/diagnostics</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

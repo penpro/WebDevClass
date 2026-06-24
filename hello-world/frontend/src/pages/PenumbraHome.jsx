@@ -701,6 +701,139 @@ export default function PenumbraHome() {
         </Container>
       </section>
 
+      {/* =========================== Deeper reads =========================== */}
+      <section
+        style={{
+          paddingTop: space['2xl'],
+          paddingBottom: space['3xl'],
+          borderTop: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <Container>
+          <SectionHeading
+            eyebrow="Two questions buyers usually have"
+            title="Read these before the call."
+            body="Most prospects arrive with one of two unasked questions. These pages answer them directly so the 30-min intro can be about your project, not about whether I'm the right kind of consultant."
+            tone="magenta"
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: space.lg,
+              marginTop: space['2xl']
+            }}
+          >
+            <Card interactive padding={space.lg}>
+              <Link
+                to="/stack"
+                style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
+              >
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.cyan,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em'
+                  }}
+                >
+                  &quot;What does all this cost?&quot;
+                </span>
+                <h3
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontSize: fontSizes.lg,
+                    fontWeight: fontWeights.semibold,
+                    color: colors.text,
+                    margin: `${space.sm} 0`,
+                    letterSpacing: '-0.005em'
+                  }}
+                >
+                  Under the hood: every line of the AWS bill.
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    color: colors.textSecondary,
+                    fontSize: fontSizes.sm,
+                    lineHeight: 1.65
+                  }}
+                >
+                  Why this stack runs at ~$15/month, what Wix / Squarespace
+                  / Shopify charge for the same feature set, and the
+                  reason the gap exists. Cost transparency as a deliverable.
+                </p>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    marginTop: space.md,
+                    color: colors.accent,
+                    fontSize: fontSizes.sm,
+                    fontWeight: fontWeights.semibold
+                  }}
+                >
+                  See the breakdown →
+                </span>
+              </Link>
+            </Card>
+            <Card interactive padding={space.lg}>
+              <Link
+                to="/judgment"
+                style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
+              >
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.magenta,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em'
+                  }}
+                >
+                  &quot;Why not just use an LLM?&quot;
+                </span>
+                <h3
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontSize: fontSizes.lg,
+                    fontWeight: fontWeights.semibold,
+                    color: colors.text,
+                    margin: `${space.sm} 0`,
+                    letterSpacing: '-0.005em'
+                  }}
+                >
+                  The judgement is the product.
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    color: colors.textSecondary,
+                    fontSize: fontSizes.sm,
+                    lineHeight: 1.65
+                  }}
+                >
+                  Seven real incidents where accepting the model&apos;s
+                  first answer would have shipped a bug, a crash, or a
+                  wasted afternoon. What the engineer adds, with receipts.
+                </p>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    marginTop: space.md,
+                    color: colors.accent,
+                    fontSize: fontSizes.sm,
+                    fontWeight: fontWeights.semibold
+                  }}
+                >
+                  Read the case →
+                </span>
+              </Link>
+            </Card>
+          </div>
+        </Container>
+      </section>
+
       {/* =========================== Closing CTA =========================== */}
       <section
         style={{

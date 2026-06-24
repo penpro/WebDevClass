@@ -37,6 +37,8 @@ const Services = lazy(() => import('./pages/Services.jsx'))
 const About = lazy(() => import('./pages/About.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
+const Stack = lazy(() => import('./pages/Stack.jsx'))
+const Judgment = lazy(() => import('./pages/Judgment.jsx'))
 
 const DiagnosticsCase = lazy(() => import('./pages/projects/DiagnosticsCase.jsx'))
 const TheoryOfComputationCase = lazy(() => import('./pages/projects/TheoryOfComputationCase.jsx'))
@@ -85,6 +87,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
+            <Route path="stack" element={<Stack />} />
+            <Route path="judgment" element={<Judgment />} />
 
             {/* Auth pages */}
             <Route path="login" element={<Login />} />
