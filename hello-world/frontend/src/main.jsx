@@ -2,6 +2,25 @@ import React, { lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
+// Self-hosted brand fonts. Each weight is a separate woff2 that Vite
+// bundles into /assets/ with the immutable cache header set in
+// nginx — first paint after deploy fetches once, every subsequent
+// visit serves from local cache. Beats Google Fonts on privacy (no
+// third-party origin trip), CSP simplicity, and offline reliability.
+//
+// Keep this list aligned with theme.js fontWeights — adding a new
+// weight to the theme means adding the matching import here.
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
+import '@fontsource/space-grotesk/400.css'
+import '@fontsource/space-grotesk/500.css'
+import '@fontsource/space-grotesk/600.css'
+import '@fontsource/space-grotesk/700.css'
+import '@fontsource/jetbrains-mono/400.css'
+import '@fontsource/jetbrains-mono/500.css'
+
 import App from './App.jsx'
 import { AuthProvider } from './AuthContext.jsx'
 

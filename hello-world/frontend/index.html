@@ -24,7 +24,7 @@
       property="og:description"
       content="Single-engineer consulting practice building full-stack web apps, AWS infrastructure, Unreal Engine systems, and the performance / reliability tooling that keeps it all from quietly falling over."
     />
-    <meta property="og:image" content="https://penumbra-tech.com/og-card.png" />
+    <meta property="og:image" content="https://penumbra-tech.com/og-card.svg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
@@ -34,22 +34,12 @@
       name="twitter:description"
       content="Single-engineer consulting practice for full-stack software, cloud infrastructure, game systems, and reliability work."
     />
-    <meta name="twitter:image" content="https://penumbra-tech.com/og-card.png" />
+    <meta name="twitter:image" content="https://penumbra-tech.com/og-card.svg" />
 
-    <!-- Brand fonts. Preconnect for the handshake, then a single
-         stylesheet pulling Space Grotesk for headings and Inter for
-         body. JetBrains Mono is loaded for the few places we render
-         code samples. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Brand fonts are self-hosted via @fontsource (see main.jsx). The
+         woff2 files are bundled by Vite into /assets/ and served from
+         our own origin with the immutable cache header. No third-party
+         font CDN, no extra DNS / TLS handshake. -->
 
     <!-- Inline SVG favicon: circled P in the corona color. -->
     <link

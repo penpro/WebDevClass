@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <!--
+    Open Graph card for penumbra-tech.com.
+    1200x630 — Twitter/Facebook/LinkedIn standard. SVG works for Slack,
+    Discord, X, iMessage; LinkedIn renders no image for SVG and falls
+    back to text-only. Rasterize to og-card.png if LinkedIn previews
+    matter (Inkscape: inkscape og-card.svg -o og-card.png -w 1200).
+  -->
+  <defs>
+    <radialGradient id="corona" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%"  stop-color="#5eead4" stop-opacity="0"/>
+      <stop offset="35%" stop-color="#5eead4" stop-opacity="0.05"/>
+      <stop offset="55%" stop-color="#5eead4" stop-opacity="0.35"/>
+      <stop offset="62%" stop-color="#22d3ee" stop-opacity="0.65"/>
+      <stop offset="68%" stop-color="#c084fc" stop-opacity="0.55"/>
+      <stop offset="80%" stop-color="#5eead4" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#5eead4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bgGlow" cx="0.78" cy="0.5" r="0.55">
+      <stop offset="0%"  stop-color="#150b30" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#07021a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="brandStroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"  stop-color="#5eead4"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep navy background -->
+  <rect width="1200" height="630" fill="#07021a"/>
+  <rect width="1200" height="630" fill="url(#bgGlow)"/>
+
+  <!-- Starfield (deterministic — same render every time) -->
+  <g fill="#ecfeff">
+    <circle cx="50"   cy="80"  r="1.2" opacity="0.6"/>
+    <circle cx="130"  cy="180" r="0.9" opacity="0.4"/>
+    <circle cx="210"  cy="60"  r="1.5" opacity="0.7"/>
+    <circle cx="320"  cy="500" r="1.0" opacity="0.5"/>
+    <circle cx="80"   cy="350" r="1.1" opacity="0.5"/>
+    <circle cx="180"  cy="450" r="0.8" opacity="0.4"/>
+    <circle cx="270"  cy="280" r="1.3" opacity="0.7"/>
+    <circle cx="60"   cy="540" r="0.9" opacity="0.5"/>
+    <circle cx="400"  cy="120" r="1.0" opacity="0.45"/>
+    <circle cx="510"  cy="540" r="0.8" opacity="0.35"/>
+    <circle cx="610"  cy="80"  r="1.2" opacity="0.5"/>
+    <circle cx="430"  cy="380" r="0.7" opacity="0.4"/>
+    <circle cx="1120" cy="120" r="1.0" opacity="0.5"/>
+    <circle cx="1060" cy="540" r="1.4" opacity="0.7"/>
+    <circle cx="1170" cy="330" r="0.8" opacity="0.4"/>
+    <circle cx="950"  cy="80"  r="1.1" opacity="0.55"/>
+    <circle cx="990"  cy="510" r="0.9" opacity="0.5"/>
+    <circle cx="1100" cy="280" r="1.2" opacity="0.6"/>
+    <circle cx="900"  cy="430" r="0.7" opacity="0.4"/>
+  </g>
+
+  <!-- Eclipse: corona ring + moon disc, anchored right of center -->
+  <g transform="translate(880 315)">
+    <circle r="240" fill="url(#corona)"/>
+    <circle r="120" fill="#07021a" stroke="#150b30" stroke-width="1"/>
+    <!-- thin corona accent ring -->
+    <circle r="124" fill="none" stroke="#5eead4" stroke-opacity="0.18" stroke-width="0.8"/>
+  </g>
+
+  <!-- Corner brackets (top-left, bottom-right) -->
+  <g stroke="#5eead4" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M40 40 L40 100 M40 40 L100 40" opacity="0.55"/>
+    <path d="M1160 590 L1160 530 M1160 590 L1100 590" opacity="0.55"/>
+  </g>
+
+  <!-- HUD eyebrow (bracketed mono label) -->
+  <g font-family="'JetBrains Mono', 'Fira Code', Consolas, monospace" font-size="20" fill="#5eead4">
+    <text x="80" y="135" letter-spacing="3" opacity="0.9">[ PENUMBRA-TECH.COM ]</text>
+  </g>
+
+  <!-- Main wordmark / tagline -->
+  <g font-family="'Space Grotesk', 'Inter', system-ui, sans-serif" fill="#ecfeff">
+    <text x="80" y="240" font-size="78" font-weight="700" letter-spacing="-2">Penumbra Tech</text>
+    <text x="80" y="340" font-size="38" font-weight="500" letter-spacing="-0.5" fill="#a4b0c4">Software that works across the seams.</text>
+  </g>
+
+  <!-- Sub-line: stack + role -->
+  <g font-family="'Inter', system-ui, sans-serif" fill="#a4b0c4">
+    <text x="80" y="430" font-size="22" font-weight="400">
+      Full-stack web · AWS · Unreal Engine · reliability work
+    </text>
+  </g>
+
+  <!-- Bottom strip with founder line + URL -->
+  <g font-family="'JetBrains Mono', monospace" font-size="20" letter-spacing="1.5">
+    <text x="80" y="545" fill="#7a85a0">Wesley Weaver Jr.</text>
+    <text x="80" y="575" fill="#5eead4">penumbra-tech.com</text>
+  </g>
+
+  <!-- Right-side teal accent rule -->
+  <line x1="80" y1="490" x2="640" y2="490" stroke="#5eead4" stroke-opacity="0.35" stroke-width="1.5"/>
+</svg>
