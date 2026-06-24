@@ -711,9 +711,9 @@ export default function PenumbraHome() {
       >
         <Container>
           <SectionHeading
-            eyebrow="Two questions buyers usually have"
-            title="Read these before the call."
-            body="Most prospects arrive with one of two unasked questions. These pages answer them directly so the 30-min intro can be about your project, not about whether I'm the right kind of consultant."
+            eyebrow="Three deeper reads"
+            title="Pick whichever question you arrived with."
+            body="Most prospects arrive with one of three unasked questions: what does this cost, why pay for an engineer when an LLM exists, or could I just do this myself. There's a long-form answer for each, so the 30-min intro can be about your project instead."
             tone="magenta"
           />
           <div
@@ -827,6 +827,60 @@ export default function PenumbraHome() {
                   }}
                 >
                   Read the case →
+                </span>
+              </Link>
+            </Card>
+            <Card interactive padding={space.lg}>
+              <Link
+                to="/guide"
+                style={{ color: 'inherit', textDecoration: 'none', display: 'block' }}
+              >
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.accent,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em'
+                  }}
+                >
+                  &quot;Could I just do this myself?&quot;
+                </span>
+                <h3
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontSize: fontSizes.lg,
+                    fontWeight: fontWeights.semibold,
+                    color: colors.text,
+                    margin: `${space.sm} 0`,
+                    letterSpacing: '-0.005em'
+                  }}
+                >
+                  The whole playbook. Free, downloadable.
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    color: colors.textSecondary,
+                    fontSize: fontSizes.sm,
+                    lineHeight: 1.65
+                  }}
+                >
+                  Every step from AWS signup to working production
+                  site, with the honest part about the 80 hours
+                  it takes and the maintenance bill that follows.
+                  Save as PDF, take it with you.
+                </p>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    marginTop: space.md,
+                    color: colors.accent,
+                    fontSize: fontSizes.sm,
+                    fontWeight: fontWeights.semibold
+                  }}
+                >
+                  Open the guide →
                 </span>
               </Link>
             </Card>
