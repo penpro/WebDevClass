@@ -507,8 +507,10 @@ export default function Guide() {
               This guide is the whole playbook. If you read it end to end
               and follow it, you will end up with a working, secured,
               monitored, backed-up production website on your own AWS
-              account for about fifteen dollars a month. The site you
-              are reading right now was built the same way.
+              account for about fifteen dollars a month (as of writing;
+              AWS pricing changes, and your region, traffic, and storage
+              choices will move the number). The site you are reading
+              right now was built the same way.
             </P>
             <P>
               There are no AI gates, no NDA-protected secrets, no special
@@ -518,6 +520,11 @@ export default function Guide() {
               forty different blog posts, three AWS docs portals, six
               Stack Overflow answers (two of them out of date), and
               whatever Claude or ChatGPT happen to give you that hour.
+            </P>
+            <P>
+              This guide is free because the steps are not the secret.
+              The value is knowing what to do when a step does not work
+              the way the documentation said it would.
             </P>
             <P>
               The catch is honest: this is a forty-to-eighty-hour project
@@ -580,10 +587,13 @@ export default function Guide() {
             <H3>Turn on MFA on the root account</H3>
             <P>
               The email address you just signed up with is now your
-              <em> root account</em>. The root account can do anything,
-              including close the account and wire money out via support
-              tickets. If somebody phishes you out of the password, they
-              have your whole AWS environment.
+              <em> root account</em>. The root account can do almost
+              anything in the AWS account: change billing settings,
+              close the account, alter security credentials, and
+              create or destroy any infrastructure. Treat it like a
+              break-glass credential, not a daily login. If somebody
+              phishes you out of the password, they have your whole
+              AWS environment.
             </P>
             <P>
               Go to IAM &gt; Dashboard. There will be a banner saying
@@ -779,13 +789,32 @@ sudo apt install -y build-essential curl git`}
               level, which matters because it&apos;s the layer your{' '}
               <em>own</em> services interact with.
             </P>
+            <P>
+              Be more specific with port 22 than the world. Opening SSH
+              to <C>0.0.0.0/0</C> means every bot scanning the internet
+              for port 22 will hammer your box constantly. Key-only auth
+              keeps them out, but the noise still costs CPU and fills
+              logs. Restrict to your home/office IP and re-add new ones
+              as needed.
+            </P>
             <CodeBlock>
-{`sudo ufw allow 22
+{`# Replace YOUR_PUBLIC_IP with the IP your laptop currently has
+# (visit https://ifconfig.me to see it). Re-run with new IPs when
+# your address changes.
+sudo ufw allow from YOUR_PUBLIC_IP to any port 22
 sudo ufw allow 80
 sudo ufw allow 443
 sudo ufw --force enable
 sudo ufw status`}
             </CodeBlock>
+            <P>
+              If your IP changes too often to keep up, leave the
+              restriction on the AWS security group side (which has the
+              same effect) or look into a bastion-host or VPN setup
+              later. For a beginner project, at minimum understand that
+              opening port 22 to the world means bots will hit it
+              constantly.
+            </P>
 
             <H3>Turn on unattended security upgrades</H3>
             <P>
@@ -803,11 +832,20 @@ sudo dpkg-reconfigure -plow unattended-upgrades
             <H3>Disable SSH password auth</H3>
             <P>
               You already have key-only access (you SSHed in with the
-              .pem file). The default Ubuntu config also allows
-              password auth, which means every bot scanning the internet
-              for port 22 will try a million dictionary passwords on
-              you. Turn it off.
+              .pem file). Verify password authentication is actually
+              off — many cloud images already disable it via cloud-init,
+              but do not assume. Check the effective sshd config:
             </P>
+            <CodeBlock>
+{`sudo sshd -T | grep -E 'passwordauthentication|permitrootlogin|pubkeyauthentication'
+
+# Expected:
+#   passwordauthentication no
+#   permitrootlogin no
+#   pubkeyauthentication yes
+#
+# If any of those are wrong, edit the config explicitly:`}
+            </CodeBlock>
             <CodeBlock>
 {`sudo nano /etc/ssh/sshd_config
 
@@ -920,8 +958,12 @@ sudo systemctl status mysql      # should be active (running)`}
 {`sudo mysql_secure_installation
 
 # Walk through the prompts:
-# - VALIDATE PASSWORD COMPONENT? no   (it forbids characters that break .env parsing)
-# - Set root password: pick something long, store in your password manager
+# - VALIDATE PASSWORD COMPONENT? optional. If you skip it, you are
+#   responsible for picking a strong password yourself. Generate a
+#   long random one in your password manager rather than hand-typing
+#   clever special-character passwords; copy-paste the exact value
+#   and quote it properly wherever it ends up (.env, my.cnf, etc.).
+# - Set root password: paste the random password from your password manager
 # - Remove anonymous users: yes
 # - Disallow root remote login: yes
 # - Remove test database: yes
@@ -992,13 +1034,17 @@ mysql -u hello_user -p hello_app -e "SELECT 'ok';"`}
 
             <H3>Node (from NodeSource, not apt)</H3>
             <P>
-              The Node in Ubuntu&apos;s default repos is old. Get the
-              current LTS from NodeSource:
+              The Node in Ubuntu&apos;s default repos is old enough to
+              break modern tooling. Use the current LTS line from
+              NodeSource. At the time this site was deployed,
+              production was running Node 22 from NodeSource; substitute
+              whichever LTS version is current when you read this.
             </P>
             <CodeBlock>
-{`curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+{`# Replace 22 with the current LTS major if it has changed.
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
-node --version       # should be v20.x
+node --version       # should be v22.x (or the current LTS)
 npm --version`}
             </CodeBlock>
 
@@ -1076,9 +1122,12 @@ Record 2 (www):
 nslookup yourdomain.com
 nslookup www.yourdomain.com
 
-# Both should return your Elastic IP. Route 53 propagates fast
-# (seconds, not minutes). If it isn't resolving after a minute,
-# the record didn't save.`}
+# Both should return your Elastic IP. Route 53 changes are usually
+# visible within seconds to a few minutes. If you still don't see
+# the right answer after several minutes, check that you edited the
+# right hosted zone, that the domain actually uses those nameservers,
+# and that you didn't accidentally create the record under the wrong
+# name.`}
             </CodeBlock>
 
             <Gotcha>
