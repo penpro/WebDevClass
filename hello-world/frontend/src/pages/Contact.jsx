@@ -31,7 +31,7 @@ import { apiFetch } from '../lib/api.js';
 // Mirrors PenumbraHome.jsx — keep both in sync if the booking event slug
 // changes. (Worth extracting to a shared site.config.js if we add a
 // third reference.)
-const CAL_BOOKING_URL = 'https://cal.com/penumbra-tech/intro';
+const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -180,7 +180,7 @@ export default function Contact() {
               letterSpacing: '-0.005em'
             }}
           >
-            Grab 20 minutes on my calendar
+            Grab 30 minutes on my calendar
           </h2>
           <p
             style={{
@@ -200,7 +200,7 @@ export default function Contact() {
               target="_blank"
               rel="noreferrer noopener"
             >
-              Book a 20-min intro →
+              Book a 30-min intro →
             </Button>
             <Button as={Link} to="/#engagements" variant="ghost">
               See pricing first

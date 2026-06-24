@@ -35,8 +35,8 @@ import HudLabel from '../components/HudLabel.jsx';
 import CodePanel from '../components/CodePanel.jsx';
 
 // One place to swap the Cal.com booking URL. Update once and every
-// "Book a 20-min intro" CTA on the site picks it up.
-const CAL_BOOKING_URL = 'https://cal.com/penumbra-tech/intro';
+// booking CTA on the site picks it up.
+const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 
 // First named-client testimonial. Sourced direct from Ryan at 360 Auto,
 // June 2026. Numbers (20-30 -> 40-50 calls/week) are his.
@@ -463,7 +463,7 @@ export default function PenumbraHome() {
               rel="noreferrer noopener"
               size="lg"
             >
-              Book a 20-min intro →
+              Book a 30-min intro →
             </Button>
             <Button as={Link} to="/contact" variant="secondary" size="lg">
               Send a written brief
@@ -751,7 +751,7 @@ export default function PenumbraHome() {
               rel="noreferrer noopener"
               size="lg"
             >
-              Book a 20-min intro →
+              Book a 30-min intro →
             </Button>
             <Button as={Link} to="/contact" variant="secondary" size="lg">
               Send a written brief
