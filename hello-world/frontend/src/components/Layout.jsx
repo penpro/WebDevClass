@@ -16,6 +16,7 @@ import { Outlet, useLocation, Link } from 'react-router-dom';
 import { colors, fonts, fontSizes, fontWeights, space } from '../theme.js';
 import NavBar from './NavBar.jsx';
 import Footer from './Footer.jsx';
+import ScrollProgress from './ScrollProgress.jsx';
 
 function PageFallback() {
   return (
@@ -189,6 +190,7 @@ export default function Layout() {
         flexDirection: 'column'
       }}
     >
+      <ScrollProgress />
       <NavBar />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <RoutedContent />

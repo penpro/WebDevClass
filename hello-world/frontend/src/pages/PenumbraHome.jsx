@@ -33,6 +33,18 @@ import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import CodePanel from '../components/CodePanel.jsx';
+import SectionRail from '../components/SectionRail.jsx';
+
+const HOME_SECTIONS = [
+  { id: 'hero',         num: '00', label: 'Intro' },
+  { id: 'code-proof',   num: '01', label: 'The code' },
+  { id: 'engagements',  num: '02', label: 'Engagements' },
+  { id: 'testimonial',  num: '03', label: 'Trust' },
+  { id: 'services',     num: '04', label: 'What I do' },
+  { id: 'featured',     num: '05', label: 'Featured work' },
+  { id: 'deeper-reads', num: '06', label: 'Deeper reads' },
+  { id: 'lets-talk',    num: '07', label: 'Book' }
+];
 
 // One place to swap the Cal.com booking URL. Update once and every
 // booking CTA on the site picks it up.
@@ -152,8 +164,11 @@ function flushK6Bucket(run, now) {
 export default function PenumbraHome() {
   return (
     <>
+      <SectionRail sections={HOME_SECTIONS} />
+
       {/* ============================== Hero ============================== */}
       <section
+        id="hero"
         style={{
           position: 'relative',
           overflow: 'hidden',
@@ -263,6 +278,7 @@ export default function PenumbraHome() {
 
       {/* ====================== Code panel "proof" ===================== */}
       <section
+        id="code-proof"
         style={{
           background: colors.bgSoft,
           paddingTop: space['3xl'],
@@ -487,6 +503,7 @@ export default function PenumbraHome() {
 
       {/* =========================== Testimonial =========================== */}
       <section
+        id="testimonial"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -551,6 +568,7 @@ export default function PenumbraHome() {
 
       {/* =========================== Services =========================== */}
       <section
+        id="services"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl'],
@@ -613,6 +631,7 @@ export default function PenumbraHome() {
 
       {/* ========================== Featured work ========================== */}
       <section
+        id="featured"
         style={{
           paddingTop: space['3xl'],
           paddingBottom: space['3xl']
@@ -703,6 +722,7 @@ export default function PenumbraHome() {
 
       {/* =========================== Deeper reads =========================== */}
       <section
+        id="deeper-reads"
         style={{
           paddingTop: space['2xl'],
           paddingBottom: space['3xl'],
@@ -890,6 +910,7 @@ export default function PenumbraHome() {
 
       {/* =========================== Closing CTA =========================== */}
       <section
+        id="lets-talk"
         style={{
           background: colors.surface,
           borderTop: `1px solid ${colors.border}`,
