@@ -33,6 +33,30 @@ import { apiFetch } from '../lib/api.js';
 // third reference.)
 const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 
+// Self-contained prompt the visitor can copy into ChatGPT / Claude /
+// any LLM. Walks them through the questions a useful dev brief needs
+// and produces a structured writeup they can paste into the form.
+// Removes the "I have a problem but don't know how to describe it"
+// friction for non-technical buyers.
+const BRIEF_BUILDER_PROMPT = `I want to hire a software developer (Penumbra Tech, penumbra-tech.com) for a project, but I'm not sure how to describe what I need. Please help me put together a structured project brief by asking me one question at a time. Cover these topics in order:
+
+1. What's the actual problem or opportunity? What's broken, slow, or impossible right now, or what would you like to be true that isn't?
+2. What's your current setup? Tools, vendors, and software you already use (Shopify, Wix, QuickBooks, spreadsheets, custom code, etc.).
+3. What have you already tried or considered?
+4. What does success look like in concrete terms? More bookings per week, hours of admin saved, a new revenue stream, fewer support tickets, etc.
+5. Budget range and timeline. "Not sure" or "exploring" is a valid answer.
+6. Tell me about your business: size, industry, and what your customers care about.
+
+After I've answered, write up a brief with these headings:
+- Context (who I am and what we do)
+- Problem (the actual pain in plain language)
+- Current workaround (how I'm dealing with it today)
+- Desired outcome (what success looks like, with numbers if I gave you any)
+- Constraints (budget range, timeline, team size, anything else)
+- Open questions (anything you think the developer would want to know that I didn't cover)
+
+Keep the brief under 400 words. Don't invent details I didn't give you. Don't pitch solutions, that's the developer's job after they read the brief. Just clearly capture what I told you.`;
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const initialForm = {
@@ -222,6 +246,8 @@ export default function Contact() {
           · or send a written brief ·
         </p>
 
+        <BriefBuilder />
+
         <Card
           variant="accent"
           padding={space.xl}
@@ -363,6 +389,135 @@ export default function Contact() {
         </Card>
       </Container>
     </section>
+  );
+}
+
+// ------------------------- brief builder ----------------------------- //
+
+// Panel that hands the visitor a ready-to-paste prompt for ChatGPT /
+// Claude / any LLM. Non-technical buyers often have a problem in mind
+// but can't articulate it well enough to ask for help; this lets the
+// LLM do the interview and produce a structured brief they paste back
+// into the form below.
+function BriefBuilder() {
+  const [copied, setCopied] = useState(false);
+
+  async function copyPrompt() {
+    try {
+      await navigator.clipboard.writeText(BRIEF_BUILDER_PROMPT);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      // Browsers can deny clipboard access; let the visitor fall back
+      // to selecting the text in the <pre> manually.
+      console.warn('Clipboard write blocked:', err);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        marginBottom: space.xl,
+        padding: `${space.lg} ${space.xl}`,
+        borderRadius: 14,
+        background: colors.bgSoft,
+        border: `1px dashed ${colors.borderAccent}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: space.sm
+      }}
+    >
+      <span
+        style={{
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.xs,
+          color: colors.magenta,
+          textTransform: 'uppercase',
+          letterSpacing: '0.12em'
+        }}
+      >
+        Brief builder
+      </span>
+      <h2
+        style={{
+          fontFamily: fonts.heading,
+          fontSize: fontSizes.lg,
+          fontWeight: fontWeights.semibold,
+          color: colors.text,
+          margin: 0,
+          letterSpacing: '-0.005em'
+        }}
+      >
+        Have something in mind but not sure how to ask?
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontSize: fontSizes.sm,
+          color: colors.textSecondary,
+          lineHeight: 1.6
+        }}
+      >
+        Copy the prompt below into ChatGPT, Claude, or any chat AI. It
+        will ask you a few questions about your problem, your setup, and
+        what success looks like, then write a structured brief you can
+        paste into the form.
+      </p>
+
+      <pre
+        style={{
+          margin: `${space.sm} 0 0`,
+          padding: space.md,
+          maxHeight: 220,
+          overflowY: 'auto',
+          background: colors.codeBg,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 8,
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.xs,
+          lineHeight: 1.55,
+          color: colors.textSecondary,
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word'
+        }}
+      >
+        {BRIEF_BUILDER_PROMPT}
+      </pre>
+
+      <div style={{ display: 'flex', gap: space.sm, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Button onClick={copyPrompt} variant="secondary" size="sm">
+          {copied ? '✓ Copied' : 'Copy prompt'}
+        </Button>
+        <a
+          href="https://chat.openai.com/"
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.xs,
+            color: colors.cyan,
+            textDecoration: 'none',
+            letterSpacing: '0.04em'
+          }}
+        >
+          Open ChatGPT ↗
+        </a>
+        <a
+          href="https://claude.ai/"
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.xs,
+            color: colors.cyan,
+            textDecoration: 'none',
+            letterSpacing: '0.04em'
+          }}
+        >
+          Open Claude ↗
+        </a>
+      </div>
+    </div>
   );
 }
 
