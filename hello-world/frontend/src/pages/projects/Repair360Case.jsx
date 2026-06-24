@@ -115,8 +115,8 @@ export default function Repair360Case() {
             }}
           >
             The brief that&apos;s secretly an engineering problem. The
-            client had a working Wix setup — booking app, email, business
-            listings all wired to that account — and no interest in
+            client had a working Wix setup (booking app, email, business
+            listings all wired to that account) and no interest in
             re-platforming. They wanted a better visitor experience
             without uprooting a back office that already worked. The lazy
             answer is &ldquo;migrate to a real stack.&rdquo; The right
@@ -176,6 +176,58 @@ export default function Repair360Case() {
               Discuss a similar project
             </Button>
           </div>
+        </Container>
+      </section>
+
+      {/* ============================ Testimonial =========================== */}
+      <section
+        style={{
+          paddingTop: space['2xl'],
+          paddingBottom: space['2xl'],
+          background: colors.surface,
+          borderTop: `1px solid ${colors.borderSubtle}`,
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <Container narrow>
+          <HudLabel tone="magenta">Client quote</HudLabel>
+          <blockquote
+            style={{
+              margin: `${space.lg} 0 0`,
+              padding: 0,
+              fontFamily: fonts.heading,
+              fontSize: fontSizes.xl,
+              lineHeight: 1.4,
+              color: colors.text,
+              letterSpacing: '-0.01em',
+              fontStyle: 'normal'
+            }}
+          >
+            &ldquo;Heyo! Ryan from 360 Auto here. Our website was in
+            shambles and Wes was able to redesign it and brought up the
+            calls and car count from 20-30 up to 40-50 a week. He treated
+            our website like his own and really knocked it out of the
+            park.&rdquo;
+          </blockquote>
+          <p
+            style={{
+              margin: `${space.lg} 0 0`,
+              fontSize: fontSizes.sm,
+              color: colors.textSecondary,
+              lineHeight: 1.55
+            }}
+          >
+            Ryan, owner ·{' '}
+            <a
+              href="https://www.repair360auto.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              style={{ color: colors.accent, textDecoration: 'none' }}
+            >
+              360 Auto
+            </a>{' '}
+            · Port Orchard, WA
+          </p>
         </Container>
       </section>
 

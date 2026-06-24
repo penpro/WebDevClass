@@ -19,6 +19,7 @@ import {
   radii,
   space
 } from '../theme.js';
+import { Link } from 'react-router-dom';
 import Container from '../components/Container.jsx';
 import Card from '../components/Card.jsx';
 import Button from '../components/Button.jsx';
@@ -26,6 +27,11 @@ import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import { apiFetch } from '../lib/api.js';
+
+// Mirrors PenumbraHome.jsx — keep both in sync if the booking event slug
+// changes. (Worth extracting to a shared site.config.js if we add a
+// third reference.)
+const CAL_BOOKING_URL = 'https://cal.com/penumbra-tech/intro';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -141,10 +147,85 @@ export default function Contact() {
           Based in Kitsap County, WA · Pacific Time
         </p>
 
+        <div
+          style={{
+            marginTop: space.xl,
+            padding: `${space.lg} ${space.xl}`,
+            borderRadius: 14,
+            background: colors.bgSoft,
+            border: `1px solid ${colors.borderSubtle}`,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: space.sm
+          }}
+        >
+          <span
+            style={{
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.xs,
+              color: colors.cyan,
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em'
+            }}
+          >
+            Fastest path
+          </span>
+          <h2
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: fontSizes.lg,
+              fontWeight: fontWeights.semibold,
+              color: colors.text,
+              margin: 0,
+              letterSpacing: '-0.005em'
+            }}
+          >
+            Grab 20 minutes on my calendar
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              fontSize: fontSizes.sm,
+              color: colors.textSecondary,
+              lineHeight: 1.6
+            }}
+          >
+            No prep, no obligation. I'll listen, ask the right questions,
+            and tell you honestly whether your project fits what I do.
+          </p>
+          <div style={{ marginTop: space.sm, display: 'flex', gap: space.md, flexWrap: 'wrap' }}>
+            <Button
+              as="a"
+              href={CAL_BOOKING_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Book a 20-min intro →
+            </Button>
+            <Button as={Link} to="/#engagements" variant="ghost">
+              See pricing first
+            </Button>
+          </div>
+        </div>
+
+        <p
+          style={{
+            margin: `${space.xl} 0 ${space.md}`,
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.xs,
+            color: colors.textMuted,
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            textAlign: 'center'
+          }}
+        >
+          · or send a written brief ·
+        </p>
+
         <Card
           variant="accent"
           padding={space.xl}
-          style={{ marginTop: space['2xl'] }}
+          style={{ marginTop: 0 }}
         >
           {status === 'sent' ? (
             <ThankYou

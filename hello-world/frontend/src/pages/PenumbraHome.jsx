@@ -34,6 +34,45 @@ import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import CodePanel from '../components/CodePanel.jsx';
 
+// One place to swap the Cal.com booking URL. Update once and every
+// "Book a 20-min intro" CTA on the site picks it up.
+const CAL_BOOKING_URL = 'https://cal.com/penumbra-tech/intro';
+
+// First named-client testimonial. Sourced direct from Ryan at 360 Auto,
+// June 2026. Numbers (20-30 -> 40-50 calls/week) are his.
+const RYAN_QUOTE =
+  '"Heyo! Ryan from 360 Auto here. Our website was in shambles and Wes was able to redesign it and brought up the calls and car count from 20-30 up to 40-50 a week. He treated our website like his own and really knocked it out of the park."';
+
+const POC_OFFERS = [
+  {
+    badge: 'Start here',
+    price: '$5K',
+    title: 'Diagnostic Week',
+    body:
+      'A short, focused engagement to find your actual constraint and put a written plan against it. One week digging through your stack, your data, and the bottleneck you can name. End the week with a written plan plus a fixed-price build quote. The fee rolls into the build credit if we move forward; the plan is yours either way.',
+    bestFor:
+      'You think you know what is wrong, but you want a senior eye on it before committing to a 4-6 week sprint.'
+  },
+  {
+    badge: 'Most common',
+    price: '$10K – $25K',
+    title: 'Build Sprint',
+    body:
+      '4-6 weeks of fixed-scope work with weekly demos. Half paid up front, half on acceptance. The second half is not owed if week-one deliverables miss the agreed criteria. Typical scopes: a customer portal, an internal dashboard, a backend rescue, an audit and remediation.',
+    bestFor:
+      'You have a defined project and you want it shipped reliably without having to manage it daily.'
+  },
+  {
+    badge: 'Ongoing',
+    price: '$250 / hr',
+    title: 'Retainer',
+    body:
+      'Block-of-hours arrangement for ongoing operations, on-call backstop, smaller asks, or the long-tail mode after a build engagement wraps. Hours roll month to month; no minimum monthly commitment.',
+    bestFor:
+      'You want a senior engineer on speed-dial without hiring full-time.'
+  }
+];
+
 const SERVICES = [
   {
     icon: ServerIcon,
@@ -316,6 +355,200 @@ export default function PenumbraHome() {
         </Container>
       </section>
 
+      {/* ============================ Engagements ============================ */}
+      <section
+        id="engagements"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          position: 'relative',
+          background: colors.surface
+        }}
+      >
+        <Container>
+          <SectionHeading
+            eyebrow="How engagements start"
+            title="Three ways to work together"
+            body="Concrete shapes with concrete prices. Pick one or ask me which fits — I'll tell you if neither does."
+            tone="cyan"
+          />
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns:
+                'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: space.lg,
+              marginTop: space['2xl']
+            }}
+          >
+            {POC_OFFERS.map((offer) => (
+              <Card key={offer.title} variant="accent" padding={space.lg}>
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.cyan,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.12em'
+                  }}
+                >
+                  {offer.badge}
+                </span>
+                <div
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontSize: fontSizes['2xl'],
+                    fontWeight: fontWeights.bold,
+                    color: colors.text,
+                    marginTop: space.xs,
+                    letterSpacing: '-0.01em'
+                  }}
+                >
+                  {offer.price}
+                </div>
+                <h3
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontSize: fontSizes.lg,
+                    fontWeight: fontWeights.semibold,
+                    color: colors.text,
+                    margin: `${space.xs} 0 ${space.sm}`
+                  }}
+                >
+                  {offer.title}
+                </h3>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: fontSizes.sm,
+                    lineHeight: 1.65,
+                    color: colors.textSecondary
+                  }}
+                >
+                  {offer.body}
+                </p>
+                <p
+                  style={{
+                    margin: `${space.md} 0 0`,
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.textMuted,
+                    lineHeight: 1.55,
+                    paddingTop: space.md,
+                    borderTop: `1px dashed ${colors.borderSubtle}`
+                  }}
+                >
+                  <strong style={{ color: colors.textSecondary, fontWeight: fontWeights.semibold }}>
+                    Best for:
+                  </strong>{' '}
+                  {offer.bestFor}
+                </p>
+              </Card>
+            ))}
+          </div>
+          <div
+            style={{
+              marginTop: space['2xl'],
+              display: 'flex',
+              gap: space.md,
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}
+          >
+            <Button
+              as="a"
+              href={CAL_BOOKING_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              size="lg"
+            >
+              Book a 20-min intro →
+            </Button>
+            <Button as={Link} to="/contact" variant="secondary" size="lg">
+              Send a written brief
+            </Button>
+          </div>
+          <p
+            style={{
+              marginTop: space.lg,
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.xs,
+              color: colors.textMuted,
+              textAlign: 'center',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase'
+            }}
+          >
+            Next intake window opens within ~2 weeks of intro call
+          </p>
+        </Container>
+      </section>
+
+      {/* =========================== Testimonial =========================== */}
+      <section
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          position: 'relative'
+        }}
+      >
+        <Container narrow>
+          <HudLabel tone="magenta">From the client side</HudLabel>
+          <blockquote
+            style={{
+              margin: `${space.lg} 0 0`,
+              padding: 0,
+              fontFamily: fonts.heading,
+              fontSize: fontSizes.xl,
+              lineHeight: 1.4,
+              color: colors.text,
+              letterSpacing: '-0.01em',
+              fontStyle: 'normal'
+            }}
+          >
+            {RYAN_QUOTE}
+          </blockquote>
+          <p
+            style={{
+              margin: `${space.lg} 0 0`,
+              fontSize: fontSizes.sm,
+              color: colors.textSecondary,
+              lineHeight: 1.55
+            }}
+          >
+            Ryan, owner ·{' '}
+            <a
+              href="https://www.repair360auto.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+              style={{ color: colors.accent, textDecoration: 'none' }}
+            >
+              360 Auto
+            </a>{' '}
+            · Port Orchard, WA
+          </p>
+          <p
+            style={{
+              margin: `${space.sm} 0 0`,
+              fontSize: fontSizes.xs,
+              fontFamily: fonts.mono,
+              color: colors.textMuted,
+              letterSpacing: '0.04em'
+            }}
+          >
+            Read the full engineering writeup:{' '}
+            <Link
+              to="/projects/repair360-auto"
+              style={{ color: colors.cyan, textDecoration: 'none' }}
+            >
+              Repair360 case study →
+            </Link>
+          </p>
+        </Container>
+      </section>
+
       {/* =========================== Services =========================== */}
       <section
         style={{
@@ -511,16 +744,17 @@ export default function PenumbraHome() {
               flexWrap: 'wrap'
             }}
           >
-            <Button as={Link} to="/contact" size="lg">
-              Start a project →
-            </Button>
             <Button
               as="a"
-              href="mailto:wesleyaweaverjr@gmail.com"
-              variant="secondary"
+              href={CAL_BOOKING_URL}
+              target="_blank"
+              rel="noreferrer noopener"
               size="lg"
             >
-              Or email me directly
+              Book a 20-min intro →
+            </Button>
+            <Button as={Link} to="/contact" variant="secondary" size="lg">
+              Send a written brief
             </Button>
           </div>
         </Container>
