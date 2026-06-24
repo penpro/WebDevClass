@@ -63,6 +63,7 @@ mysqldump \
   --triggers \
   --skip-lock-tables \
   --set-gtid-purged=OFF \
+  --no-tablespaces \
   "$DB_NAME" \
   | gzip -c > "$OUT"
 
