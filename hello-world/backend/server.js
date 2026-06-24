@@ -1,5 +1,27 @@
 require('dotenv').config();
 
+// Production fail-fast: refuse to start with the example/insecure session
+// secret or with secure cookies disabled. Without this, a misplaced .env
+// or a bad deploy silently ships the public-in-git default secret, which
+// is the same as no signing at all.
+if (process.env.NODE_ENV === 'production') {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret || /change-me|insecure|example/i.test(secret)) {
+    console.error(
+      'FATAL: SESSION_SECRET is missing or matches an example value in production. ' +
+      'Set a long random value in .env before starting.'
+    );
+    process.exit(1);
+  }
+  if (process.env.COOKIE_SECURE !== 'true') {
+    console.error(
+      'FATAL: COOKIE_SECURE must be "true" in production so the session ' +
+      'cookie is never sent over plain HTTP.'
+    );
+    process.exit(1);
+  }
+}
+
 const express = require('express');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
@@ -26,6 +48,10 @@ const {
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
+
+// Remove the default `X-Powered-By: Express` fingerprint so attackers
+// scanning for framework-specific CVEs don't get a free hint.
+app.disable('x-powered-by');
 
 // We sit behind nginx, so honor its X-Forwarded-* headers.
 app.set('trust proxy', 1);
@@ -185,12 +211,14 @@ app.use(
 // can distinguish maintenance-mode 503s from genuine "service is broken"
 // 503s and show the user a friendly banner instead of a cryptic error.
 const MAINTENANCE_BYPASS = [
-  '/api/auth/',          // login, logout, /me, register, password reset
-  '/api/admin/',         // user search, role change, AND diagnostics
-  '/api/payments/webhook' // Stripe webhook must keep working — Stripe
-                         // retries with exponential backoff; missing
-                         // delivery during a 4-min test isn't fatal but
-                         // there's no reason to drop them
+  '/api/auth/',           // login, logout, /me, register, password reset
+  '/api/admin/',          // user search, role change, AND diagnostics
+  '/api/payments/webhook', // Stripe webhook must keep working: Stripe
+                          // retries with exponential backoff; missing
+                          // delivery during a 4-min test isn't fatal but
+                          // there's no reason to drop them
+  '/api/health'           // UptimeRobot / probes need to see actual liveness
+                          // during a planned maintenance window, not 503
 ];
 
 app.use((req, res, next) => {
@@ -276,6 +304,61 @@ app.get('/api/messages', async (req, res) => {
     console.error('Database query failed:', error);
     res.status(500).json({ error: 'Database query failed' });
   }
+});
+
+// ---------------------------------------------------------------------------
+// Health check
+// ---------------------------------------------------------------------------
+// Cheap liveness + readiness probe for UptimeRobot / future load balancers
+// / PM2. Pings the DB with a trivial SELECT 1 so a healthy 200 actually
+// means "the worker can talk to MySQL," not just "the process is up."
+//
+// Skips maintenance + rate-limit middleware order because it's mounted on
+// /api so global rate limit still applies (intentional: catches probe
+// loops gone wild). Bypasses maintenance because /api/health is a probe,
+// not a user endpoint, and going dark to UptimeRobot during a planned
+// maintenance window is exactly what we don't want.
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', uptime: process.uptime() });
+  } catch (error) {
+    res.status(503).json({ status: 'degraded', reason: 'db_unreachable' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Global error handler — last middleware
+// ---------------------------------------------------------------------------
+// Express only routes errors here when a route throws synchronously OR
+// passes the error to next(err). Async route handlers must still wrap in
+// try/catch (which most do). This catches the rest: forgotten try/catches,
+// middleware that throws after headers were set, etc.
+//
+// Hide the stack from clients in production — full detail still goes to
+// the PM2 log via console.error.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// ---------------------------------------------------------------------------
+// Process-level safety net
+// ---------------------------------------------------------------------------
+// PM2 restarts the worker on a process exit, so the right move on an
+// uncaught error is to log + exit (clean signal) rather than try to keep
+// running with corrupted state. unhandledRejection used to be a warning;
+// Node 15+ treats it as a process-killing event by default, but logging
+// it explicitly makes the cause traceable in PM2 logs.
+process.on('uncaughtException', (err) => {
+  console.error('uncaughtException:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('unhandledRejection:', reason);
+  process.exit(1);
 });
 
 app.listen(port, () => {
