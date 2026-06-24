@@ -66,6 +66,10 @@ const PROOFS = [
   {
     signal: 'Education',
     detail: 'Computer Science BS coursework, Olympic College.'
+  },
+  {
+    signal: 'Entity',
+    detail: 'Penumbra Tech is a sole proprietorship operating from Kitsap County, WA.'
   }
 ]
 
@@ -104,19 +108,57 @@ export default function About() {
 
       <Container narrow style={{ position: 'relative', zIndex: 1 }}>
         <HudLabel tone="magenta">About</HudLabel>
-        <h1
+        <div
+          className="penumbra-about-hero"
           style={{
-            fontFamily: fonts.heading,
-            fontSize: 'clamp(2rem, 4vw, 3.25rem)',
-            fontWeight: fontWeights.bold,
-            lineHeight: 1.1,
-            letterSpacing: '-0.02em',
-            margin: `${space.md} 0 ${space.lg}`,
-            color: colors.text
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1fr) 200px',
+            gap: space.xl,
+            alignItems: 'start',
+            margin: `${space.md} 0 ${space.lg}`
           }}
         >
-          One engineer, generalist by choice.
-        </h1>
+          <h1
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: 'clamp(2rem, 4vw, 3.25rem)',
+              fontWeight: fontWeights.bold,
+              lineHeight: 1.1,
+              letterSpacing: '-0.02em',
+              margin: 0,
+              color: colors.text
+            }}
+          >
+            One engineer, generalist by choice.
+          </h1>
+          <img
+            src="/wesley.jpg"
+            alt="Wesley Weaver Jr."
+            width="200"
+            height="250"
+            style={{
+              width: '100%',
+              maxWidth: 200,
+              aspectRatio: '4 / 5',
+              objectFit: 'cover',
+              borderRadius: 12,
+              border: `1px solid ${colors.borderAccent}`,
+              boxShadow: '0 12px 30px rgba(0,0,0,.5)',
+              display: 'block'
+            }}
+          />
+        </div>
+        <style>{`
+          @media (max-width: 640px) {
+            .penumbra-about-hero {
+              grid-template-columns: 1fr !important;
+            }
+            .penumbra-about-hero img {
+              max-width: 160px !important;
+              justify-self: start;
+            }
+          }
+        `}</style>
 
         <Prose>
           <p>
