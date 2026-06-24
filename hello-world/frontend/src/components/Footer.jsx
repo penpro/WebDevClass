@@ -105,8 +105,8 @@ export default function Footer() {
 
           <div>
             <FooterHeading>Connect</FooterHeading>
-            <FooterExternal href="mailto:wesleyaweaverjr@gmail.com">
-              wesleyaweaverjr@gmail.com
+            <FooterExternal href="mailto:wesley@penumbra-tech.com">
+              wesley@penumbra-tech.com
             </FooterExternal>
             <FooterExternal href="tel:+13608507876">
               (360) 850-7876

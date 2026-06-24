@@ -102,6 +102,13 @@ const SERVICES = [
 
 const FEATURED = [
   {
+    to: '/saas-rescue',
+    badge: 'Playbook · SaaS infrastructure',
+    title: 'The 6-week SaaS-rescue playbook',
+    body:
+      "For the solo founder four months in who is losing a day a week to TLS, payments, deploys, and the boring infra. Eight chapters, real code from this backend, and a 'what hiring me looks like in this week' reframe on every one. Free if you have the time, the price if you don't."
+  },
+  {
     to: '/projects/diagnostics',
     badge: 'Performance engineering',
     title: 'Diagnostics & load-testing dashboard',
@@ -109,18 +116,11 @@ const FEATURED = [
       'A live k6 test runner with SSE-streamed charts, runtime rate-limit and maintenance toggles, and a 128-bit bypass token model. Measured the actual ceiling of a t3.micro at ~1000 req/s.'
   },
   {
-    to: '/tasktrackr',
-    badge: 'Full-stack web app',
-    title: 'TaskTrackr',
+    to: '/projects/repair360-auto',
+    badge: 'Client work · constraint engineering',
+    title: 'Repair360 Auto inside a Wix panel',
     body:
-      'Task manager with category filtering, auto-saving edits, Facebook-style progress feed, and a role-aware multer uploader gated behind Stripe Subscriptions.'
-  },
-  {
-    to: '/moodboard',
-    badge: 'Web app + canvas',
-    title: 'MoodBoard',
-    body:
-      'Image-URL boards with public share links and a client-side collage generator: seeded layouts, cover-crop drawing, and pastel accent fills computed from neighbouring images.'
+      "Hand-built single-file front-end embedded in a Wix HTML/Iframe panel, plus the hidden work: brand reverse-engineering, JPEG-to-SVG logo recovery, mojibake fix, and the AutoRepair JSON-LD that made the embed visible to Google. Ryan at 360 Auto says calls went from 20-30/wk to 40-50/wk."
   }
 ];
 

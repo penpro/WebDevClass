@@ -40,6 +40,7 @@ const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Stack = lazy(() => import('./pages/Stack.jsx'))
 const Judgment = lazy(() => import('./pages/Judgment.jsx'))
 const Guide = lazy(() => import('./pages/Guide.jsx'))
+const SaasRescue = lazy(() => import('./pages/SaasRescue.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 const DiagnosticsCase = lazy(() => import('./pages/projects/DiagnosticsCase.jsx'))
@@ -92,6 +93,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="stack" element={<Stack />} />
             <Route path="judgment" element={<Judgment />} />
             <Route path="guide" element={<Guide />} />
+            <Route path="saas-rescue" element={<SaasRescue />} />
 
             {/* Auth pages */}
             <Route path="login" element={<Login />} />

@@ -376,13 +376,13 @@ export default function Contact() {
               >
                 Prefer email?{' '}
                 <a
-                  href="mailto:wesleyaweaverjr@gmail.com"
+                  href="mailto:wesley@penumbra-tech.com"
                   style={{
                     color: colors.accent,
                     textDecoration: 'none'
                   }}
                 >
-                  wesleyaweaverjr@gmail.com
+                  wesley@penumbra-tech.com
                 </a>
               </p>
             </form>

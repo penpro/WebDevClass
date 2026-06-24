@@ -20,6 +20,15 @@ import HudLabel from '../components/HudLabel.jsx';
 
 const PROJECTS = [
   {
+    to: '/saas-rescue',
+    badge: 'Playbook · SaaS infrastructure',
+    title: 'The 6-week SaaS-rescue playbook',
+    summary:
+      "Vertical-specific long-form for the solo founder four months into a SaaS who is shipping features fine but losing a day or two a week to TLS, payments, deploys, and the stuff nobody notices until it breaks. Eight chapters with real code from this backend (Stripe webhook ordering, /api/health pattern, nightly mysqldump, nginx security headers). Each chapter has a 'what hiring me looks like in this week' reframe. Free if you have the time, the price if you don't.",
+    stack: ['Express patterns', 'Stripe', 'AWS / EC2', 'nginx hardening', 'Operations'],
+    auth: 'Open playbook · Save as PDF · Book a 30-min intro'
+  },
+  {
     to: '/projects/diagnostics',
     // No fallback to the admin route — the case study at /projects/diagnostics
     // is the public-facing page. The live admin dashboard stays behind auth.
