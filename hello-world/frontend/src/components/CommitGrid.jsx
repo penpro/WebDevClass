@@ -1,12 +1,16 @@
-// Last-30-days commit grid for penpro/WebDevClass, GitHub-contribution-style.
-// Fetches commits client-side from the public GitHub API on mount, buckets by
-// local date, and renders 30 corona-accent cells whose brightness scales with
-// commit count for that day. Cached in sessionStorage for an hour so a visitor
-// browsing multiple pages doesn't trigger a fresh fetch each time.
+// Multi-repo "recent shipping" grid for /about.
 //
-// No auth required — the commits API is public read for public repos. Anon
-// limit is 60 req/hr/IP, which the session cache + ~4-page pagination keeps
-// us well under.
+// Fetches the top-N most-recently-pushed public, non-fork, non-archived
+// repos owned by the user, then renders one row per repo. Each row's
+// 30-cell window ENDS at that repo's last-push date — so dormant repos
+// still show their last burst of activity instead of reading as a blank
+// "abandoned" row. The relative-time label next to each repo name makes
+// the staleness honest ("4 months ago" not hidden).
+//
+// Cached in sessionStorage (1h TTL) so a visitor browsing /about →
+// /contact → /about doesn't re-hit the GitHub API. Anonymous limit is
+// 60 req/hr/IP; this component uses 1 + N requests per cold load, well
+// under that ceiling even with multiple visitors sharing an IP.
 
 import { useEffect, useState } from 'react';
 import {
@@ -17,9 +21,10 @@ import {
   space
 } from '../theme.js';
 
-const REPO = 'penpro/WebDevClass';
+const USER = 'penpro';
+const REPO_COUNT = 8;
 const DAYS = 30;
-const CACHE_KEY = 'penumbra_commit_grid_v1';
+const CACHE_KEY = 'penumbra_commit_grid_v2';
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 function dateKey(d) {
@@ -29,13 +34,13 @@ function dateKey(d) {
   return `${y}-${m}-${day}`;
 }
 
-function buildLastNDays(n) {
+function buildDays(endDate, n) {
   const out = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
   for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
+    const d = new Date(end);
+    d.setDate(end.getDate() - i);
     out.push(dateKey(d));
   }
   return out;
@@ -49,7 +54,6 @@ function bucketOf(count) {
   return 4;
 }
 
-// Corona-tinted opacity ramp. Index = bucket 0..4.
 const FILL = [
   { bg: 'rgba(94, 234, 212, 0.06)', border: 'rgba(94, 234, 212, 0.18)' },
   { bg: 'rgba(94, 234, 212, 0.28)', border: 'rgba(94, 234, 212, 0.45)' },
@@ -58,21 +62,72 @@ const FILL = [
   { bg: 'rgba(94, 234, 212, 1.00)', border: 'rgba(94, 234, 212, 1.00)' }
 ];
 
-async function fetchAllCommits(sinceIso) {
-  let url = `https://api.github.com/repos/${REPO}/commits?since=${encodeURIComponent(sinceIso)}&per_page=100`;
-  const all = [];
-  while (url && all.length < 1000) {
+function relativeTime(iso) {
+  const ms = Date.now() - new Date(iso).getTime();
+  const seconds = Math.round(ms / 1000);
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.round(minutes / 60);
+  const days = Math.round(hours / 24);
+  const months = Math.round(days / 30);
+  const years = Math.round(days / 365);
+
+  const fmt = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+  if (Math.abs(seconds) < 60) return fmt.format(-seconds, 'second');
+  if (Math.abs(minutes) < 60) return fmt.format(-minutes, 'minute');
+  if (Math.abs(hours) < 24) return fmt.format(-hours, 'hour');
+  if (Math.abs(days) < 30) return fmt.format(-days, 'day');
+  if (Math.abs(months) < 12) return fmt.format(-months, 'month');
+  return fmt.format(-years, 'year');
+}
+
+async function fetchRepos() {
+  const url = `https://api.github.com/users/${USER}/repos?type=owner&sort=pushed&per_page=30`;
+  const r = await fetch(url, {
+    headers: { Accept: 'application/vnd.github+json' }
+  });
+  if (!r.ok) throw new Error(`Repos API ${r.status}`);
+  const data = await r.json();
+  return data
+    .filter((repo) => !repo.fork && !repo.archived)
+    .slice(0, REPO_COUNT);
+}
+
+async function fetchRepoCommits(repo) {
+  const pushedAt = new Date(repo.pushed_at);
+  const since = new Date(pushedAt);
+  since.setDate(since.getDate() - DAYS + 1);
+  since.setHours(0, 0, 0, 0);
+
+  let url = `https://api.github.com/repos/${repo.full_name}/commits?since=${encodeURIComponent(since.toISOString())}&until=${encodeURIComponent(pushedAt.toISOString())}&per_page=100`;
+
+  const commits = [];
+  while (url && commits.length < 500) {
     const r = await fetch(url, {
       headers: { Accept: 'application/vnd.github+json' }
     });
-    if (!r.ok) throw new Error(`GitHub API ${r.status}`);
+    if (!r.ok) throw new Error(`Commits API ${r.status} for ${repo.full_name}`);
     const page = await r.json();
-    all.push(...page);
+    commits.push(...page);
     const link = r.headers.get('Link');
     const match = link && link.match(/<([^>]+)>;\s*rel="next"/);
     url = match ? match[1] : null;
   }
-  return all;
+
+  const counts = {};
+  for (const c of commits) {
+    const iso = c.commit?.committer?.date || c.commit?.author?.date;
+    if (!iso) continue;
+    const key = dateKey(new Date(iso));
+    counts[key] = (counts[key] || 0) + 1;
+  }
+
+  return {
+    name: repo.name,
+    fullName: repo.full_name,
+    htmlUrl: repo.html_url,
+    pushedAt: repo.pushed_at,
+    counts
+  };
 }
 
 function readCache() {
@@ -81,71 +136,66 @@ function readCache() {
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (Date.now() - parsed.ts > CACHE_TTL_MS) return null;
-    return parsed.counts;
+    return parsed.repos;
   } catch {
     return null;
   }
 }
 
-function writeCache(counts) {
+function writeCache(repos) {
   try {
     sessionStorage.setItem(
       CACHE_KEY,
-      JSON.stringify({ ts: Date.now(), counts })
+      JSON.stringify({ ts: Date.now(), repos })
     );
   } catch {
-    // sessionStorage can be unavailable (private mode, quota, etc) — fine.
+    // sessionStorage can be unavailable; cache is a nice-to-have.
   }
 }
 
 export default function CommitGrid() {
-  const [state, setState] = useState({ status: 'loading', counts: {} });
-  const days = buildLastNDays(DAYS);
-  const today = days[days.length - 1];
+  const [state, setState] = useState({ status: 'loading', repos: [] });
 
   useEffect(() => {
     const cached = readCache();
     if (cached) {
-      setState({ status: 'ready', counts: cached });
+      setState({ status: 'ready', repos: cached });
       return;
     }
 
-    const since = new Date();
-    since.setDate(since.getDate() - DAYS);
-    since.setHours(0, 0, 0, 0);
-
     let cancelled = false;
-    fetchAllCommits(since.toISOString())
-      .then((commits) => {
+    (async () => {
+      try {
+        const repos = await fetchRepos();
+        const results = await Promise.all(
+          repos.map((repo) =>
+            fetchRepoCommits(repo).catch(() => null)
+          )
+        );
+        const filtered = results.filter(Boolean);
         if (cancelled) return;
-        const counts = {};
-        for (const c of commits) {
-          const iso =
-            c.commit?.committer?.date || c.commit?.author?.date;
-          if (!iso) continue;
-          const key = dateKey(new Date(iso));
-          counts[key] = (counts[key] || 0) + 1;
-        }
-        writeCache(counts);
-        setState({ status: 'ready', counts });
-      })
-      .catch(() => {
+        writeCache(filtered);
+        setState({ status: 'ready', repos: filtered });
+      } catch {
         if (cancelled) return;
-        setState({ status: 'error', counts: {} });
-      });
+        setState({ status: 'error', repos: [] });
+      }
+    })();
 
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const { status, counts } = state;
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
-  const activeDays = Object.values(counts).filter((c) => c > 0).length;
+  const { status, repos } = state;
+  const totalCommits = repos.reduce(
+    (sum, r) => sum + Object.values(r.counts).reduce((a, b) => a + b, 0),
+    0
+  );
 
   const headerRight =
     status === 'ready'
-      ? `${total} commit${total === 1 ? '' : 's'} across ${activeDays} day${activeDays === 1 ? '' : 's'}`
+      ? `${totalCommits} commit${totalCommits === 1 ? '' : 's'} across ${repos.length} repo${repos.length === 1 ? '' : 's'}`
       : status === 'error'
         ? 'GitHub API unreachable'
         : 'fetching...';
@@ -159,7 +209,7 @@ export default function CommitGrid() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: space.sm,
-          marginBottom: space.md
+          marginBottom: space.lg
         }}
       >
         <h3
@@ -185,51 +235,33 @@ export default function CommitGrid() {
         </span>
       </div>
 
+      {status === 'ready' && repos.length === 0 && (
+        <p
+          style={{
+            margin: 0,
+            color: colors.textMuted,
+            fontSize: fontSizes.sm
+          }}
+        >
+          No public repos found.
+        </p>
+      )}
+
       <div
-        role="img"
-        aria-label={`Commit activity for the last ${DAYS} days`}
         style={{
           display: 'flex',
-          gap: 4,
-          flexWrap: 'nowrap',
-          overflowX: 'auto',
-          paddingBottom: 2
+          flexDirection: 'column',
+          gap: space.sm
         }}
       >
-        {days.map((day) => {
-          const count = counts[day] || 0;
-          const b = bucketOf(count);
-          const fill = FILL[b];
-          const isToday = day === today;
-          const label =
-            status === 'ready'
-              ? `${day}: ${count} commit${count === 1 ? '' : 's'}`
-              : day;
-          return (
-            <span
-              key={day}
-              title={label}
-              aria-label={label}
-              style={{
-                width: 14,
-                height: 14,
-                borderRadius: 3,
-                background: fill.bg,
-                border: `1px solid ${fill.border}`,
-                boxShadow: isToday
-                  ? '0 0 10px rgba(94, 234, 212, 0.55)'
-                  : 'none',
-                flexShrink: 0,
-                display: 'inline-block'
-              }}
-            />
-          );
-        })}
+        {repos.map((repo) => (
+          <Row key={repo.fullName} repo={repo} status={status} />
+        ))}
       </div>
 
       <div
         style={{
-          marginTop: space.md,
+          marginTop: space.lg,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -241,7 +273,7 @@ export default function CommitGrid() {
           letterSpacing: '0.04em'
         }}
       >
-        <span>30 days ago → today</span>
+        <span>30 days ending at each repo&apos;s last commit</span>
         <span
           style={{
             display: 'inline-flex',
@@ -266,7 +298,7 @@ export default function CommitGrid() {
           more
         </span>
         <a
-          href={`https://github.com/${REPO}/commits/main`}
+          href={`https://github.com/${USER}`}
           target="_blank"
           rel="noreferrer noopener"
           style={{
@@ -274,9 +306,114 @@ export default function CommitGrid() {
             textDecoration: 'none'
           }}
         >
-          github.com/{REPO} ↗
+          github.com/{USER} ↗
         </a>
       </div>
+
+      <style>{`
+        @media (max-width: 700px) {
+          .commit-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 4px !important;
+          }
+          .commit-row-meta {
+            min-width: 0 !important;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function Row({ repo, status }) {
+  const days = buildDays(new Date(repo.pushedAt), DAYS);
+  const lastIdx = days.length - 1;
+  const totalForRepo = Object.values(repo.counts).reduce(
+    (a, b) => a + b,
+    0
+  );
+  const rel = relativeTime(repo.pushedAt);
+
+  return (
+    <div
+      className="commit-row"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: space.md
+      }}
+    >
+      <a
+        href={repo.htmlUrl}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="commit-row-meta"
+        style={{
+          flexShrink: 0,
+          minWidth: 160,
+          color: colors.text,
+          textDecoration: 'none',
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.sm,
+          fontWeight: fontWeights.medium
+        }}
+        title={`${totalForRepo} commit${totalForRepo === 1 ? '' : 's'} in this window`}
+      >
+        {repo.name}
+      </a>
+      <span
+        className="commit-row-meta"
+        style={{
+          flexShrink: 0,
+          minWidth: 90,
+          color: colors.textMuted,
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.xs,
+          letterSpacing: '0.04em'
+        }}
+      >
+        {rel}
+      </span>
+      <span
+        style={{
+          display: 'inline-flex',
+          gap: 3,
+          marginLeft: 'auto',
+          flexShrink: 0
+        }}
+      >
+        {days.map((day, i) => {
+          const count = repo.counts[day] || 0;
+          const b = bucketOf(count);
+          const fill = FILL[b];
+          const isLast = i === lastIdx;
+          const label =
+            status === 'ready'
+              ? `${day}: ${count} commit${count === 1 ? '' : 's'}`
+              : day;
+          return (
+            <span
+              key={day}
+              title={label}
+              aria-label={label}
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: 2,
+                background: fill.bg,
+                border: `1px solid ${fill.border}`,
+                boxShadow:
+                  isLast && count > 0
+                    ? '0 0 8px rgba(94, 234, 212, 0.55)'
+                    : 'none',
+                flexShrink: 0,
+                display: 'inline-block'
+              }}
+            />
+          );
+        })}
+      </span>
     </div>
   );
 }
