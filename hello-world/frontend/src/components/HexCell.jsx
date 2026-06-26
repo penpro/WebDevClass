@@ -1,34 +1,68 @@
-// 24-triangle hex with per-triangle unroll animation.
+// 24-triangle hex with per-triangle unroll animation + palette morph.
 //
-// Renders an SVG canvas 280x78 wide. By default the 24 triangles sit in
-// hex formation at the center of the canvas (the visible 78x78 area when
-// the parent .hex-card is collapsed). When an ancestor with class
-// .hex-card is hovered, each triangle CSS-transforms (translate + rotate
-// around its source centroid) to a target position in a horizontal strip
-// of 24 alternating up/down equilateral triangles. Stagger is 14ms per
-// triangle, giving a sequential "unroll" feel from one end of the hex
-// to the other.
+// Renders a 280×78 SVG. By default the 24 triangles sit in hex formation
+// at the center of the canvas (visible 78×78 area when the parent
+// .hex-card is collapsed). When an ancestor with class .hex-card is
+// hovered, each triangle CSS-transforms (translate + rotate around its
+// source centroid) to a target position in a horizontal strip of
+// alternating up/down equilateral triangles. Stagger is 14ms per
+// triangle, giving a sequential "unroll" feel.
 //
-// Geometry: flat-top hex (vertices start at 0° not -90°). This 30°
-// rotation from the pointy-top orientation makes the hexes tile cleanly
-// when arranged at 60° intervals around an empty center in the parent
-// flower layout — each pair of adjacent hexes shares a flat edge.
+// Color: paths get their fill/stroke from a palette object (PALETTES
+// export). A palette is { buckets, morph } — buckets[i] = static color
+// for bucket index i, morph[i] = the "other" color cells of bucket i
+// pulse to (or null for no animation). The pulsing is driven by a CSS
+// @keyframes rule (hex-cell-pulse) defined in CommitGrid.jsx that reads
+// per-path --c-from / --c-to / --phase CSS variables set inline here.
+// Each path's --phase is offset so the cells ripple through the cycle
+// instead of pulsing in lockstep.
 //
-// Subdivision: 6 wedges × 4 sub-triangles = 24 cells. Indices 0..17 are
-// the outer ring (3 sub-triangles per wedge, clockwise); 18..23 are the
-// inner hex (the 6 sub-triangles touching the center). Day mapping puts
-// the oldest 18 days on the outer ring and the newest 6 in the inner
-// core — so active repos visually "glow from the center", and when the
-// hex unrolls, the older-day triangles land on the LEFT of the strip and
-// newer days on the RIGHT (left-to-right chronological reading).
+// Geometry: flat-top hex (rotated 30° from pointy-top) so hexes tile
+// cleanly when arranged at 60° intervals around an empty center.
+// 6 wedges × 4 sub-triangles = 24 cells. Indices 0..17 = outer ring
+// (3 cells per wedge, clockwise); 18..23 = inner hex. Day mapping puts
+// oldest 18 on outer ring, newest 6 in inner core — so when the hex
+// unrolls, older days land LEFT and newer days land RIGHT.
 
-export const FILL = [
-  { bg: 'rgba(94, 234, 212, 0.06)', border: 'rgba(94, 234, 212, 0.18)' },
-  { bg: 'rgba(94, 234, 212, 0.28)', border: 'rgba(94, 234, 212, 0.45)' },
-  { bg: 'rgba(94, 234, 212, 0.50)', border: 'rgba(94, 234, 212, 0.65)' },
-  { bg: 'rgba(94, 234, 212, 0.75)', border: 'rgba(94, 234, 212, 0.90)' },
-  { bg: 'rgba(94, 234, 212, 1.00)', border: 'rgba(94, 234, 212, 1.00)' }
-];
+export const PALETTES = {
+  corona: {
+    name: 'Corona',
+    buckets: [
+      { bg: 'rgba(94, 234, 212, 0.06)', border: 'rgba(94, 234, 212, 0.18)' },
+      { bg: 'rgba(94, 234, 212, 0.28)', border: 'rgba(94, 234, 212, 0.45)' },
+      { bg: 'rgba(94, 234, 212, 0.50)', border: 'rgba(94, 234, 212, 0.65)' },
+      { bg: 'rgba(94, 234, 212, 0.75)', border: 'rgba(94, 234, 212, 0.90)' },
+      { bg: 'rgba(94, 234, 212, 1.00)', border: 'rgba(94, 234, 212, 1.00)' }
+    ],
+    morph: null
+  },
+  duotone: {
+    name: 'Duotone',
+    buckets: [
+      { bg: 'rgba(94, 234, 212, 0.06)', border: 'rgba(94, 234, 212, 0.18)' },
+      { bg: 'rgba(94, 234, 212, 0.28)', border: 'rgba(94, 234, 212, 0.45)' },
+      { bg: 'rgba(94, 234, 212, 0.50)', border: 'rgba(94, 234, 212, 0.65)' },
+      { bg: 'rgba(94, 234, 212, 0.75)', border: 'rgba(94, 234, 212, 0.90)' },
+      { bg: 'rgba(94, 234, 212, 1.00)', border: 'rgba(94, 234, 212, 1.00)' }
+    ],
+    // Bucket 0 (empty cells) stays static at the dim corona color above —
+    // null here means "don't animate this bucket". Active cells morph to
+    // the magenta side.
+    morph: [
+      null,
+      { bg: 'rgba(192, 132, 252, 0.28)', border: 'rgba(192, 132, 252, 0.45)' },
+      { bg: 'rgba(192, 132, 252, 0.50)', border: 'rgba(192, 132, 252, 0.65)' },
+      { bg: 'rgba(192, 132, 252, 0.75)', border: 'rgba(192, 132, 252, 0.90)' },
+      { bg: 'rgba(192, 132, 252, 1.00)', border: 'rgba(192, 132, 252, 1.00)' }
+    ]
+  }
+};
+
+// Backward-compat export — used by the mobile strip-row + the static
+// legend in the footer. Always the corona palette regardless of the
+// active selection (the legend represents the bucket scale, not the
+// current palette).
+export const FILL = PALETTES.corona.buckets;
 
 export function bucketOf(count) {
   if (count === 0) return 0;
@@ -43,6 +77,7 @@ const SVG_WIDTH = 280;
 const SVG_HEIGHT = HEX_SIZE;
 const STAGGER_MS = 14;
 const TRANSITION_MS = 540;
+const PULSE_SECONDS = 8;
 
 function computeHexCells(size, cx, cy) {
   const R = size / 2;
@@ -82,9 +117,6 @@ function computeHexCells(size, cx, cy) {
 }
 
 function computeStripTargets(svgWidth, svgHeight) {
-  // 24 equilateral triangles of side b=19.5, alternating up/down, sharing
-  // edges. Adjacent centers are b/2 apart horizontally. Strip is centered
-  // in the SVG width.
   const b = 19.5;
   const totalWidth = 23 * (b / 2) + b;
   const leftEdge = (svgWidth - totalWidth) / 2;
@@ -108,8 +140,6 @@ function normalizeAngle(rad) {
   return a;
 }
 
-// Pre-compute once at module load. Hex shape is identical across all
-// repos (only fills differ), so we share the geometry.
 const cells = computeHexCells(HEX_SIZE, SVG_WIDTH / 2, SVG_HEIGHT / 2);
 const targets = computeStripTargets(SVG_WIDTH, SVG_HEIGHT);
 const transforms = cells.map((cell, k) => {
@@ -119,11 +149,15 @@ const transforms = cells.map((cell, k) => {
     dx: tgt.cx - cell.centroid.x,
     dy: tgt.cy - cell.centroid.y,
     rotationDeg: (normalizeAngle(tgt.angle - cell.angle) * 180) / Math.PI,
-    delayMs: k * STAGGER_MS
+    delayMs: k * STAGGER_MS,
+    // Negative animation-delay shifts each cell into a different phase
+    // of the pulse cycle so they ripple instead of pulsing in lockstep.
+    phaseSeconds: -((k * PULSE_SECONDS) / 24)
   };
 });
 
-export default function HexCell({ fills, ariaLabel }) {
+export default function HexCell({ buckets, palette, ariaLabel }) {
+  const p = palette || PALETTES.corona;
   return (
     <svg
       width={SVG_WIDTH}
@@ -134,21 +168,29 @@ export default function HexCell({ fills, ariaLabel }) {
       style={{ display: 'block' }}
     >
       {cells.map((cell, k) => {
-        const fill = fills[k] || FILL[0];
+        const bucket = buckets[k];
+        const from = p.buckets[bucket] || p.buckets[0];
+        const to = p.morph ? p.morph[bucket] : null;
         const t = transforms[k];
         return (
           <path
             key={k}
             d={cell.path}
-            fill={fill.bg}
-            stroke={fill.border}
+            fill={from.bg}
+            stroke={from.border}
             strokeWidth={0.5}
+            data-pulse={to ? '1' : '0'}
             style={{
               transformOrigin: `${t.centroid.x.toFixed(2)}px ${t.centroid.y.toFixed(2)}px`,
               transition: `transform ${TRANSITION_MS}ms cubic-bezier(0.4, 0, 0.2, 1) ${t.delayMs}ms`,
               '--tx': `${t.dx.toFixed(2)}px`,
               '--ty': `${t.dy.toFixed(2)}px`,
-              '--tr': `${t.rotationDeg.toFixed(1)}deg`
+              '--tr': `${t.rotationDeg.toFixed(1)}deg`,
+              '--c-from': from.bg,
+              '--c-to': to ? to.bg : from.bg,
+              '--c-from-border': from.border,
+              '--c-to-border': to ? to.border : from.border,
+              '--phase': `${t.phaseSeconds.toFixed(2)}s`
             }}
           />
         );

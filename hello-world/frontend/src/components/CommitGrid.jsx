@@ -8,12 +8,16 @@
 //
 // Hover a hex and the 24 triangles individually translate + rotate to
 // target positions in a horizontal alternating-up/down strip — staggered
-// 14ms per triangle so they appear to peel off sequentially. The card
-// itself expands 78→280px wide to accommodate the unrolled strip. Click
-// navigates to the repo on GitHub.
+// 14ms per triangle. The card itself expands 78→280px wide to fit the
+// unrolled strip. Click navigates to the repo on GitHub.
 //
-// Mobile (< 760): falls back to the previous strip-row layout. Honeycomb
-// geometry doesn't shrink gracefully below the desktop breakpoint.
+// Color: active cells continuously morph between two palette colors via
+// the hex-cell-pulse @keyframes rule below. Each cell has its own --phase
+// so they ripple instead of pulsing in lockstep. The user picks a
+// palette (corona = teal only, duotone = teal ↔ violet) and the choice
+// persists in localStorage.
+//
+// Mobile (< 760): falls back to the previous strip-row layout, no morph.
 //
 // Data source: GitHub public commits API, anonymous. 1 list call + N
 // per-repo commit calls per cold load. sessionStorage cache (1h TTL)
@@ -27,13 +31,14 @@ import {
   fontWeights,
   space
 } from '../theme.js';
-import HexCell, { FILL, bucketOf } from './HexCell.jsx';
+import HexCell, { FILL, PALETTES, bucketOf } from './HexCell.jsx';
 
 const USER = 'penpro';
 const REPO_COUNT = 6;
 const DAYS = 24;
 const CACHE_KEY = 'penumbra_commit_grid_v4';
 const CACHE_TTL_MS = 60 * 60 * 1000;
+const PALETTE_KEY = 'penumbra_commit_palette_v1';
 
 function dateKey(d) {
   const y = d.getFullYear();
@@ -145,8 +150,31 @@ function writeCache(repos) {
   }
 }
 
+function readPalettePref() {
+  try {
+    const v = localStorage.getItem(PALETTE_KEY);
+    return v && PALETTES[v] ? v : 'corona';
+  } catch {
+    return 'corona';
+  }
+}
+
+function writePalettePref(key) {
+  try {
+    localStorage.setItem(PALETTE_KEY, key);
+  } catch {
+    // localStorage can be unavailable.
+  }
+}
+
 export default function CommitGrid() {
   const [state, setState] = useState({ status: 'loading', repos: [] });
+  const [paletteKey, setPaletteKey] = useState(readPalettePref);
+  const palette = PALETTES[paletteKey] || PALETTES.corona;
+
+  useEffect(() => {
+    writePalettePref(paletteKey);
+  }, [paletteKey]);
 
   useEffect(() => {
     const cached = readCache();
@@ -240,7 +268,8 @@ export default function CommitGrid() {
       {status === 'ready' && repos.length > 0 && (
         <>
           <div className="commit-flower-desktop">
-            <HexFlower repos={repos} />
+            <PaletteSelector value={paletteKey} onChange={setPaletteKey} />
+            <HexFlower repos={repos} palette={palette} />
           </div>
           <div className="commit-strip-mobile">
             {repos.map((repo) => (
@@ -305,8 +334,6 @@ export default function CommitGrid() {
         .commit-flower-desktop { display: block; }
         .commit-strip-mobile { display: none; }
 
-        /* Hex card: 78x78 by default, expands to 280x78 on hover. Centered
-           on its --cx/--cy CSS variables via the left calc. */
         .hex-card {
           position: absolute;
           width: 78px;
@@ -326,7 +353,6 @@ export default function CommitGrid() {
           z-index: 20;
         }
 
-        /* Background panel that fades in behind the unrolled strip. */
         .hex-card-bg {
           position: absolute;
           inset: 0;
@@ -343,9 +369,6 @@ export default function CommitGrid() {
           opacity: 1;
         }
 
-        /* SVG wrapper stays 280px wide always; centered in the card. When
-           card is 78px wide, only the center 78px of the SVG is visible
-           (the hex). When card expands to 280, the full strip is visible. */
         .hex-card-svg-wrap {
           position: absolute;
           top: 0;
@@ -360,14 +383,31 @@ export default function CommitGrid() {
           filter: none;
         }
 
-        /* Default path transform = identity. On hover, each path picks up
-           its own --tx, --ty, --tr from inline style (set per-path in
-           HexCell.jsx) and translates+rotates to its strip target. */
+        /* Triangle unroll on hover. Each path picks up its own --tx/--ty/--tr
+           from inline styles set in HexCell.jsx. */
         .hex-card svg path {
           transform: translate(0px, 0px) rotate(0deg);
         }
         .hex-card:hover svg path {
           transform: translate(var(--tx), var(--ty)) rotate(var(--tr));
+        }
+
+        /* Color morph for cells with non-zero activity. Each path picks
+           its own --c-from / --c-to / --phase from inline styles. Bucket-0
+           cells have data-pulse="0" and stay at their static fill. */
+        @keyframes hex-cell-pulse {
+          0%, 100% {
+            fill: var(--c-from);
+            stroke: var(--c-from-border);
+          }
+          50% {
+            fill: var(--c-to);
+            stroke: var(--c-to-border);
+          }
+        }
+        .hex-card svg path[data-pulse="1"] {
+          animation: hex-cell-pulse 8s ease-in-out infinite;
+          animation-delay: var(--phase, 0s);
         }
 
         @media (max-width: 760px) {
@@ -400,16 +440,94 @@ export default function CommitGrid() {
   );
 }
 
+// ---- Palette selector ----
+
+function PaletteSelector({ value, onChange }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: 6,
+        justifyContent: 'center',
+        marginBottom: 12,
+        flexWrap: 'wrap'
+      }}
+      role="radiogroup"
+      aria-label="Color palette"
+    >
+      {Object.entries(PALETTES).map(([key, p]) => {
+        const active = value === key;
+        const swatchFrom = p.buckets[3];
+        const swatchTo = p.morph?.[3] || swatchFrom;
+        return (
+          <button
+            key={key}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onChange(key)}
+            title={p.name}
+            style={{
+              background: active
+                ? 'rgba(94, 234, 212, 0.08)'
+                : 'transparent',
+              border: `1px solid ${active ? colors.borderAccent : colors.borderSubtle}`,
+              borderRadius: 4,
+              padding: '4px 8px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              color: active ? colors.text : colors.textMuted,
+              fontFamily: fonts.mono,
+              fontSize: 10,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              transition: 'all 150ms'
+            }}
+          >
+            <span style={{ display: 'inline-flex', gap: 2 }}>
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 2,
+                  background: swatchFrom.bg,
+                  border: `1px solid ${swatchFrom.border}`,
+                  display: 'inline-block'
+                }}
+              />
+              {p.morph && (
+                <span
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 2,
+                    background: swatchTo.bg,
+                    border: `1px solid ${swatchTo.border}`,
+                    display: 'inline-block'
+                  }}
+                />
+              )}
+            </span>
+            <span>{p.name}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ---- 6-hex honeycomb ring ----
 
-function HexFlower({ repos }) {
+function HexFlower({ repos, palette }) {
   const N = repos.length;
   if (N === 0) return null;
 
   const hexSize = 78;
   const R = hexSize / 2;
   const sqrt3 = Math.sqrt(3);
-  const ringR = R * sqrt3; // 67.5 — touching distance for hexes at 60° intervals
+  const ringR = R * sqrt3;
 
   const W = 460;
   const H = 320;
@@ -417,9 +535,6 @@ function HexFlower({ repos }) {
   const cy = H / 2;
   const labelOffset = 18;
 
-  // 6 positions at 60° intervals starting from top (-π/2). For N < 6 we
-  // just leave the trailing positions empty; for N > 6 (shouldn't happen
-  // given REPO_COUNT=6) we'd slice.
   const layout = Array.from({ length: 6 }, (_, i) => {
     const angle = -Math.PI / 2 + (i * Math.PI) / 3;
     return {
@@ -538,6 +653,7 @@ function HexFlower({ repos }) {
             key={`hex-${repo.fullName}`}
             repo={repo}
             position={{ x: p.hexX, y: p.hexY }}
+            palette={palette}
           />
         );
       })}
@@ -547,9 +663,9 @@ function HexFlower({ repos }) {
 
 // ---- Single hex card. Hover behavior is pure CSS (no React state). ----
 
-function HexNode({ repo, position }) {
+function HexNode({ repo, position, palette }) {
   const days = buildDays(new Date(repo.pushedAt), DAYS);
-  const fills = days.map((day) => FILL[bucketOf(repo.counts[day] || 0)]);
+  const buckets = days.map((day) => bucketOf(repo.counts[day] || 0));
   const totalForRepo = Object.values(repo.counts).reduce((a, b) => a + b, 0);
 
   return (
@@ -567,7 +683,8 @@ function HexNode({ repo, position }) {
       <div className="hex-card-bg" />
       <div className="hex-card-svg-wrap">
         <HexCell
-          fills={fills}
+          buckets={buckets}
+          palette={palette}
           ariaLabel={`${repo.name}: ${DAYS}-day activity hex, ${totalForRepo} commits`}
         />
       </div>
