@@ -311,16 +311,21 @@ export default function CommitGrid() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 700px) {
           .commit-row {
             flex-direction: column !important;
-            align-items: flex-start !important;
+            align-items: stretch !important;
             gap: 4px !important;
           }
           .commit-row-name,
-          .commit-row-meta {
+          .commit-row-time {
+            flex: 0 0 auto !important;
             width: auto !important;
-            min-width: 0 !important;
+          }
+          .commit-row-cells {
+            margin-left: 0 !important;
+            width: 100% !important;
+            grid-template-columns: repeat(${DAYS}, minmax(0, 1fr)) !important;
           }
         }
       `}</style>
@@ -352,8 +357,8 @@ function Row({ repo, status }) {
         rel="noreferrer noopener"
         className="commit-row-name"
         style={{
-          flexShrink: 0,
-          width: 160,
+          flex: '0 0 160px',
+          minWidth: 0,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -368,10 +373,10 @@ function Row({ repo, status }) {
         {repo.name}
       </a>
       <span
-        className="commit-row-meta"
+        className="commit-row-time"
         style={{
-          flexShrink: 0,
-          width: 90,
+          flex: '0 0 90px',
+          minWidth: 0,
           color: colors.textMuted,
           fontFamily: fonts.mono,
           fontSize: fontSizes.xs,
@@ -380,12 +385,15 @@ function Row({ repo, status }) {
       >
         {rel}
       </span>
-      <span
+      <div
+        className="commit-row-cells"
         style={{
-          display: 'inline-flex',
-          gap: 3,
+          flex: '0 1 auto',
+          minWidth: 0,
           marginLeft: 'auto',
-          flexShrink: 0
+          display: 'grid',
+          gridTemplateColumns: `repeat(${DAYS}, minmax(0, 12px))`,
+          gap: 3
         }}
       >
         {days.map((day, i) => {
@@ -403,8 +411,7 @@ function Row({ repo, status }) {
               title={label}
               aria-label={label}
               style={{
-                width: 12,
-                height: 12,
+                aspectRatio: '1 / 1',
                 borderRadius: 2,
                 background: fill.bg,
                 border: `1px solid ${fill.border}`,
@@ -412,13 +419,12 @@ function Row({ repo, status }) {
                   isLast && count > 0
                     ? '0 0 8px rgba(94, 234, 212, 0.55)'
                     : 'none',
-                flexShrink: 0,
-                display: 'inline-block'
+                display: 'block'
               }}
             />
           );
         })}
-      </span>
+      </div>
     </div>
   );
 }
