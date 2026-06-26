@@ -1,18 +1,19 @@
 // "Recent shipping" visualization for /about.
 //
-// Desktop (viewport ≥ 760): radial hex flower. Each repo is rendered as a
-// pointy-top hexagon split into 24 triangular cells (6 inner + 18 outer).
-// The 6 most recent days light up the inner core; the older 18 fill the
-// outer ring clockwise from the top. Hexes are distributed evenly around
-// a center point, with repo names + relative-time labels radiating outward
-// and dashed connector lines tying each hex to its label.
+// Desktop (viewport ≥ 760): 6-hex honeycomb ring. Each repo is rendered
+// as a flat-top hexagon split into 24 triangular cells; the 6 hexes
+// arrange at 60° intervals around an empty center, touching at flat
+// edges (true honeycomb tiling). Repo names + relative-time labels
+// radiate outward from each hex with dashed connector lines.
 //
-// Hover a hex and it expands sideways into a horizontal 24-cell strip
-// showing the linear timeline (crossfade between hex and strip views,
-// 350ms). Click navigates to the repo on GitHub.
+// Hover a hex and the 24 triangles individually translate + rotate to
+// target positions in a horizontal alternating-up/down strip — staggered
+// 14ms per triangle so they appear to peel off sequentially. The card
+// itself expands 78→280px wide to accommodate the unrolled strip. Click
+// navigates to the repo on GitHub.
 //
-// Mobile (< 760): falls back to the previous strip-row layout — radial
-// geometry doesn't shrink gracefully below ~700px wide.
+// Mobile (< 760): falls back to the previous strip-row layout. Honeycomb
+// geometry doesn't shrink gracefully below the desktop breakpoint.
 //
 // Data source: GitHub public commits API, anonymous. 1 list call + N
 // per-repo commit calls per cold load. sessionStorage cache (1h TTL)
@@ -29,9 +30,9 @@ import {
 import HexCell, { FILL, bucketOf } from './HexCell.jsx';
 
 const USER = 'penpro';
-const REPO_COUNT = 8;
+const REPO_COUNT = 6;
 const DAYS = 24;
-const CACHE_KEY = 'penumbra_commit_grid_v3';
+const CACHE_KEY = 'penumbra_commit_grid_v4';
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
 function dateKey(d) {
@@ -263,7 +264,7 @@ export default function CommitGrid() {
           letterSpacing: '0.04em'
         }}
       >
-        <span>{DAYS} days ending at each repo&apos;s last commit · hover to expand</span>
+        <span>{DAYS} days ending at each repo&apos;s last commit · hover to unroll</span>
         <span
           style={{
             display: 'inline-flex',
@@ -303,6 +304,72 @@ export default function CommitGrid() {
       <style>{`
         .commit-flower-desktop { display: block; }
         .commit-strip-mobile { display: none; }
+
+        /* Hex card: 78x78 by default, expands to 280x78 on hover. Centered
+           on its --cx/--cy CSS variables via the left calc. */
+        .hex-card {
+          position: absolute;
+          width: 78px;
+          height: 78px;
+          z-index: 5;
+          cursor: pointer;
+          overflow: hidden;
+          border-radius: 8px;
+          left: calc(var(--cx) - 39px);
+          top: calc(var(--cy) - 39px);
+          transition: width 380ms cubic-bezier(0.4, 0, 0.2, 1),
+                      left 380ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hex-card:hover {
+          width: 280px;
+          left: calc(var(--cx) - 140px);
+          z-index: 20;
+        }
+
+        /* Background panel that fades in behind the unrolled strip. */
+        .hex-card-bg {
+          position: absolute;
+          inset: 0;
+          background: rgba(13, 6, 38, 0.94);
+          border: 1px solid rgba(94, 234, 212, 0.35);
+          border-radius: 8px;
+          box-shadow: 0 0 24px rgba(94, 234, 212, 0.28);
+          opacity: 0;
+          transition: opacity 280ms 60ms;
+          pointer-events: none;
+          box-sizing: border-box;
+        }
+        .hex-card:hover .hex-card-bg {
+          opacity: 1;
+        }
+
+        /* SVG wrapper stays 280px wide always; centered in the card. When
+           card is 78px wide, only the center 78px of the SVG is visible
+           (the hex). When card expands to 280, the full strip is visible. */
+        .hex-card-svg-wrap {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 280px;
+          height: 78px;
+          filter: drop-shadow(0 0 8px rgba(94, 234, 212, 0.18));
+          transition: filter 180ms;
+        }
+        .hex-card:hover .hex-card-svg-wrap {
+          filter: none;
+        }
+
+        /* Default path transform = identity. On hover, each path picks up
+           its own --tx, --ty, --tr from inline style (set per-path in
+           HexCell.jsx) and translates+rotates to its strip target. */
+        .hex-card svg path {
+          transform: translate(0px, 0px) rotate(0deg);
+        }
+        .hex-card:hover svg path {
+          transform: translate(var(--tx), var(--ty)) rotate(var(--tr));
+        }
+
         @media (max-width: 760px) {
           .commit-flower-desktop { display: none; }
           .commit-strip-mobile {
@@ -333,31 +400,50 @@ export default function CommitGrid() {
   );
 }
 
-// ---- Radial hex flower ----
+// ---- 6-hex honeycomb ring ----
 
 function HexFlower({ repos }) {
   const N = repos.length;
-  const W = 700;
-  const H = 560;
+  if (N === 0) return null;
+
+  const hexSize = 78;
+  const R = hexSize / 2;
+  const sqrt3 = Math.sqrt(3);
+  const ringR = R * sqrt3; // 67.5 — touching distance for hexes at 60° intervals
+
+  const W = 460;
+  const H = 320;
   const cx = W / 2;
   const cy = H / 2;
-  const layoutR = 175;
-  const hexSize = 78;
-  const labelOffset = 26;
+  const labelOffset = 18;
 
-  const positions = repos.map((_, i) => {
-    const angle = -Math.PI / 2 + (2 * Math.PI * i) / N;
-    const radial = layoutR + hexSize / 2;
+  // 6 positions at 60° intervals starting from top (-π/2). For N < 6 we
+  // just leave the trailing positions empty; for N > 6 (shouldn't happen
+  // given REPO_COUNT=6) we'd slice.
+  const layout = Array.from({ length: 6 }, (_, i) => {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 3;
     return {
-      angle,
-      hexX: cx + layoutR * Math.cos(angle),
-      hexY: cy + layoutR * Math.sin(angle),
-      labelX: cx + (radial + labelOffset) * Math.cos(angle),
-      labelY: cy + (radial + labelOffset) * Math.sin(angle),
-      lineStartX: cx + (radial - 1) * Math.cos(angle),
-      lineStartY: cy + (radial - 1) * Math.sin(angle),
-      lineEndX: cx + (radial + labelOffset - 4) * Math.cos(angle),
-      lineEndY: cy + (radial + labelOffset - 4) * Math.sin(angle)
+      x: ringR * Math.cos(angle),
+      y: ringR * Math.sin(angle),
+      angle
+    };
+  });
+
+  const positions = repos.slice(0, 6).map((_, i) => {
+    const p = layout[i];
+    const hexX = cx + p.x;
+    const hexY = cy + p.y;
+    const labelDist = R + labelOffset;
+    return {
+      angle: p.angle,
+      hexX,
+      hexY,
+      labelX: hexX + labelDist * Math.cos(p.angle),
+      labelY: hexY + labelDist * Math.sin(p.angle),
+      lineStartX: hexX + (R - 1) * Math.cos(p.angle),
+      lineStartY: hexY + (R - 1) * Math.sin(p.angle),
+      lineEndX: hexX + (R + labelOffset - 4) * Math.cos(p.angle),
+      lineEndY: hexY + (R + labelOffset - 4) * Math.sin(p.angle)
     };
   });
 
@@ -396,7 +482,7 @@ function HexFlower({ repos }) {
         ))}
       </svg>
 
-      {repos.map((repo, i) => {
+      {repos.slice(0, 6).map((repo, i) => {
         const p = positions[i];
         const cosA = Math.cos(p.angle);
         const align = cosA > 0.3 ? 'left' : cosA < -0.3 ? 'right' : 'center';
@@ -445,14 +531,13 @@ function HexFlower({ repos }) {
         );
       })}
 
-      {repos.map((repo, i) => {
+      {repos.slice(0, 6).map((repo, i) => {
         const p = positions[i];
         return (
           <HexNode
             key={`hex-${repo.fullName}`}
             repo={repo}
             position={{ x: p.hexX, y: p.hexY }}
-            hexSize={hexSize}
           />
         );
       })}
@@ -460,100 +545,37 @@ function HexFlower({ repos }) {
   );
 }
 
-// ---- Single hex node with hover-expand-to-strip ----
+// ---- Single hex card. Hover behavior is pure CSS (no React state). ----
 
-function HexNode({ repo, position, hexSize }) {
-  const [hovered, setHovered] = useState(false);
-  const stripWidth = 280;
-  const cardWidth = hovered ? stripWidth : hexSize;
+function HexNode({ repo, position }) {
   const days = buildDays(new Date(repo.pushedAt), DAYS);
   const fills = days.map((day) => FILL[bucketOf(repo.counts[day] || 0)]);
   const totalForRepo = Object.values(repo.counts).reduce((a, b) => a + b, 0);
 
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={() => window.open(repo.htmlUrl, '_blank', 'noopener,noreferrer')}
-      title={`${repo.name} — ${totalForRepo} commit${totalForRepo === 1 ? '' : 's'} in ${DAYS}-day window. Click for repo.`}
+      className="hex-card"
       style={{
-        position: 'absolute',
-        left: position.x - cardWidth / 2,
-        top: position.y - hexSize / 2,
-        width: cardWidth,
-        height: hexSize,
-        transition:
-          'left 380ms cubic-bezier(0.4, 0, 0.2, 1), width 380ms cubic-bezier(0.4, 0, 0.2, 1)',
-        cursor: 'pointer',
-        zIndex: hovered ? 20 : 5
+        '--cx': `${position.x}px`,
+        '--cy': `${position.y}px`
       }}
+      onClick={() =>
+        window.open(repo.htmlUrl, '_blank', 'noopener,noreferrer')
+      }
+      title={`${repo.name} — ${totalForRepo} commit${totalForRepo === 1 ? '' : 's'} in ${DAYS}-day window. Click for repo.`}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: hexSize,
-          height: hexSize,
-          opacity: hovered ? 0 : 1,
-          transition: 'opacity 180ms',
-          filter: hovered
-            ? 'none'
-            : 'drop-shadow(0 0 8px rgba(94, 234, 212, 0.18))'
-        }}
-      >
+      <div className="hex-card-bg" />
+      <div className="hex-card-svg-wrap">
         <HexCell
-          size={hexSize}
           fills={fills}
           ariaLabel={`${repo.name}: ${DAYS}-day activity hex, ${totalForRepo} commits`}
         />
-      </div>
-
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          opacity: hovered ? 1 : 0,
-          pointerEvents: hovered ? 'auto' : 'none',
-          transition: 'opacity 220ms 160ms',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 12px',
-          background: 'rgba(13, 6, 38, 0.94)',
-          border: `1px solid ${colors.borderAccent}`,
-          borderRadius: 8,
-          boxShadow: '0 0 24px rgba(94, 234, 212, 0.28)'
-        }}
-      >
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${DAYS}, minmax(0, 1fr))`,
-            gap: 2,
-            width: '100%',
-            height: 26
-          }}
-        >
-          {fills.map((fill, idx) => (
-            <span
-              key={idx}
-              style={{
-                aspectRatio: '1 / 1',
-                background: fill.bg,
-                border: `1px solid ${fill.border}`,
-                borderRadius: 1,
-                display: 'block'
-              }}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
 }
 
-// ---- Mobile-fallback strip row (same layout as the previous version) ----
+// ---- Mobile-fallback strip row ----
 
 function StripRow({ repo, status }) {
   const days = buildDays(new Date(repo.pushedAt), DAYS);
