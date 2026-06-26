@@ -23,7 +23,7 @@ import {
 
 const USER = 'penpro';
 const REPO_COUNT = 8;
-const DAYS = 30;
+const DAYS = 25;
 const CACHE_KEY = 'penumbra_commit_grid_v2';
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
@@ -273,7 +273,7 @@ export default function CommitGrid() {
           letterSpacing: '0.04em'
         }}
       >
-        <span>30 days ending at each repo&apos;s last commit</span>
+        <span>{DAYS} days ending at each repo&apos;s last commit</span>
         <span
           style={{
             display: 'inline-flex',
