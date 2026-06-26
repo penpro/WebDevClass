@@ -311,13 +311,15 @@ export default function CommitGrid() {
       </div>
 
       <style>{`
-        @media (max-width: 700px) {
+        @media (max-width: 768px) {
           .commit-row {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 4px !important;
           }
+          .commit-row-name,
           .commit-row-meta {
+            width: auto !important;
             min-width: 0 !important;
           }
         }
@@ -341,24 +343,27 @@ function Row({ repo, status }) {
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: space.md
+        gap: space.sm
       }}
     >
       <a
         href={repo.htmlUrl}
         target="_blank"
         rel="noreferrer noopener"
-        className="commit-row-meta"
+        className="commit-row-name"
         style={{
           flexShrink: 0,
-          minWidth: 160,
+          width: 160,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
           color: colors.text,
           textDecoration: 'none',
           fontFamily: fonts.mono,
           fontSize: fontSizes.sm,
           fontWeight: fontWeights.medium
         }}
-        title={`${totalForRepo} commit${totalForRepo === 1 ? '' : 's'} in this window`}
+        title={`${repo.name} — ${totalForRepo} commit${totalForRepo === 1 ? '' : 's'} in window`}
       >
         {repo.name}
       </a>
@@ -366,7 +371,7 @@ function Row({ repo, status }) {
         className="commit-row-meta"
         style={{
           flexShrink: 0,
-          minWidth: 90,
+          width: 90,
           color: colors.textMuted,
           fontFamily: fonts.mono,
           fontSize: fontSizes.xs,
