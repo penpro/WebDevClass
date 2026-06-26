@@ -25,13 +25,15 @@ import CornerBrackets from '../components/CornerBrackets.jsx'
 import HudLabel from '../components/HudLabel.jsx'
 import Eclipse from '../components/Eclipse.jsx'
 import SectionRail from '../components/SectionRail.jsx'
+import CommitGrid from '../components/CommitGrid.jsx'
 
 const SECTIONS = [
   { id: 'hero',        num: '00', label: 'Intro' },
   { id: 'story',       num: '01', label: 'Story' },
   { id: 'proof',       num: '02', label: 'Proof strip' },
-  { id: 'how-i-think', num: '03', label: 'How I think' },
-  { id: 'working',     num: '04', label: 'Working with me' }
+  { id: 'shipping',    num: '03', label: 'Shipping' },
+  { id: 'how-i-think', num: '04', label: 'How I think' },
+  { id: 'working',     num: '05', label: 'Working with me' }
 ];
 
 const PILLARS = [
@@ -324,6 +326,16 @@ export default function About() {
               ))}
             </tbody>
           </table>
+        </Card>
+
+        {/* ------------ Recent shipping ------------ */}
+        <Card
+          id="shipping"
+          variant="accent"
+          padding={space.lg}
+          style={{ marginTop: space['2xl'] }}
+        >
+          <CommitGrid />
         </Card>
 
         {/* ------------ Pillars ------------ */}
