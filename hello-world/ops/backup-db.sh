@@ -36,8 +36,11 @@ if [ -z "${DB_HOST:-}" ] || [ -z "${DB_USER:-}" ] || [ -z "${DB_PASSWORD:-}" ] |
   exit 1
 fi
 
+# Use $(id -un) rather than $USER — cron doesn't populate $USER, and
+# the script's `set -u` would kill us before mkdir under cron context.
+RUN_AS="$(id -un)"
 sudo mkdir -p "$BACKUP_DIR"
-sudo chown "$USER:$USER" "$BACKUP_DIR"
+sudo chown "$RUN_AS:$RUN_AS" "$BACKUP_DIR"
 
 STAMP="$(date +%F)"
 OUT="$BACKUP_DIR/hello_app_${STAMP}.sql.gz"
