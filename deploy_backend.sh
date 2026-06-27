@@ -30,6 +30,11 @@ if [ ! -f "$BACKEND_DIR/.env" ]; then
   echo "         can talk to MySQL or sign session cookies."
 fi
 
+# Re-assert owner-only perms on .env every deploy. Cheap insurance in
+# case it ever gets restored from a backup or recreated with looser
+# perms; chmod is idempotent so this is free when it's already correct.
+[ -f "$BACKEND_DIR/.env" ] && chmod 600 "$BACKEND_DIR/.env"
+
 cd "$BACKEND_DIR"
 
 echo "==> Backend directory: $BACKEND_DIR"
