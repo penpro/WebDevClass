@@ -23,6 +23,7 @@ import {
 } from '../theme.js';
 import Container from '../components/Container.jsx';
 import Card from '../components/Card.jsx';
+import Button from '../components/Button.jsx';
 import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
@@ -35,7 +36,8 @@ const SECTIONS = [
   { id: 'cat-infra',      num: '02', label: 'Infrastructure' },
   { id: 'cat-apps',       num: '03', label: 'Web apps' },
   { id: 'cat-csgames',    num: '04', label: 'CS & games' },
-  { id: 'cat-reference',  num: '05', label: 'Source & docs' }
+  { id: 'cat-reference',  num: '05', label: 'Source & docs' },
+  { id: 'book',           num: '06', label: 'Book a Call' }
 ];
 
 const CATEGORIES = [
@@ -452,6 +454,48 @@ export default function Projects() {
           </section>
         );
       })}
+
+      <section
+        id="book"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          scrollMarginTop: 90,
+          textAlign: 'center'
+        }}
+      >
+        <Container>
+          <h2
+            style={{
+              margin: 0,
+              fontFamily: fonts.heading,
+              fontSize: fontSizes.xl,
+              fontWeight: fontWeights.bold,
+              color: colors.text
+            }}
+          >
+            See something close to your problem?
+          </h2>
+          <p
+            style={{
+              margin: `${space.md} auto 0`,
+              maxWidth: '52ch',
+              color: colors.textSecondary,
+              fontSize: fontSizes.base,
+              lineHeight: 1.6
+            }}
+          >
+            Most engagements start with a 30-minute call. Quick sketch of the
+            problem, honest answer on whether I'm the right person for it, and
+            a rough shape of the work.
+          </p>
+          <div style={{ marginTop: space.lg }}>
+            <Button as={Link} to="/contact" size="lg">
+              Book a 30-min intro →
+            </Button>
+          </div>
+        </Container>
+      </section>
     </>
   );
 }

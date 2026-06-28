@@ -34,7 +34,7 @@ const SECTIONS = [
   { id: 'proof',       num: '02', label: 'Proof strip' },
   { id: 'shipping',    num: '03', label: 'Shipping' },
   { id: 'how-i-think', num: '04', label: 'How I think' },
-  { id: 'working',     num: '05', label: 'Working with me' }
+  { id: 'working',     num: '05', label: 'Book a Call' }
 ];
 
 const PILLARS = [

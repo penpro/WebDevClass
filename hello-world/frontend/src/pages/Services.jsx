@@ -22,7 +22,8 @@ import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',     num: '00', label: 'Intro' },
-  { id: 'services', num: '01', label: 'The work' }
+  { id: 'services', num: '01', label: 'The work' },
+  { id: 'book',     num: '02', label: 'Book a Call' }
 ];
 
 const SERVICES = [
@@ -270,9 +271,11 @@ export default function Services() {
           `}</style>
 
           <div
+            id="book"
             style={{
               textAlign: 'center',
-              marginTop: space['2xl']
+              marginTop: space['2xl'],
+              scrollMarginTop: 90
             }}
           >
             <Button as={Link} to="/contact" size="lg">
