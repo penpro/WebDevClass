@@ -32,8 +32,8 @@
 > Tech rides on the same Express + MySQL + nginx + PM2 + EC2 infrastructure
 > with one additional table (`contacts`) and one additional API surface
 > (`/api/contact` + `/api/admin/contacts`) for the contact form. The
-> canonical hostname is now **penumbra-tech.com**; `penumbrapro.duckdns.org`
-> is kept as a legacy alias on the same TLS certificate.
+> canonical hostname is **penumbra-tech.com** (served by a Let's Encrypt
+> cert covering `penumbra-tech.com` and `www.penumbra-tech.com`).
 
 ## Overview
 
@@ -70,7 +70,7 @@ Nginx :443 (Let's Encrypt cert, auto-redirects :80 -> :443,
   +-- /api/loadtest/*            /     (header-gated synthetic endpoints)
 ```
 
-The site is live at **https://penumbra-tech.com** (with `https://penumbrapro.duckdns.org` kept as a legacy alias). Unauthenticated visitors see the seeded hello-world messages and a public **API Guide** documenting every endpoint. Logged-in users have access to:
+The site is live at **https://penumbra-tech.com**. Unauthenticated visitors see the seeded hello-world messages and a public **API Guide** documenting every endpoint. Logged-in users have access to:
 
 - **QuickNotes** — user-scoped note list with full CRUD
 - **MoodBoard** — image-URL boards, public share link, plus a client-side **Create Collage** feature that renders a downloadable portrait collage entirely in the browser
