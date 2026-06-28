@@ -23,13 +23,14 @@ import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import SectionRail from '../../components/SectionRail.jsx';
+import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',        num: '00', label: 'Intro' },
   { id: 'why',         num: '01', label: 'Why it matters' },
   { id: 'design',      num: '02', label: 'Design idea' },
   { id: 'engineering', num: '03', label: 'Engineering note' },
-  { id: 'cta',         num: '04', label: 'Book' }
+  { id: 'cta',         num: '04', label: 'Book a Call' }
 ];
 
 const STEAM_URL = 'https://store.steampowered.com/app/3622460/Trigonometry_Tools/';
@@ -37,6 +38,12 @@ const STEAM_HEADER =
   'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3622460/4e15e9aa9551fb437a109ce99ca4c5951a89b4be/header.jpg?t=1744404808';
 
 export default function TrigonometryToolsCase() {
+  useDocumentMeta({
+    title: 'Trigonometry Tools — Steam-published math game | Penumbra Tech',
+    description:
+      "Educational game published to Steam in April 2025 under Penumbra Productions. Gamifies the unit-circle drill for precalculus students. Small on purpose; went through the full Steam release process. Free.",
+    canonical: 'https://penumbra-tech.com/projects/trigonometry-tools'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

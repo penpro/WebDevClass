@@ -22,6 +22,7 @@ import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import SectionRail from '../../components/SectionRail.jsx';
+import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',         num: '00', label: 'Intro' },
@@ -29,7 +30,7 @@ const SECTIONS = [
   { id: 'real-project', num: '02', label: 'The real project' },
   { id: 'toolset',      num: '03', label: 'The toolset' },
   { id: 'leverage',     num: '04', label: 'Leverage limit' },
-  { id: 'cta',          num: '05', label: 'Book' }
+  { id: 'cta',          num: '05', label: 'Book a Call' }
 ];
 
 const STEAM_URL = 'https://store.steampowered.com/app/1602810/Metaverse_Origins/';
@@ -37,6 +38,12 @@ const STEAM_HEADER =
   'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1602810/header.jpg?t=1640856855';
 
 export default function MetaverseOriginsCase() {
+  useDocumentMeta({
+    title: 'Metaverse: Origins case study — Unreal Engine multiplayer | Penumbra Tech',
+    description:
+      "Steam Early Access since May 2021. 150K+ lines across 500+ files and 15 subsystems. The interesting story: agent-driven content pipeline with adversarial verification (last pass: 9 critical + 48 high-severity defects).",
+    canonical: 'https://penumbra-tech.com/projects/metaverse-origins'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

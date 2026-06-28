@@ -1,8 +1,17 @@
-// Projects / portfolio index. Each card links to the re-themed wrapper
-// route under /projects/<slug>; a few cards still fall back to the
-// legacy top-level routes (quicknotes, moodboard, etc.) for the apps
-// that don't yet have a dedicated case-study wrapper.
+// Projects / portfolio index.
+//
+// Each project carries a `category` field. The page groups them into
+// titled sections — Client work, Infrastructure & SaaS, Web apps,
+// Computer science & games, Reference — and the SectionRail on the
+// left gets a stop per category so a buyer can jump straight to the
+// kind of evidence they care about.
+//
+// A plain substring search at the top of the page filters across every
+// category at once (title + summary + stack). Sections with zero
+// matches collapse to a "no matches" line so the rail anchors still
+// scroll-land correctly.
 
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   colors,
@@ -18,14 +27,48 @@ import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import SectionRail from '../components/SectionRail.jsx';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
-  { id: 'hero', num: '00', label: 'Intro' },
-  { id: 'grid', num: '01', label: 'Projects' }
+  { id: 'hero',           num: '00', label: 'Intro' },
+  { id: 'cat-client',     num: '01', label: 'Client work' },
+  { id: 'cat-infra',      num: '02', label: 'Infrastructure' },
+  { id: 'cat-apps',       num: '03', label: 'Web apps' },
+  { id: 'cat-csgames',    num: '04', label: 'CS & games' },
+  { id: 'cat-reference',  num: '05', label: 'Source & docs' }
+];
+
+const CATEGORIES = [
+  {
+    id: 'cat-client',
+    label: 'Client work',
+    intro: 'Paid engagements with named outside clients.'
+  },
+  {
+    id: 'cat-infra',
+    label: 'Infrastructure & SaaS',
+    intro: 'The plumbing — load testing, payments, deploys, SaaS rescue patterns.'
+  },
+  {
+    id: 'cat-apps',
+    label: 'Web apps',
+    intro: 'Full-stack web apps with auth, MySQL, and the seams that always need work.'
+  },
+  {
+    id: 'cat-csgames',
+    label: 'Computer science & games',
+    intro: 'Where the work is mostly about ideas — theory, gameplay, agent pipelines.'
+  },
+  {
+    id: 'cat-reference',
+    label: 'Source & documentation',
+    intro: 'Where to read the actual code and the public API.'
+  }
 ];
 
 const PROJECTS = [
   {
+    category: 'cat-infra',
     to: '/saas-rescue',
     badge: 'Playbook · SaaS infrastructure',
     title: 'The 6-week SaaS-rescue playbook',
@@ -35,9 +78,8 @@ const PROJECTS = [
     auth: 'Open playbook · Save as PDF · Book a 30-min intro'
   },
   {
+    category: 'cat-infra',
     to: '/projects/diagnostics',
-    // No fallback to the admin route — the case study at /projects/diagnostics
-    // is the public-facing page. The live admin dashboard stays behind auth.
     badge: 'Performance engineering',
     title: 'Diagnostics & load-testing dashboard',
     summary:
@@ -46,6 +88,7 @@ const PROJECTS = [
     auth: 'Case study (live tool is super_admin only)'
   },
   {
+    category: 'cat-csgames',
     to: '/projects/theory-of-computation',
     badge: 'Computer science depth',
     title: 'Theory of Computation review tool',
@@ -55,6 +98,7 @@ const PROJECTS = [
     auth: 'Live + offline (GitHub); see case study'
   },
   {
+    category: 'cat-csgames',
     to: '/projects/trigonometry-tools',
     badge: 'Published software · Steam',
     title: 'Trigonometry Tools',
@@ -64,6 +108,7 @@ const PROJECTS = [
     auth: 'Live on Steam, free download'
   },
   {
+    category: 'cat-csgames',
     to: '/projects/metaverse-origins',
     badge: 'Published software · Steam Early Access',
     title: 'Metaverse: Origins',
@@ -80,15 +125,17 @@ const PROJECTS = [
     auth: 'Live on Steam: paid, pre-alpha (read the EA framing)'
   },
   {
+    category: 'cat-client',
     to: '/projects/repair360-auto',
     badge: 'Client work',
     title: 'Repair360 Auto: modern site inside a Wix panel',
     summary:
-      "Client kept their Wix host because their booking app, email, and listings were already wired to it. Built a hand-written dependency-free single-file front-end (~160 KB, no framework, no build step) embedded in a Wix HTML/Iframe panel, plus the harder hidden work: reverse-engineering the brand from social-media flyers, JPEG-to-SVG logo recovery, defeating a UTF-8 mojibake bug in the delivery pipeline, and fixing the iframe SEO-invisibility trap with AutoRepair JSON-LD and native host elements.",
+      "Client kept their Wix host because their booking app, email, and listings were already wired to it. Built a hand-written dependency-free single-file front-end (~160 KB, no framework, no build step) embedded in a Wix HTML/Iframe panel, plus the harder hidden work: reverse-engineering the brand from social-media flyers, JPEG-to-SVG logo recovery, defeating a UTF-8 mojibake bug in the delivery pipeline, and fixing the iframe SEO-invisibility trap with AutoRepair JSON-LD and native host elements. Calls and car count went from 20-30/wk to 40-50/wk.",
     stack: ['Vanilla JS', 'Responsive CSS', 'SVG vectorization', 'JSON-LD', 'Wix embed'],
     auth: 'Live site link inside the case study'
   },
   {
+    category: 'cat-apps',
     to: '/projects/tasktrackr',
     fallback: '/tasktrackr',
     badge: 'Full-stack web app',
@@ -99,6 +146,7 @@ const PROJECTS = [
     auth: 'Public; sign in to try it'
   },
   {
+    category: 'cat-apps',
     to: '/projects/moodboard',
     fallback: '/moodboard',
     badge: 'Web app + canvas',
@@ -109,6 +157,7 @@ const PROJECTS = [
     auth: 'Public; sign in to create, share link to view'
   },
   {
+    category: 'cat-infra',
     to: '/projects/subscribe',
     fallback: '/subscribe',
     badge: 'Payments integration',
@@ -119,6 +168,7 @@ const PROJECTS = [
     auth: 'Public; sign in to use'
   },
   {
+    category: 'cat-reference',
     to: '/projects/api-guide',
     fallback: '/api-guide',
     badge: 'Documentation',
@@ -129,6 +179,7 @@ const PROJECTS = [
     auth: 'Public; no login required'
   },
   {
+    category: 'cat-apps',
     to: '/projects/quicknotes',
     fallback: '/quicknotes',
     badge: 'Full-stack web app',
@@ -142,15 +193,52 @@ const PROJECTS = [
 
 const EXTERNAL = [
   {
+    category: 'cat-reference',
     href: 'https://github.com/penpro/WebDevClass',
     badge: 'Source code',
     title: 'Full repository on GitHub',
     summary:
-      'Everything visible on this site (the React frontend, the Express backend with auth and four rate-limit tiers, the MySQL migration runner, the diagnostics infrastructure, the deploy scripts, the serverless companion project on AWS Lambda) all open for reading.'
+      'Everything visible on this site (the React frontend, the Express backend with auth and four rate-limit tiers, the MySQL migration runner, the diagnostics infrastructure, the deploy scripts, the serverless companion project on AWS Lambda) all open for reading.',
+    stack: ['React', 'Express', 'MySQL', 'AWS', 'Open source']
   }
 ];
 
+function matchesQuery(project, q) {
+  if (!q) return true;
+  const haystack = (
+    project.title +
+    ' ' +
+    project.summary +
+    ' ' +
+    (project.stack || []).join(' ') +
+    ' ' +
+    (project.badge || '')
+  ).toLowerCase();
+  return q
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((term) => haystack.includes(term));
+}
+
 export default function Projects() {
+  useDocumentMeta({
+    title: 'Live projects and case studies | Penumbra Tech',
+    description:
+      'Live, exercisable evidence — case studies and running demos across client work, SaaS infrastructure, performance engineering, computer science depth, and Steam-published software.',
+    canonical: 'https://penumbra-tech.com/projects'
+  });
+
+  const [query, setQuery] = useState('');
+
+  const allProjects = useMemo(() => [...PROJECTS, ...EXTERNAL], []);
+  const filtered = useMemo(
+    () => allProjects.filter((p) => matchesQuery(p, query)),
+    [allProjects, query]
+  );
+  const totalCount = allProjects.length;
+  const filteredCount = filtered.length;
+
   return (
     <>
       <SectionRail sections={SECTIONS} />
@@ -195,96 +283,180 @@ export default function Projects() {
             because they save data to the database, which only makes
             sense per-user.
           </p>
-        </Container>
-      </section>
 
-      <section
-        id="grid"
-        style={{
-          paddingTop: space['2xl'],
-          paddingBottom: space['3xl']
-        }}
-      >
-        <Container>
+          {/* Search bar — substring match across title, summary, stack,
+              badge. Plain controlled input, no fancy fuzzy library. */}
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns:
-                'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: space.lg
+              marginTop: space.xl,
+              display: 'flex',
+              alignItems: 'center',
+              gap: space.md,
+              flexWrap: 'wrap'
             }}
           >
-            {PROJECTS.map((p) => (
-              <ProjectCard key={p.title} project={p} />
-            ))}
-            {EXTERNAL.map((p) => (
-              <Card key={p.title} interactive>
-                <a
-                  href={p.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: 'inherit',
-                    textDecoration: 'none',
-                    display: 'block'
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: fonts.mono,
-                      fontSize: fontSizes.xs,
-                      color: colors.cyan,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em'
-                    }}
-                  >
-                    {p.badge}
-                  </span>
-                  <h2
-                    style={{
-                      fontFamily: fonts.heading,
-                      fontSize: fontSizes.lg,
-                      fontWeight: fontWeights.semibold,
-                      margin: `${space.sm} 0`,
-                      color: colors.text
-                    }}
-                  >
-                    {p.title}
-                  </h2>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: fontSizes.sm,
-                      lineHeight: 1.6,
-                      color: colors.textSecondary
-                    }}
-                  >
-                    {p.summary}
-                  </p>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      marginTop: space.md,
-                      color: colors.accent,
-                      fontSize: fontSizes.sm,
-                      fontWeight: fontWeights.semibold
-                    }}
-                  >
-                    Open on GitHub ↗
-                  </span>
-                </a>
-              </Card>
-            ))}
+            <label
+              htmlFor="project-search"
+              style={{
+                fontFamily: fonts.mono,
+                fontSize: fontSizes.xs,
+                color: colors.cyan,
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em'
+              }}
+            >
+              Search
+            </label>
+            <input
+              id="project-search"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="stripe · k6 · unreal · stack name · keyword"
+              style={{
+                flex: '1 1 320px',
+                maxWidth: 520,
+                padding: '0.6rem 0.9rem',
+                background: colors.bg,
+                border: `1px solid ${colors.border}`,
+                borderRadius: radii.md,
+                color: colors.text,
+                fontFamily: fonts.mono,
+                fontSize: fontSizes.sm,
+                outline: 'none'
+              }}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                style={{
+                  background: 'transparent',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: radii.md,
+                  padding: '0.5rem 0.75rem',
+                  color: colors.textSecondary,
+                  fontFamily: fonts.mono,
+                  fontSize: fontSizes.xs,
+                  cursor: 'pointer'
+                }}
+              >
+                Clear
+              </button>
+            )}
+            <span
+              style={{
+                fontFamily: fonts.mono,
+                fontSize: fontSizes.xs,
+                color: colors.textMuted,
+                marginLeft: 'auto'
+              }}
+            >
+              {query
+                ? `${filteredCount} of ${totalCount} matching`
+                : `${totalCount} projects`}
+            </span>
           </div>
         </Container>
       </section>
+
+      {CATEGORIES.map((cat) => {
+        const projectsInCat = filtered.filter((p) => p.category === cat.id);
+        return (
+          <section
+            key={cat.id}
+            id={cat.id}
+            style={{
+              paddingTop: space['2xl'],
+              paddingBottom: space.xl,
+              borderBottom: `1px solid ${colors.borderSubtle}`
+            }}
+          >
+            <Container>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: space.sm,
+                  marginBottom: space.lg
+                }}
+              >
+                <div>
+                  <h2
+                    style={{
+                      margin: 0,
+                      fontFamily: fonts.heading,
+                      fontSize: fontSizes.xl,
+                      fontWeight: fontWeights.bold,
+                      color: colors.text
+                    }}
+                  >
+                    {cat.label}
+                  </h2>
+                  <p
+                    style={{
+                      margin: `${space.xs} 0 0`,
+                      color: colors.textSecondary,
+                      fontSize: fontSizes.sm,
+                      maxWidth: '60ch'
+                    }}
+                  >
+                    {cat.intro}
+                  </p>
+                </div>
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.textMuted,
+                    letterSpacing: '0.04em'
+                  }}
+                >
+                  {projectsInCat.length} project
+                  {projectsInCat.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {projectsInCat.length === 0 ? (
+                <p
+                  style={{
+                    color: colors.textMuted,
+                    fontStyle: 'italic',
+                    fontSize: fontSizes.sm,
+                    margin: 0
+                  }}
+                >
+                  No matches in this category.
+                </p>
+              ) : (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns:
+                      'repeat(auto-fit, minmax(320px, 1fr))',
+                    gap: space.lg
+                  }}
+                >
+                  {projectsInCat.map((p) =>
+                    p.href ? (
+                      <ExternalCard key={p.title} project={p} />
+                    ) : (
+                      <ProjectCard key={p.title} project={p} />
+                    )
+                  )}
+                </div>
+              )}
+            </Container>
+          </section>
+        );
+      })}
     </>
   );
 }
 
 function ProjectCard({ project }) {
-  // Prefer the per-project case-study wrapper at /projects/<slug>; fall
-  // back to the app's legacy top-level route when no wrapper exists yet.
   const href = project.fallback || project.to;
   return (
     <Card interactive padding={space.lg}>
@@ -296,39 +468,90 @@ function ProjectCard({ project }) {
           display: 'block'
         }}
       >
+        <CardBody project={project} />
         <span
           style={{
-            fontFamily: fonts.mono,
-            fontSize: fontSizes.xs,
-            color: colors.cyan,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em'
-          }}
-        >
-          {project.badge}
-        </span>
-        <h2
-          style={{
-            fontFamily: fonts.heading,
-            fontSize: fontSizes.lg,
-            fontWeight: fontWeights.semibold,
-            margin: `${space.sm} 0`,
-            color: colors.text
-          }}
-        >
-          {project.title}
-        </h2>
-        <p
-          style={{
-            margin: 0,
+            display: 'inline-block',
+            marginTop: space.md,
+            color: colors.accent,
             fontSize: fontSizes.sm,
-            lineHeight: 1.6,
-            color: colors.textSecondary
+            fontWeight: fontWeights.semibold
           }}
         >
-          {project.summary}
-        </p>
+          Open the project →
+        </span>
+      </Link>
+    </Card>
+  );
+}
 
+function ExternalCard({ project }) {
+  return (
+    <Card interactive padding={space.lg}>
+      <a
+        href={project.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          color: 'inherit',
+          textDecoration: 'none',
+          display: 'block'
+        }}
+      >
+        <CardBody project={project} />
+        <span
+          style={{
+            display: 'inline-block',
+            marginTop: space.md,
+            color: colors.accent,
+            fontSize: fontSizes.sm,
+            fontWeight: fontWeights.semibold
+          }}
+        >
+          Open on GitHub ↗
+        </span>
+      </a>
+    </Card>
+  );
+}
+
+function CardBody({ project }) {
+  return (
+    <>
+      <span
+        style={{
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.xs,
+          color: colors.cyan,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em'
+        }}
+      >
+        {project.badge}
+      </span>
+      <h3
+        style={{
+          fontFamily: fonts.heading,
+          fontSize: fontSizes.lg,
+          fontWeight: fontWeights.semibold,
+          margin: `${space.sm} 0`,
+          color: colors.text
+        }}
+      >
+        {project.title}
+      </h3>
+      <p
+        style={{
+          margin: 0,
+          fontSize: fontSizes.sm,
+          lineHeight: 1.6,
+          color: colors.textSecondary
+        }}
+      >
+        {project.summary}
+      </p>
+
+      {project.stack && (
         <div
           style={{
             marginTop: space.md,
@@ -354,7 +577,9 @@ function ProjectCard({ project }) {
             </span>
           ))}
         </div>
+      )}
 
+      {project.auth && (
         <div
           style={{
             marginTop: space.md,
@@ -364,19 +589,7 @@ function ProjectCard({ project }) {
         >
           {project.auth}
         </div>
-
-        <span
-          style={{
-            display: 'inline-block',
-            marginTop: space.md,
-            color: colors.accent,
-            fontSize: fontSizes.sm,
-            fontWeight: fontWeights.semibold
-          }}
-        >
-          Open the project →
-        </span>
-      </Link>
-    </Card>
+      )}
+    </>
   );
 }

@@ -10,10 +10,10 @@
     />
     <meta name="theme-color" content="#07021a" />
 
-    <!-- Canonical + social cards. Per-route metadata would need an SPA
-         framework like react-helmet-async or server-side prerendering;
-         root-level tags below cover the marketing surface that gets
-         shared into Slack, LinkedIn, Discord, X, etc. -->
+    <!-- Canonical + social cards. The values below are the homepage
+         defaults; per-route titles/descriptions are overridden by the
+         useDocumentMeta hook in each page component, then baked into
+         the prerendered HTML by puppeteer (see prerender.js). -->
     <link rel="canonical" href="https://penumbra-tech.com/" />
 
     <meta property="og:type" content="website" />
@@ -47,6 +47,71 @@
       type="image/svg+xml"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2307021a'/%3E%3Cg stroke='%235eead4' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='32' cy='32' r='24'/%3E%3Cpath d='M24 18 L24 48 M24 18 L38 18 a8 8 0 0 1 0 16 L24 34'/%3E%3C/g%3E%3C/svg%3E"
     />
+
+    <!-- Structured data: tells Google, Bing, etc. that this is a real
+         professional-services business with a founder, a service area,
+         a price range, and concrete offers. Helps the knowledge panel
+         pick Penumbra Tech up as an entity and improves rich-snippet
+         appearance in search results. Mirrors fields that are visible
+         elsewhere on the site (about page, services page, contact page)
+         so it's not making claims that don't show up in the prose. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Penumbra Tech",
+        "description": "Single-engineer consulting practice building full-stack web apps, AWS infrastructure, Unreal Engine systems, and the performance / reliability tooling that keeps it all from quietly falling over.",
+        "url": "https://penumbra-tech.com",
+        "image": "https://penumbra-tech.com/og-card.png",
+        "logo": "https://penumbra-tech.com/og-card.png",
+        "telephone": "+1-360-850-7876",
+        "email": "wesley@penumbra-tech.com",
+        "priceRange": "$$$",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Kitsap County",
+          "addressRegion": "WA",
+          "addressCountry": "US"
+        },
+        "areaServed": [
+          { "@type": "Place", "name": "Kitsap County, Washington" },
+          { "@type": "Place", "name": "Washington State" },
+          { "@type": "Place", "name": "United States (remote)" }
+        ],
+        "founder": {
+          "@type": "Person",
+          "name": "Wesley Weaver Jr.",
+          "url": "https://penumbra-tech.com/about",
+          "sameAs": [
+            "https://github.com/penpro",
+            "https://www.linkedin.com/in/wesley-weaver-31726629/"
+          ]
+        },
+        "sameAs": [
+          "https://github.com/penpro",
+          "https://www.linkedin.com/in/wesley-weaver-31726629/"
+        ],
+        "knowsAbout": [
+          "Custom web application development",
+          "AWS infrastructure",
+          "Node.js and Express",
+          "React",
+          "MySQL",
+          "Unreal Engine",
+          "Performance engineering",
+          "Reliability engineering"
+        ],
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "Engagement shapes",
+          "itemListElement": [
+            { "@type": "Offer", "name": "Diagnostic Week", "price": "5000", "priceCurrency": "USD" },
+            { "@type": "Offer", "name": "Build Sprint", "priceSpecification": { "@type": "PriceSpecification", "minPrice": "10000", "maxPrice": "25000", "priceCurrency": "USD" } },
+            { "@type": "Offer", "name": "Hourly retainer", "price": "250", "priceCurrency": "USD", "unitText": "HOUR" }
+          ]
+        }
+      }
+    </script>
 
     <script type="module" src="/src/main.jsx"></script>
 

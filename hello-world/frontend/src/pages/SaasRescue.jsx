@@ -11,7 +11,7 @@
 // in this week" callout that's the conversion reframe — the page
 // gives away the recipe and sells the execution.
 
-import { useEffect } from 'react';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 import { Link } from 'react-router-dom';
 import {
   colors,
@@ -282,9 +282,12 @@ function UL({ children }) {
 // ---------------------------------------------------------------------- //
 
 export default function SaasRescue() {
-  useEffect(() => {
-    document.title = 'The 6-week SaaS-rescue playbook — Penumbra Tech';
-  }, []);
+  useDocumentMeta({
+    title: 'The 6-week SaaS-rescue playbook — Penumbra Tech',
+    description:
+      "8 chapters for solo SaaS founders whose backend is on fire. Real code: Stripe webhook ordering, nightly mysqldump, /api/health, nginx security headers. Free if you have the time, $10K-$25K if you don't.",
+    canonical: 'https://penumbra-tech.com/saas-rescue'
+  });
 
   return (
     <>

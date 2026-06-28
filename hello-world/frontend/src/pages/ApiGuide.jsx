@@ -8,6 +8,7 @@ import Container from '../components/Container.jsx'
 import Card from '../components/Card.jsx'
 import HudLabel from '../components/HudLabel.jsx'
 import CornerBrackets from '../components/CornerBrackets.jsx'
+import useDocumentMeta from '../hooks/useDocumentMeta.js'
 import {
   colors as theme,
   fonts,
@@ -116,6 +117,12 @@ function EndpointTable({ rows }) {
 }
 
 export default function ApiGuide() {
+  useDocumentMeta({
+    title: 'Public API reference | Penumbra Tech',
+    description:
+      "Reference for every public endpoint on this site — REST conventions, status codes, role requirements, rate-limit tiers. Both documentation and evidence that the API has been thoughtfully designed.",
+    canonical: 'https://penumbra-tech.com/api-guide'
+  })
   return (
     <>
       <section

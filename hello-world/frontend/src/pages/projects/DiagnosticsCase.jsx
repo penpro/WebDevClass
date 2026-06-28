@@ -31,6 +31,7 @@ import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import LineChart from '../../components/LineChart.jsx';
 import SectionRail from '../../components/SectionRail.jsx';
+import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',  num: '00', label: 'Intro' },
@@ -181,6 +182,12 @@ const BLOCK_SUMMARY = {
 // --------------------------------- View -------------------------------- //
 
 export default function DiagnosticsCase() {
+  useDocumentMeta({
+    title: 'Diagnostics & load-testing dashboard case study | Penumbra Tech',
+    description:
+      "Live k6-driven load-testing dashboard with SSE-streamed metrics, runtime feature toggles, and head-to-head EC2 vs Lambda+DynamoDB benchmarks. Performance engineering by construction, not by guess.",
+    canonical: 'https://penumbra-tech.com/projects/diagnostics'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

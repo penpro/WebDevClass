@@ -28,6 +28,7 @@ import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import CodePanel from '../../components/CodePanel.jsx';
 import SectionRail from '../../components/SectionRail.jsx';
+import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',        num: '00', label: 'Intro' },
@@ -80,6 +81,12 @@ const JSONLD_CODE = `<script type="application/ld+json">
 </script>`;
 
 export default function Repair360Case() {
+  useDocumentMeta({
+    title: 'Repair360 Auto — Wix embed brand rescue | Penumbra Tech',
+    description:
+      "Client case study: hand-written vanilla JS frontend embedded in a Wix HTML/Iframe panel, JSON-LD SEO recovery, JPEG-to-SVG logo rebuild, and mojibake fixes. Calls and car count went from 20-30/wk to 40-50/wk.",
+    canonical: 'https://penumbra-tech.com/projects/repair360-auto'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

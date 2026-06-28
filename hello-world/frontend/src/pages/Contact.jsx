@@ -28,6 +28,7 @@ import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import SectionRail from '../components/SectionRail.jsx';
 import { apiFetch } from '../lib/api.js';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',          num: '00', label: 'Intro' },
@@ -75,6 +76,12 @@ const initialForm = {
 };
 
 export default function Contact() {
+  useDocumentMeta({
+    title: 'Book a call or send a brief | Penumbra Tech',
+    description:
+      "Three ways to start: book a 30-minute Cal.com intro, send a project brief, or use the brief-builder prompt to clarify what you want before paying for the first hour. Phone, email, and Kitsap County address available.",
+    canonical: 'https://penumbra-tech.com/contact'
+  });
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle'); // idle | sending | sent | error
   const [error, setError] = useState(null);

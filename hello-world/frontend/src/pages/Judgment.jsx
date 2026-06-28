@@ -24,6 +24,7 @@ import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import SectionRail from '../components/SectionRail.jsx';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 
@@ -31,7 +32,7 @@ const SECTIONS = [
   { id: 'hero',      num: '00', label: 'Intro' },
   { id: 'incidents', num: '01', label: 'Incidents' },
   { id: 'adds',      num: '02', label: 'What I add' },
-  { id: 'cta',       num: '03', label: 'Book' }
+  { id: 'cta',       num: '03', label: 'Book a Call' }
 ];
 
 const INCIDENTS = [
@@ -103,6 +104,12 @@ const ADDS = [
 ];
 
 export default function Judgment() {
+  useDocumentMeta({
+    title: 'The judgment is the product | Penumbra Tech',
+    description:
+      "Why engineering judgment is what consulting clients actually buy, with two independent LLM-authored writeups of this site integrated as proof of how that judgment manifests across the work.",
+    canonical: 'https://penumbra-tech.com/judgment'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

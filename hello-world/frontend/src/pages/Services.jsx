@@ -18,6 +18,7 @@ import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import SectionRail from '../components/SectionRail.jsx';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',     num: '00', label: 'Intro' },
@@ -84,6 +85,12 @@ const SERVICES = [
 ];
 
 export default function Services() {
+  useDocumentMeta({
+    title: 'Services — custom software, AWS, Unreal, performance | Penumbra Tech',
+    description:
+      'Four engagement categories: custom web apps (React + Express + MySQL), AWS infrastructure (EC2/Lambda/DynamoDB/S3), Unreal Engine systems, and performance + reliability work (k6 load testing, profiling, incident response). Fixed scope or hourly.',
+    canonical: 'https://penumbra-tech.com/services'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

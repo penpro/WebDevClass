@@ -18,7 +18,7 @@
 // makes the case that paying someone whose full-time job is this is
 // often cheaper than your own time.
 
-import { useEffect } from 'react';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 import { Link } from 'react-router-dom';
 import {
   colors,
@@ -241,9 +241,12 @@ function UL({ children }) {
 // ---------------------------------------------------------------------- //
 
 export default function Guide() {
-  useEffect(() => {
-    document.title = 'The DIY playbook — Penumbra Tech';
-  }, []);
+  useDocumentMeta({
+    title: 'The DIY playbook — Penumbra Tech',
+    description:
+      "13-chapter, ~8,000-word DIY playbook for building a small production web app on AWS yourself: IAM, EC2, MySQL, nginx, PM2, Let's Encrypt, security headers, backups, and the operational patterns that survive contact with users. Free.",
+    canonical: 'https://penumbra-tech.com/guide'
+  });
 
   return (
     <>

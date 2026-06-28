@@ -26,6 +26,7 @@ import HudLabel from '../components/HudLabel.jsx'
 import Eclipse from '../components/Eclipse.jsx'
 import SectionRail from '../components/SectionRail.jsx'
 import CommitGrid from '../components/CommitGrid.jsx'
+import useDocumentMeta from '../hooks/useDocumentMeta.js'
 
 const SECTIONS = [
   { id: 'hero',        num: '00', label: 'Intro' },
@@ -85,6 +86,12 @@ const PROOFS = [
 ]
 
 export default function About() {
+  useDocumentMeta({
+    title: 'About Wesley Weaver Jr. — generalist engineer | Penumbra Tech',
+    description:
+      "Single-engineer consulting practice run by Wesley Weaver Jr. Navy nuclear pipeline background, founder of Penumbra Group / PC / Productions since 2016, based in Kitsap County WA. The engineer who works in the seams between front-end, back-end, cloud, and operations.",
+    canonical: 'https://penumbra-tech.com/about'
+  })
   return (
     <>
     <SectionRail sections={SECTIONS} />

@@ -24,6 +24,7 @@ import Stars from '../components/Stars.jsx';
 import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import SectionRail from '../components/SectionRail.jsx';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';
 
@@ -34,7 +35,7 @@ const SECTIONS = [
   { id: 'opaque',     num: '03', label: 'Why it costs more' },
   { id: 'security',   num: '04', label: 'Security blast' },
   { id: 'ownership',  num: '05', label: 'What you get' },
-  { id: 'cta',        num: '06', label: 'Book' }
+  { id: 'cta',        num: '06', label: 'Book a Call' }
 ];
 
 // All numbers in USD, current as of 2026 us-east-2 list pricing.
@@ -156,6 +157,12 @@ const monoNumberStyle = {
 };
 
 export default function Stack() {
+  useDocumentMeta({
+    title: 'What this site runs on — the actual AWS bill | Penumbra Tech',
+    description:
+      'Cost transparency: the $15/month AWS bill behind this site, what it actually buys, and why a small custom stack on EC2 can be cheaper and more controllable than $30-$300/month SaaS site builders.',
+    canonical: 'https://penumbra-tech.com/stack'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

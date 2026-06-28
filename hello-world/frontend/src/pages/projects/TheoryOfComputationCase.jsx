@@ -23,6 +23,7 @@ import CornerBrackets from '../../components/CornerBrackets.jsx';
 import HudLabel from '../../components/HudLabel.jsx';
 import CodePanel from '../../components/CodePanel.jsx';
 import SectionRail from '../../components/SectionRail.jsx';
+import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',     num: '00', label: 'Intro' },
@@ -31,7 +32,7 @@ const SECTIONS = [
   { id: 'learning', num: '03', label: 'Learning algo' },
   { id: 'practice', num: '04', label: 'Hands-on' },
   { id: 'builds',   num: '05', label: 'Live vs offline' },
-  { id: 'cta',      num: '06', label: 'Book' }
+  { id: 'cta',      num: '06', label: 'Book a Call' }
 ];
 
 // Coverage table — mirrors the README. Real numbers, not invented.
@@ -73,6 +74,12 @@ function weight(question, now) {
 }`;
 
 export default function TheoryOfComputationCase() {
+  useDocumentMeta({
+    title: 'Theory of Computation review tool case study | Penumbra Tech',
+    description:
+      "Offline-first study app for Sipser's graduate Theory of Computation course. 670+ original questions, custom Leitner + streak SRS scheduler, DFA/NFA state-diagram practice, KaTeX-rendered math.",
+    canonical: 'https://penumbra-tech.com/projects/theory-of-computation'
+  });
   return (
     <>
       <SectionRail sections={SECTIONS} />

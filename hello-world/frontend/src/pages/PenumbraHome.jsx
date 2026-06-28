@@ -34,6 +34,7 @@ import CornerBrackets from '../components/CornerBrackets.jsx';
 import HudLabel from '../components/HudLabel.jsx';
 import CodePanel from '../components/CodePanel.jsx';
 import SectionRail from '../components/SectionRail.jsx';
+import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const HOME_SECTIONS = [
   { id: 'hero',         num: '00', label: 'Intro' },
@@ -42,8 +43,8 @@ const HOME_SECTIONS = [
   { id: 'testimonial',  num: '03', label: 'Trust' },
   { id: 'services',     num: '04', label: 'What I do' },
   { id: 'featured',     num: '05', label: 'Featured work' },
-  { id: 'deeper-reads', num: '06', label: 'Deeper reads' },
-  { id: 'lets-talk',    num: '07', label: 'Book' }
+  { id: 'deeper-reads', num: '06', label: 'Free resources' },
+  { id: 'lets-talk',    num: '07', label: 'Book a Call' }
 ];
 
 // One place to swap the Cal.com booking URL. Update once and every
@@ -162,6 +163,12 @@ function flushK6Bucket(run, now) {
 }`;
 
 export default function PenumbraHome() {
+  useDocumentMeta({
+    title: 'Penumbra Tech — Custom software, AWS, and reliability consulting',
+    description:
+      "Single-engineer consulting practice run by Wesley Weaver Jr. Custom web apps, AWS infrastructure, Unreal Engine systems, and the performance / reliability tooling that keeps it from quietly falling over. $5K Diagnostic Week, $10K-25K Build Sprint, $250/hr retainer.",
+    canonical: 'https://penumbra-tech.com/'
+  });
   return (
     <>
       <SectionRail sections={HOME_SECTIONS} />
@@ -731,7 +738,7 @@ export default function PenumbraHome() {
       >
         <Container>
           <SectionHeading
-            eyebrow="Three deeper reads"
+            eyebrow="Three free resources"
             title="Pick whichever question you arrived with."
             body="Most prospects arrive with one of three unasked questions: what does this cost, why pay for an engineer when an LLM exists, or could I just do this myself. There's a long-form answer for each, so the 30-min intro can be about your project instead."
             tone="magenta"
