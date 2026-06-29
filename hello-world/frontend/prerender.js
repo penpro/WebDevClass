@@ -48,6 +48,7 @@ const ROUTES = [
   '/projects/repair360-auto',
   '/projects/trigonometry-tools',
   '/projects/metaverse-origins',
+  '/projects/music-visualizer',
   '/api-guide'
 ];
 

@@ -111,6 +111,16 @@ const PROJECTS = [
   },
   {
     category: 'cat-csgames',
+    to: '/projects/music-visualizer',
+    badge: 'Single-file web app · Open source',
+    title: 'Penumbra Music Visualizer',
+    summary:
+      "I wanted a music visualizer that survived bad wifi at a party — no install, no cookies, no signup, no cloud dependency, just one HTML file you double-click. Drag a song onto it and nine reactive visualizers light up (three Penumbra-branded, six conventional spectrum treatments). From-scratch BPM detection via onset-envelope autocorrelation, musical-key detection via Krumhansl-Schmuckler chroma — both cached in localStorage so each song is analyzed once. Tab-audio capture lets it visualize YouTube Music or Spotify; built-in canvas+audio recorder exports a .webm. Zero dependencies, no build step, ~52KB of one index.html.",
+    stack: ['Single-file HTML', 'Web Audio API', 'Canvas 2D', 'FFT / BPM / Key detection', 'localStorage cache', 'MediaRecorder'],
+    auth: 'Open source · MIT · Download index.html, double-click'
+  },
+  {
+    category: 'cat-csgames',
     to: '/projects/metaverse-origins',
     badge: 'Published software · Steam Early Access',
     title: 'Metaverse: Origins',

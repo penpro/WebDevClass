@@ -48,6 +48,7 @@ const TheoryOfComputationCase = lazy(() => import('./pages/projects/TheoryOfComp
 const Repair360Case = lazy(() => import('./pages/projects/Repair360Case.jsx'))
 const TrigonometryToolsCase = lazy(() => import('./pages/projects/TrigonometryToolsCase.jsx'))
 const MetaverseOriginsCase = lazy(() => import('./pages/projects/MetaverseOriginsCase.jsx'))
+const MusicVisualizerCase = lazy(() => import('./pages/projects/MusicVisualizerCase.jsx'))
 
 const Login = lazy(() => import('./pages/Login.jsx'))
 const Register = lazy(() => import('./pages/Register.jsx'))
@@ -87,6 +88,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route
               path="projects/metaverse-origins"
               element={<MetaverseOriginsCase />}
+            />
+            <Route
+              path="projects/music-visualizer"
+              element={<MusicVisualizerCase />}
             />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
