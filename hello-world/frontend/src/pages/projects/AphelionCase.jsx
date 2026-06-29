@@ -17,6 +17,7 @@
 // nginx config: frame-src must include https://penpro.github.io
 // (added in security-headers-snippet.conf).
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   colors,
@@ -53,6 +54,16 @@ export default function AphelionCase() {
       "Aphelion is a free, open-source Windows desktop app that runs powerful AI models entirely on the user's own machine. No cloud, no account, no telemetry. Tauri + Rust + bundled llama.cpp engine; auto-fits the best GGUF model to the GPU. MIT licensed.",
     canonical: 'https://penumbra-tech.com/projects/aphelion'
   });
+
+  // GitHub Pages serves the landing page with Cache-Control: max-age=600,
+  // so without a cache buster the browser would serve a stale iframe copy
+  // for up to 10 minutes after an upstream update. A timestamp computed
+  // once per mount (lazy useState — not regenerated on re-render) gives
+  // every fresh visit a unique URL that busts the browser cache, while
+  // hydration replaces the prerendered URL before `loading="lazy"` lets
+  // the browser actually fetch the frame.
+  const [iframeBust] = useState(() => Date.now());
+  const iframeSrc = `${PRODUCT_SITE}?t=${iframeBust}`;
 
   return (
     <>
@@ -244,7 +255,7 @@ export default function AphelionCase() {
             }}
           >
             <iframe
-              src={PRODUCT_SITE}
+              src={iframeSrc}
               title="Aphelion product page (penpro.github.io/Aphelion)"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
