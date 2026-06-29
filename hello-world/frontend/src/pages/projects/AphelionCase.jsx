@@ -1,14 +1,21 @@
 // Aphelion — Penumbra product case study.
 //
-// Aphelion (n.) — the point in an orbit farthest from the sun. The name
-// is the pitch: your AI, at the farthest point from the cloud. It's a
-// free, open-source Windows desktop app that runs LLMs entirely on the
-// user's own machine — Tauri v2 (Rust + React/TypeScript) shell around a
-// bundled llama.cpp engine, GGUF models auto-fit to the user's GPU.
+// Aphelion has its own marketing site at https://penpro.github.io/Aphelion/
+// — that's the canonical product page (features, models, FAQ, safety
+// framing, screenshots, download CTAs).  Rather than fork that content
+// here and drift, this page is a thin consulting-side wrapper:
 //
-// Case study positions it inside the Penumbra family — same corona /
-// eclipse motif as this site and the streaming overlay, same operator
-// lineage as Penumbra Group / PC / Productions called out on /about.
+//   1. A short "why this matters for a Penumbra client" framing — the
+//      part that belongs on the consulting site, not the product site.
+//   2. The live product page embedded inline via iframe, so visitors
+//      see the same marketing the GitHub release does without us
+//      maintaining two copies.
+//   3. A closing CTA: download + book-a-call.
+//
+// Updating the product page on the Aphelion repo's docs/index.html
+// automatically reflects here — there is no sync step.  Required
+// nginx config: frame-src must include https://penpro.github.io
+// (added in security-headers-snippet.conf).
 
 import { Link } from 'react-router-dom';
 import {
@@ -20,7 +27,6 @@ import {
   space
 } from '../../theme.js';
 import Container from '../../components/Container.jsx';
-import Card from '../../components/Card.jsx';
 import Button from '../../components/Button.jsx';
 import Stars from '../../components/Stars.jsx';
 import CornerBrackets from '../../components/CornerBrackets.jsx';
@@ -29,25 +35,22 @@ import SectionRail from '../../components/SectionRail.jsx';
 import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
-  { id: 'hero',        num: '00', label: 'Intro' },
-  { id: 'why',         num: '01', label: 'Why' },
-  { id: 'what',        num: '02', label: 'What it does' },
-  { id: 'engineering', num: '03', label: 'How it works' },
-  { id: 'brand',       num: '04', label: 'Brand family' },
-  { id: 'cta',         num: '05', label: 'Book a Call' }
+  { id: 'hero',  num: '00', label: 'Intro' },
+  { id: 'why',   num: '01', label: 'Why this matters' },
+  { id: 'live',  num: '02', label: 'Live product' },
+  { id: 'brand', num: '03', label: 'Brand family' },
+  { id: 'cta',   num: '04', label: 'Book a Call' }
 ];
 
 const REPO_URL = 'https://github.com/penpro/Aphelion';
 const DOWNLOAD_URL = 'https://github.com/penpro/Aphelion/releases/latest';
-const BRAND_RAW = 'https://raw.githubusercontent.com/penpro/Aphelion/main/Branding/penumbra-brand';
-const BANNER_SRC = `${BRAND_RAW}/readme-banner.svg`;
-const ECLIPSE_SRC = `${BRAND_RAW}/logos/corona-eclipse.svg`;
+const PRODUCT_SITE = 'https://penpro.github.io/Aphelion/';
 
 export default function AphelionCase() {
   useDocumentMeta({
     title: 'Aphelion — local AI desktop app by Penumbra | Penumbra Tech',
     description:
-      "Aphelion is a free, open-source Windows desktop app that runs powerful AI models entirely on your own machine. No cloud, no account, no telemetry. Tauri + Rust + bundled llama.cpp engine; auto-fits the best GGUF model to your GPU and VRAM. MIT licensed.",
+      "Aphelion is a free, open-source Windows desktop app that runs powerful AI models entirely on the user's own machine. No cloud, no account, no telemetry. Tauri + Rust + bundled llama.cpp engine; auto-fits the best GGUF model to the GPU. MIT licensed.",
     canonical: 'https://penumbra-tech.com/projects/aphelion'
   });
 
@@ -67,16 +70,16 @@ export default function AphelionCase() {
           borderBottom: `1px solid ${colors.borderSubtle}`
         }}
       >
-        <Stars density={140} heroDensity={16} colorTint="mixed" />
+        <Stars density={120} heroDensity={14} colorTint="mixed" />
         <CornerBrackets size={28} inset={24} />
         <Container style={{ position: 'relative', zIndex: 1 }}>
           <HudLabel tone="corona">
-            Case study: Product · Open source · Windows
+            Penumbra product · Open source · Windows
           </HudLabel>
           <h1
             style={{
               fontFamily: fonts.heading,
-              fontSize: 'clamp(2rem, 4vw, 3.25rem)',
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
               fontWeight: fontWeights.bold,
               lineHeight: 1.1,
               letterSpacing: '-0.02em',
@@ -96,48 +99,11 @@ export default function AphelionCase() {
               lineHeight: 1.6
             }}
           >
-            A free, open-source Windows desktop app that runs powerful AI
-            models <em>entirely on your own machine</em>. One install. No
-            servers, no Docker, no glue scripts, no account, no
-            telemetry. It reads your GPU and VRAM and auto-fits the best
-            local model that&apos;ll run fast. Then it gets out of the
-            way and you chat, write, build characters, draft code, or
-            branch dialogue — all in one window, all offline.
+            A free, open-source Windows desktop app that runs powerful
+            AI models entirely on the user&apos;s own machine. The
+            product page is embedded below — the consulting-side note
+            on why a Penumbra customer should care lives right here.
           </p>
-
-          <div
-            style={{
-              display: 'flex',
-              gap: space.sm,
-              flexWrap: 'wrap',
-              marginTop: space.lg
-            }}
-          >
-            {[
-              'Windows 10 / 11',
-              'Tauri v2',
-              'Rust + React + TypeScript',
-              'llama.cpp + Vulkan',
-              'GGUF models',
-              '100% offline',
-              'MIT'
-            ].map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  fontFamily: fonts.mono,
-                  fontSize: fontSizes.xs,
-                  padding: '0.2rem 0.6rem',
-                  background: colors.bg,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: radii.full,
-                  color: colors.textSecondary
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
 
           <div
             style={{
@@ -166,256 +132,201 @@ export default function AphelionCase() {
             >
               View on GitHub ↗
             </Button>
+            <Button
+              as="a"
+              href={PRODUCT_SITE}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+              size="lg"
+            >
+              Open product page ↗
+            </Button>
           </div>
         </Container>
       </section>
 
-      {/* =========================== Brand banner =========================== */}
-      <BrandBanner src={BANNER_SRC} href={REPO_URL} />
-
-      {/* =============================== Why ================================ */}
-      <div id="why">
-      <ChallengeSection
-        eyebrow="Why this exists"
-        tone="cyan"
-        title="Local AI is everyone's correct answer; the plumbing is everyone's blocker."
+      {/* ====================== Why this matters ============================ */}
+      <section
+        id="why"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          background: colors.bgSoft,
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
       >
-        <p>
-          By 2026, the technically literate answer to &ldquo;where
-          should my AI run&rdquo; is &ldquo;on your own hardware,
-          unless there&apos;s a specific reason it can&apos;t.&rdquo;
-          Your prompts and conversations stay on the machine. There&apos;s
-          no per-token cost, no opaque retention policy, no rate-limit
-          surprise, no server outage. The model file is yours.
-        </p>
-        <p>
-          What stops most people from actually running local is the
-          tower of plumbing: install an inference server (llama.cpp,
-          Ollama, vLLM, LM Studio, take your pick), find a model file,
-          guess which quantization fits your VRAM, install a chat
-          front-end, configure them to talk to each other, then update
-          all three when any one of them moves. By the time the user
-          has a working setup they&apos;ve spent a Saturday on it and
-          they&apos;re using a workflow they have to remember next
-          month.
-        </p>
-        <p>
-          Aphelion exists because that&apos;s the wrong shape of
-          product. <strong style={{ color: colors.text }}>The right shape is one
-          installer that hands you a working AI workspace.</strong>{' '}
-          Auto-fit the model to the machine. Don&apos;t require an
-          account. Don&apos;t phone home. Don&apos;t ask the user to
-          understand what a quantization is. The infrastructure is
-          plumbing; the workspace is the product.
-        </p>
-      </ChallengeSection>
-      </div>
+        <Container>
+          <div style={{ maxWidth: '64ch' }}>
+            <HudLabel tone="cyan">Why this matters to a Penumbra client</HudLabel>
+            <h2 style={sectionTitleStyle}>
+              The same operator who ships consulting work also ships
+              products.
+            </h2>
+            <div
+              style={{
+                marginTop: space.md,
+                color: colors.textSecondary,
+                fontSize: fontSizes.md,
+                lineHeight: 1.7
+              }}
+            >
+              <p>
+                Most consulting sites show a list of past employers
+                and ask you to trust the resume. Aphelion is a
+                different kind of evidence: an end-to-end product —
+                Tauri shell, bundled inference engine, auto-fit model
+                pipeline, branded installer, GitHub Pages landing
+                site, MIT license — released to the public under the
+                Penumbra name. Anyone can download it, run it, and
+                form their own opinion on the engineering quality.
+              </p>
+              <p>
+                If your work needs a similar shape — a one-installer
+                desktop tool that runs locally and doesn&apos;t depend
+                on a cloud account, a domain-specific local-LLM
+                assistant for a regulated industry, a small Tauri
+                + Rust app wrapping an existing engine —{' '}
+                <strong style={{ color: colors.text }}>that&apos;s a
+                real engagement shape I can take on</strong>. The
+                product below is the proof I&apos;ve done the work
+                end-to-end at least once.
+              </p>
+              <p>
+                The same coherence applies to the brand. Aphelion uses
+                the same corona-eclipse motif, the same JetBrains-Rider
+                HUD chrome, and the same Penumbra family lineage as
+                this site, the streaming overlay, and the Steam-published
+                games. That consistency is a signal: the standards on
+                paid client work and the standards on shipped products
+                are the same standards.
+              </p>
+            </div>
+          </div>
+        </Container>
+      </section>
 
-      {/* ============================== What ================================ */}
-      <div id="what">
-      <ChallengeSection
-        background={colors.bgSoft}
-        eyebrow="What it actually does"
-        tone="corona"
-        title="One install. Five workspaces in the same window."
+      {/* =========================== Live iframe ============================ */}
+      <section
+        id="live"
+        style={{
+          paddingTop: space['2xl'],
+          paddingBottom: space['2xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
       >
-        <p>
-          First-run setup detects your GPU + VRAM, picks a model that
-          will run fast on it, and downloads it (one-time, 2–16 GB
-          depending on the hardware). Then the model lives on disk and
-          the app runs offline. You can change the model in Settings;
-          there&apos;s an opt-in section for uncensored models behind a
-          clear warning.
-        </p>
-        <ul
-          style={{
-            margin: `${space.md} 0 0`,
-            paddingLeft: '1.4em',
-            color: colors.textSecondary,
-            fontSize: fontSizes.md,
-            lineHeight: 1.7
-          }}
-        >
-          <li>
-            <strong style={{ color: colors.text }}>Chat</strong> — a
-            real conversation UI with multiple personas (a coding
-            expert, a blunt straight-answers expert, others).
-          </li>
-          <li style={{ marginTop: space.sm }}>
-            <strong style={{ color: colors.text }}>Characters & roleplay</strong>
-            {' '}— named characters with their own context and voice,
-            group chats with several at once.
-          </li>
-          <li style={{ marginTop: space.sm }}>
-            <strong style={{ color: colors.text }}>Story writing</strong>
-            {' '}— long-form drafting with the model as a collaborator.
-          </li>
-          <li style={{ marginTop: space.sm }}>
-            <strong style={{ color: colors.text }}>Dialogue trees</strong>
-            {' '}— branching conversations for game writing or
-            interactive fiction.
-          </li>
-          <li style={{ marginTop: space.sm }}>
-            <strong style={{ color: colors.text }}>Code assistant</strong>
-            {' '}— draft, analyze, refactor; an in-app expert profile
-            tuned for it.
-          </li>
-        </ul>
-        <p style={{ marginTop: space.lg }}>
-          The five surfaces share the same loaded model, the same
-          local memory, and the same workspace chrome. You don&apos;t
-          juggle separate tools — they&apos;re tabs in one window with
-          one running engine behind them.
-        </p>
-      </ChallengeSection>
-      </div>
-
-      {/* =========================== How it works ============================ */}
-      <div id="engineering">
-      <ChallengeSection
-        eyebrow="How it works"
-        tone="cyan"
-        title="Tauri shell, llama.cpp engine, GGUF brain."
-      >
-        <p>
-          The app is a{' '}
-          <a
-            href="https://tauri.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: colors.accent, textDecoration: 'none' }}
-          >
-            Tauri v2
-          </a>{' '}
-          desktop binary — a Rust core wrapping a React 18 / TypeScript /
-          Vite front-end via the OS webview. Bundle size stays small
-          (no shipped Chromium) and the Rust side handles file I/O,
-          process supervision, and the bridge to the inference engine.
-          The whole UI is built with the same design tokens this site
-          uses (corona teal, void purple-black, JetBrains Mono).
-        </p>
-        <p>
-          The inference engine is a bundled{' '}
-          <a
-            href="https://github.com/ggml-org/llama.cpp"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: colors.accent, textDecoration: 'none' }}
-          >
-            llama.cpp
-          </a>{' '}
-          server built against{' '}
-          <strong style={{ color: colors.text }}>Vulkan</strong>, so it
-          accelerates on AMD, Nvidia, and Intel GPUs without separate
-          builds. Tauri starts it on app launch bound to{' '}
-          <code style={inlineCodeStyle}>127.0.0.1</code> with no console
-          window, the React UI talks to it over the loopback, and the
-          process is killed on app exit. No external port is opened.
-        </p>
-        <p>
-          Models are stored locally in{' '}
-          <strong style={{ color: colors.text }}>GGUF</strong> format
-          (the llama.cpp-native quantized file format). Setup reads
-          the GPU&apos;s reported VRAM and picks a quantization tier
-          that fits — bigger model on a 4090, smaller on a laptop iGPU
-          — and writes the choice into a per-machine config so the
-          next launch is instant. The opt-in uncensored section ships
-          models from independent publishers; their licenses are
-          shown alongside.
-        </p>
-        <p>
-          What&apos;s deliberately NOT there: any telemetry endpoint,
-          any account system, any analytics, any phone-home heartbeat.
-          The lock icon in the corner is structural — there&apos;s no
-          network code that COULD leak data even if asked.
-        </p>
-      </ChallengeSection>
-      </div>
-
-      {/* ============================ Brand family =========================== */}
-      <div id="brand">
-      <ChallengeSection
-        background={colors.bgSoft}
-        eyebrow="Brand family"
-        tone="magenta"
-        title="Same eclipse, different orbit."
-      >
-        <p>
-          Aphelion is a Penumbra product — same corona-and-eclipse
-          motif as this consulting site and the live streaming
-          overlay, same JetBrains-Rider HUD chrome, same operator
-          lineage that runs through Penumbra Group, Penumbra PC,
-          Penumbra Productions, and Penumbra.tech. The name is the
-          pitch: <em>aphelion</em> is the orbital point farthest from
-          the sun, and the product is the point farthest from the
-          cloud.
-        </p>
-        <p>
-          That brand coherence isn&apos;t aesthetic vanity — it&apos;s
-          a signal of how the practice operates. The same engineering
-          standards that run the consulting work also ship the
-          released software, with the same visual language tying it
-          together. Aphelion is one more piece of evidence that
-          Penumbra ships things, not just talks about shipping things.
-        </p>
-        <div
-          style={{
-            marginTop: space.lg,
-            display: 'flex',
-            gap: space.lg,
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}
-        >
-          <img
-            src={ECLIPSE_SRC}
-            alt="Aphelion corona-eclipse mark"
-            loading="lazy"
-            style={{
-              width: 96,
-              height: 96,
-              display: 'block'
-            }}
-          />
+        <Container>
+          <HudLabel tone="corona">Live product page</HudLabel>
+          <h2 style={{ ...sectionTitleStyle, marginBottom: space.sm }}>
+            Embedded from penpro.github.io/Aphelion
+          </h2>
           <p
             style={{
-              margin: 0,
+              margin: `${space.sm} 0 ${space.lg}`,
               color: colors.textMuted,
               fontFamily: fonts.mono,
               fontSize: fontSizes.xs,
-              maxWidth: '40ch',
-              lineHeight: 1.6
+              maxWidth: '64ch'
             }}
           >
-            The Aphelion corona-eclipse mark — same brand DNA as the
-            corner brackets and HUD labels throughout this site.
-            Tokens, lockups, and social cards all live in the{' '}
+            The frame below is the canonical Aphelion landing page,
+            served live from GitHub Pages. Updates to the product page
+            appear here automatically — there is no duplicate copy of
+            the marketing to keep in sync.
+          </p>
+          <div
+            style={{
+              border: `1px solid ${colors.border}`,
+              borderRadius: radii.lg,
+              overflow: 'hidden',
+              background: colors.bg,
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.4)'
+            }}
+          >
+            <iframe
+              src={PRODUCT_SITE}
+              title="Aphelion product page (penpro.github.io/Aphelion)"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              style={{
+                display: 'block',
+                width: '100%',
+                height: '3600px',
+                border: 'none',
+                background: '#07021A'
+              }}
+            />
+          </div>
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              color: colors.textMuted,
+              fontSize: fontSizes.xs,
+              fontFamily: fonts.mono
+            }}
+          >
+            iframe blocked or rendering oddly?{' '}
             <a
-              href={`${REPO_URL}/tree/main/Branding/penumbra-brand`}
+              href={PRODUCT_SITE}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: colors.accent, textDecoration: 'none' }}
             >
-              Branding package
-            </a>{' '}
-            in the repo.
+              Open it directly at penpro.github.io/Aphelion ↗
+            </a>
           </p>
-        </div>
-      </ChallengeSection>
-      </div>
+        </Container>
+      </section>
 
-      {/* =========================== Closing CTA =========================== */}
+      {/* ============================ Brand family =========================== */}
+      <section
+        id="brand"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          background: colors.bgSoft,
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <Container>
+          <div style={{ maxWidth: '64ch' }}>
+            <HudLabel tone="magenta">Brand family</HudLabel>
+            <h2 style={sectionTitleStyle}>Same eclipse, different orbit.</h2>
+            <p
+              style={{
+                marginTop: space.md,
+                color: colors.textSecondary,
+                fontSize: fontSizes.md,
+                lineHeight: 1.7
+              }}
+            >
+              Aphelion belongs to the same brand family as this
+              consulting site, the streaming overlay, Penumbra
+              Productions (Trigonometry Tools on Steam), and
+              Penumbra.tech (Metaverse: Origins on Steam). The name
+              is the pitch: <em>aphelion</em> is the orbital point
+              farthest from the sun, and the product is the point
+              farthest from the cloud. The visual language — corona
+              teal, void purple-black, HUD brackets — is shared on
+              purpose, so that anyone landing on any Penumbra surface
+              sees the same operator behind it.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* =========================== Closing CTA ============================ */}
       <section
         id="cta"
         style={{
-          background: colors.surface,
-          borderTop: `1px solid ${colors.border}`,
           paddingTop: space['3xl'],
-          paddingBottom: space['3xl']
+          paddingBottom: space['3xl'],
+          background: colors.surface,
+          borderTop: `1px solid ${colors.border}`
         }}
       >
         <Container narrow style={{ textAlign: 'center' }}>
-          <HudLabel tone="cyan">Get the app</HudLabel>
+          <HudLabel tone="cyan">What&apos;s next</HudLabel>
           <h2
             style={{
               fontFamily: fonts.heading,
@@ -425,7 +336,7 @@ export default function AphelionCase() {
               color: colors.text
             }}
           >
-            Free, open source, on your machine in minutes.
+            Want a similar product built for your business?
           </h2>
           <p
             style={{
@@ -435,12 +346,11 @@ export default function AphelionCase() {
               lineHeight: 1.6
             }}
           >
-            Download the installer, run it, give it a few minutes to
-            pull the right model for your hardware, and you&apos;re
-            chatting with your own AI offline. If you want a similar
-            one-installer desktop product built for your own use case
-            — Rust + Tauri + a domain-specific local model — that&apos;s
-            a real shape of engagement; book a call below.
+            Download Aphelion to see the bar I hold for shipped
+            software, then book a 30-min intro to talk about a custom
+            local-AI tool, a Tauri + Rust desktop app for your team,
+            or any other engagement that uses the same engineering
+            shape.
           </p>
           <div
             style={{
@@ -480,8 +390,6 @@ export default function AphelionCase() {
   );
 }
 
-// ----------------------------- subcomponents ---------------------------- //
-
 function BackLink() {
   return (
     <div style={{ paddingTop: space.lg }}>
@@ -502,83 +410,6 @@ function BackLink() {
   );
 }
 
-function BrandBanner({ src, href }) {
-  return (
-    <section
-      style={{
-        paddingTop: space.xl,
-        paddingBottom: space.xl,
-        borderBottom: `1px solid ${colors.borderSubtle}`
-      }}
-    >
-      <Container>
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ display: 'block', textDecoration: 'none' }}
-        >
-          <Card padding={0} interactive style={{ overflow: 'hidden' }}>
-            <img
-              src={src}
-              alt="Aphelion — Local AI, by Penumbra"
-              loading="lazy"
-              style={{
-                display: 'block',
-                width: '100%',
-                height: 'auto',
-                background: colors.bg
-              }}
-            />
-            <div
-              style={{
-                padding: `${space.sm} ${space.md}`,
-                fontSize: fontSizes.xs,
-                color: colors.textSecondary,
-                background: colors.surfaceMuted,
-                borderTop: `1px solid ${colors.borderSubtle}`,
-                fontFamily: fonts.mono
-              }}
-            >
-              Aphelion brand banner — Branding/penumbra-brand/readme-banner.svg
-            </div>
-          </Card>
-        </a>
-      </Container>
-    </section>
-  );
-}
-
-function ChallengeSection({ eyebrow, tone, title, background, children }) {
-  return (
-    <section
-      style={{
-        background: background || 'transparent',
-        paddingTop: space['3xl'],
-        paddingBottom: space['3xl'],
-        borderBottom: `1px solid ${colors.borderSubtle}`
-      }}
-    >
-      <Container>
-        <div style={{ maxWidth: '64ch' }}>
-          <HudLabel tone={tone}>{eyebrow}</HudLabel>
-          <h2 style={sectionTitleStyle}>{title}</h2>
-          <div
-            style={{
-              marginTop: space.md,
-              color: colors.textSecondary,
-              fontSize: fontSizes.md,
-              lineHeight: 1.7
-            }}
-          >
-            {children}
-          </div>
-        </div>
-      </Container>
-    </section>
-  );
-}
-
 const sectionTitleStyle = {
   fontFamily: fonts.heading,
   fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
@@ -587,14 +418,4 @@ const sectionTitleStyle = {
   letterSpacing: '-0.015em',
   margin: `${space.md} 0 0`,
   color: colors.text
-};
-
-const inlineCodeStyle = {
-  fontFamily: fonts.mono,
-  fontSize: '0.85em',
-  background: colors.bg,
-  color: colors.accentBright,
-  padding: '0.1rem 0.4rem',
-  borderRadius: radii.sm,
-  border: `1px solid ${colors.borderSubtle}`
 };
