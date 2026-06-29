@@ -36,11 +36,12 @@ import SectionRail from '../../components/SectionRail.jsx';
 import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
-  { id: 'hero',  num: '00', label: 'Intro' },
-  { id: 'why',   num: '01', label: 'Why this matters' },
-  { id: 'live',  num: '02', label: 'Live product' },
-  { id: 'brand', num: '03', label: 'Brand family' },
-  { id: 'cta',   num: '04', label: 'Book a Call' }
+  { id: 'hero',    num: '00', label: 'Intro' },
+  { id: 'why',     num: '01', label: 'Why this matters' },
+  { id: 'live',    num: '02', label: 'Live product' },
+  { id: 'support', num: '03', label: 'Support' },
+  { id: 'brand',   num: '04', label: 'Brand family' },
+  { id: 'cta',     num: '05', label: 'Book a Call' }
 ];
 
 const REPO_URL = 'https://github.com/penpro/Aphelion';
@@ -289,6 +290,184 @@ export default function AphelionCase() {
         </Container>
       </section>
 
+      {/* ============================== Support ============================== */}
+      <section
+        id="support"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          background: colors.bg,
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          scrollMarginTop: 90
+        }}
+      >
+        <Container>
+          <div style={{ maxWidth: '64ch' }}>
+            <HudLabel tone="corona">Support</HudLabel>
+            <h2 style={sectionTitleStyle}>Free — and staying that way.</h2>
+            <p
+              style={{
+                margin: `${space.md} 0 ${space.lg}`,
+                color: colors.textSecondary,
+                fontSize: fontSizes.md,
+                lineHeight: 1.7
+              }}
+            >
+              Aphelion is free and open source. It&apos;s also{' '}
+              <em>unsigned</em> — the only reason Windows shows that
+              &ldquo;unknown publisher&rdquo; warning — because a
+              code-signing certificate is a recurring monthly cost,
+              and I haven&apos;t paid for one. If donations start
+              coming in, that&apos;s the first thing they&apos;ll go
+              toward. They also help keep Aphelion free: the more
+              they offset what it costs to build and ship, the less
+              chance I&apos;d ever have to charge for it. No pressure
+              — if it&apos;s useful to you, anything helps.
+            </p>
+
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: space.md,
+                alignItems: 'flex-start',
+                marginBottom: space.lg
+              }}
+            >
+              <a
+                href="https://venmo.com/u/drfaustus"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  ...payBtnStyle,
+                  background: '#008CFF',
+                  color: '#fff'
+                }}
+              >
+                <span style={{ fontWeight: 700, fontSize: '1.02rem', letterSpacing: '-0.01em' }}>
+                  Venmo
+                </span>
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontWeight: 500,
+                    fontSize: '0.82rem',
+                    opacity: 0.95
+                  }}
+                >
+                  @drfaustus
+                </span>
+              </a>
+
+              <a
+                href="https://cash.app/$penumbrapro"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  ...payBtnStyle,
+                  background: '#00D632',
+                  color: '#fff'
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    background: '#fff',
+                    color: '#00D632',
+                    fontWeight: 900,
+                    fontSize: 13
+                  }}
+                >
+                  $
+                </span>
+                <span
+                  style={{
+                    fontFamily: fonts.mono,
+                    fontWeight: 500,
+                    fontSize: '0.82rem',
+                    opacity: 0.95
+                  }}
+                >
+                  $penumbrapro
+                </span>
+              </a>
+
+              <form
+                action="https://www.paypal.com/ncp/payment/VW5MDGVLWWSJ8"
+                method="post"
+                target="_blank"
+                style={{
+                  display: 'inline-grid',
+                  justifyItems: 'center',
+                  alignContent: 'start',
+                  gap: '0.5rem',
+                  margin: 0
+                }}
+              >
+                <input
+                  type="submit"
+                  value="Donate"
+                  style={{
+                    textAlign: 'center',
+                    border: 'none',
+                    borderRadius: '0.5rem',
+                    minWidth: '11.625rem',
+                    padding: '0 2rem',
+                    height: '2.625rem',
+                    fontWeight: 'bold',
+                    background: '#FFD140',
+                    color: '#000',
+                    fontFamily: fonts.heading,
+                    fontSize: '1rem',
+                    lineHeight: '1.25rem',
+                    cursor: 'pointer'
+                  }}
+                />
+                <img
+                  src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg"
+                  alt="Cards accepted"
+                  style={{ display: 'block' }}
+                />
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    color: colors.textMuted,
+                    fontFamily: fonts.mono
+                  }}
+                >
+                  Powered by{' '}
+                  <img
+                    src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg"
+                    alt="PayPal"
+                    style={{ height: '0.875rem', verticalAlign: 'middle' }}
+                  />
+                </span>
+              </form>
+            </div>
+
+            <p
+              style={{
+                margin: 0,
+                color: colors.textMuted,
+                fontSize: fontSizes.sm,
+                lineHeight: 1.65,
+                fontFamily: fonts.mono
+              }}
+            >
+              No pressure, ever — the app stays free either way.
+              Donations just decide how fast the rough edges (like
+              that signing warning) get smoothed out.
+            </p>
+          </div>
+        </Container>
+      </section>
+
       {/* ============================ Brand family =========================== */}
       <section
         id="brand"
@@ -325,6 +504,46 @@ export default function AphelionCase() {
           </div>
         </Container>
       </section>
+
+      {/* ====================== Floating Donate button ====================== */}
+      {/*
+        Lifted from the GH Pages page; scoped to this route because it's
+        rendered inside AphelionCase. When the user navigates away the
+        component unmounts and the button goes with it.
+      */}
+      <a
+        href="#support"
+        aria-label="Donate to support Aphelion"
+        style={{
+          position: 'fixed',
+          right: 'clamp(16px, 3vw, 28px)',
+          bottom: 'clamp(16px, 3vw, 28px)',
+          zIndex: 60,
+          fontFamily: fonts.heading,
+          fontWeight: 500,
+          fontSize: 14,
+          color: colors.bg,
+          textDecoration: 'none',
+          background: `linear-gradient(100deg, ${colors.accent}, ${colors.cyan})`,
+          padding: '12px 20px',
+          borderRadius: 999,
+          boxShadow:
+            '0 0 0 1px rgba(94,234,212,0.4), 0 10px 30px rgba(34,211,238,0.4)',
+          transition: 'transform 150ms ease, box-shadow 150ms ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow =
+            '0 0 0 1px rgba(94,234,212,0.65), 0 16px 44px rgba(34,211,238,0.55)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'none';
+          e.currentTarget.style.boxShadow =
+            '0 0 0 1px rgba(94,234,212,0.4), 0 10px 30px rgba(34,211,238,0.4)';
+        }}
+      >
+        <span aria-hidden="true">♥</span>&nbsp;Donate
+      </a>
 
       {/* =========================== Closing CTA ============================ */}
       <section
@@ -429,4 +648,18 @@ const sectionTitleStyle = {
   letterSpacing: '-0.015em',
   margin: `${space.md} 0 0`,
   color: colors.text
+};
+
+const payBtnStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 9,
+  height: '2.625rem',
+  minWidth: '11.625rem',
+  padding: '0 1.4rem',
+  borderRadius: '0.5rem',
+  fontFamily: fonts.heading,
+  textDecoration: 'none',
+  transition: 'filter 150ms ease, transform 150ms ease'
 };
