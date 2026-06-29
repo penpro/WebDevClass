@@ -32,17 +32,19 @@ import useDocumentMeta from '../../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',         num: '00', label: 'Intro' },
-  { id: 'why',          num: '01', label: 'Why' },
-  { id: 'what',         num: '02', label: 'What it does' },
-  { id: 'shots',        num: '03', label: 'Visuals' },
-  { id: 'engineering',  num: '04', label: 'How it works' },
-  { id: 'cta',          num: '05', label: 'Book a Call' }
+  { id: 'try',          num: '01', label: 'Try it live' },
+  { id: 'why',          num: '02', label: 'Why' },
+  { id: 'what',         num: '03', label: 'What it does' },
+  { id: 'shots',        num: '04', label: 'Visuals' },
+  { id: 'engineering',  num: '05', label: 'How it works' },
+  { id: 'cta',          num: '06', label: 'Book a Call' }
 ];
 
 const REPO_URL = 'https://github.com/penpro/MusicVisualizer';
 const RAW_URL = 'https://raw.githubusercontent.com/penpro/MusicVisualizer/main';
 const DEMO_VIDEO_URL = 'https://youtu.be/qXSvnXlZAhg';
 const DEMO_THUMB = 'https://img.youtube.com/vi/qXSvnXlZAhg/maxresdefault.jpg';
+const LIVE_URL = '/visualizer/';
 
 const SCREENSHOTS = [
   { src: `${RAW_URL}/docs/01-triangular-peaks.png`, label: 'Triangular Peaks — a 3D perspective lattice of equilateral triangles, spectrum radiating from the center' },
@@ -161,9 +163,19 @@ export default function MusicVisualizerCase() {
           >
             <Button
               as="a"
+              href={LIVE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="lg"
+            >
+              Try it out ▷
+            </Button>
+            <Button
+              as="a"
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
+              variant="secondary"
               size="lg"
             >
               View on GitHub ↗
@@ -179,6 +191,77 @@ export default function MusicVisualizerCase() {
               Watch the demo ▶
             </Button>
           </div>
+        </Container>
+      </section>
+
+      {/* ============================== Try it live ============================== */}
+      <section
+        id="try"
+        style={{
+          paddingTop: space['2xl'],
+          paddingBottom: space['2xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          background: colors.bgSoft
+        }}
+      >
+        <Container>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: space.sm,
+              marginBottom: space.lg
+            }}
+          >
+            <div>
+              <HudLabel tone="corona">Live tool</HudLabel>
+              <h2 style={{ ...sectionTitleStyle, maxWidth: '32ch' }}>
+                Drag a song onto the frame.
+              </h2>
+              <p
+                style={{
+                  marginTop: space.md,
+                  color: colors.textSecondary,
+                  fontSize: fontSizes.md,
+                  lineHeight: 1.7,
+                  maxWidth: '60ch'
+                }}
+              >
+                Same single HTML file from the repo, served from this site
+                so you can use it right now. Drag any{' '}
+                <code style={inlineCodeStyle}>.mp3</code> from your desktop
+                onto the frame to start. Use the bottom controls to switch
+                visualizers and tune the feel. For the full-screen
+                experience, open it in its own tab.
+              </p>
+            </div>
+            <Button
+              as="a"
+              href={LIVE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+            >
+              Open full-screen ↗
+            </Button>
+          </div>
+          <Card padding={0} style={{ overflow: 'hidden' }}>
+            <iframe
+              src={LIVE_URL}
+              title="Penumbra Music Visualizer (live)"
+              loading="lazy"
+              allow="microphone; display-capture; autoplay; clipboard-write"
+              style={{
+                display: 'block',
+                width: '100%',
+                height: 'min(80vh, 640px)',
+                border: 'none',
+                background: colors.bg
+              }}
+            />
+          </Card>
         </Container>
       </section>
 
@@ -455,15 +538,25 @@ export default function MusicVisualizerCase() {
           >
             <Button
               as="a"
-              href={REPO_URL}
+              href={LIVE_URL}
               target="_blank"
               rel="noopener noreferrer"
               size="lg"
             >
-              View on GitHub ↗
+              Try it out ▷
             </Button>
-            <Button as={Link} to="/contact" variant="secondary" size="lg">
+            <Button as={Link} to="/contact" size="lg">
               Book a 30-min intro →
+            </Button>
+            <Button
+              as="a"
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+              size="lg"
+            >
+              View on GitHub ↗
             </Button>
           </div>
         </Container>
