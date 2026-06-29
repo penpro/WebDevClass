@@ -76,6 +76,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://penumbra-tech.com/projects/aphelion</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://penumbra-tech.com/api-guide</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

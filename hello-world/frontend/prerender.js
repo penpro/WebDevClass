@@ -49,6 +49,7 @@ const ROUTES = [
   '/projects/trigonometry-tools',
   '/projects/metaverse-origins',
   '/projects/music-visualizer',
+  '/projects/aphelion',
   '/api-guide'
 ];
 

@@ -27,6 +27,7 @@ The site is a React SPA with server-side pre-rendering — every public route re
 - [Trigonometry Tools](https://penumbra-tech.com/projects/trigonometry-tools): Interactive math learning tool with live geometry rendering.
 - [Metaverse Origins](https://penumbra-tech.com/projects/metaverse-origins): Unreal Engine 5 multiplayer game systems, Steam OnlineSubsystem integration, agent-driven content pipeline.
 - [Music Visualizer](https://penumbra-tech.com/projects/music-visualizer): Single-file in-browser music visualizer (no install, no cookies, no wifi). Web Audio + Canvas 2D, with from-scratch BPM and musical-key detection. Open source / MIT.
+- [Aphelion](https://penumbra-tech.com/projects/aphelion): Penumbra product — free, open-source Windows desktop app that runs LLMs entirely on the user's machine. Tauri v2 + bundled llama.cpp engine + GGUF models auto-fit to GPU/VRAM. No cloud, no account, no telemetry. MIT.
 - [Projects overview](https://penumbra-tech.com/projects): Index of all case studies.
 
 ## Operational

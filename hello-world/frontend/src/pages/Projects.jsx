@@ -111,6 +111,16 @@ const PROJECTS = [
   },
   {
     category: 'cat-csgames',
+    to: '/projects/aphelion',
+    badge: 'Penumbra product · Open source · Windows',
+    title: 'Aphelion: local AI desktop app',
+    summary:
+      "A free, open-source Windows desktop app that runs powerful LLMs entirely on the user's own machine. Tauri v2 (Rust + React + TypeScript) shell around a bundled llama.cpp engine (Vulkan), GGUF models auto-fit to the GPU's reported VRAM. One installer, no servers, no Docker, no account, no telemetry, no phone-home. Five workspaces share the same loaded engine: chat, characters & roleplay, story writing, dialogue trees, code assistant. Aphelion (n.) — the orbital point farthest from the sun; your AI, at the farthest point from the cloud.",
+    stack: ['Tauri v2', 'Rust', 'React + TypeScript + Vite', 'llama.cpp + Vulkan', 'GGUF models', '100% offline'],
+    auth: 'Free download · Windows installer · MIT'
+  },
+  {
+    category: 'cat-csgames',
     to: '/projects/music-visualizer',
     badge: 'Single-file web app · Open source',
     title: 'Penumbra Music Visualizer',
