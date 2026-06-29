@@ -32,15 +32,22 @@ import useDocumentMeta from '../hooks/useDocumentMeta.js';
 
 const SECTIONS = [
   { id: 'hero',           num: '00', label: 'Intro' },
-  { id: 'cat-client',     num: '01', label: 'Client work' },
-  { id: 'cat-infra',      num: '02', label: 'Infrastructure' },
-  { id: 'cat-apps',       num: '03', label: 'Web apps' },
-  { id: 'cat-csgames',    num: '04', label: 'CS & games' },
-  { id: 'cat-reference',  num: '05', label: 'Source & docs' },
-  { id: 'book',           num: '06', label: 'Book a Call' }
+  { id: 'cat-products',   num: '01', label: 'Products' },
+  { id: 'cat-client',     num: '02', label: 'Client work' },
+  { id: 'cat-infra',      num: '03', label: 'Infrastructure' },
+  { id: 'cat-apps',       num: '04', label: 'Web apps' },
+  { id: 'cat-csgames',    num: '05', label: 'CS & tools' },
+  { id: 'cat-reference',  num: '06', label: 'Source & docs' },
+  { id: 'book',           num: '07', label: 'Book a Call' }
 ];
 
 const CATEGORIES = [
+  {
+    id: 'cat-products',
+    label: 'Products',
+    intro:
+      'Shipped, downloadable software — Steam releases and installable Windows apps under the Penumbra family of studios.'
+  },
   {
     id: 'cat-client',
     label: 'Client work',
@@ -58,8 +65,9 @@ const CATEGORIES = [
   },
   {
     id: 'cat-csgames',
-    label: 'Computer science & games',
-    intro: 'Where the work is mostly about ideas — theory, gameplay, agent pipelines.'
+    label: 'Computer science & tools',
+    intro:
+      'Pure-craft work: graduate-level theory of computation depth and zero-dependency browser tools.'
   },
   {
     id: 'cat-reference',
@@ -90,27 +98,7 @@ const PROJECTS = [
     auth: 'Case study (live tool is super_admin only)'
   },
   {
-    category: 'cat-csgames',
-    to: '/projects/theory-of-computation',
-    badge: 'Computer science depth',
-    title: 'Theory of Computation review tool',
-    summary:
-      "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Live themed build runs in the browser at /toc/; canonical offline build is on GitHub. Built to prove I can think about computability and complexity, not just stitch libraries.",
-    stack: ['Vanilla JS', 'KaTeX', 'Spaced repetition', 'Offline-first'],
-    auth: 'Live + offline (GitHub); see case study'
-  },
-  {
-    category: 'cat-csgames',
-    to: '/projects/trigonometry-tools',
-    badge: 'Published software · Steam',
-    title: 'Trigonometry Tools',
-    summary:
-      "A free educational game published to Steam in April 2025 under the Penumbra Productions name. Gamifies the unit-circle drill that precalculus students need to reach fluency (radians, sine, cosine at every standard angle) on a Steam-installed PC. Small on purpose, but it went through the full Steam release process: Steamworks app, store presence, public download.",
-    stack: ['Steam release', 'Education', 'Penumbra Productions'],
-    auth: 'Live on Steam, free download'
-  },
-  {
-    category: 'cat-csgames',
+    category: 'cat-products',
     to: '/projects/aphelion',
     badge: 'Penumbra product · Open source · Windows',
     title: 'Aphelion: local AI desktop app',
@@ -120,17 +108,7 @@ const PROJECTS = [
     auth: 'Free download · Windows installer · MIT'
   },
   {
-    category: 'cat-csgames',
-    to: '/projects/music-visualizer',
-    badge: 'Single-file web app · Open source',
-    title: 'Penumbra Music Visualizer',
-    summary:
-      "I wanted a music visualizer that survived bad wifi at a party — no install, no cookies, no signup, no cloud dependency, just one HTML file you double-click. Drag a song onto it and nine reactive visualizers light up (three Penumbra-branded, six conventional spectrum treatments). From-scratch BPM detection via onset-envelope autocorrelation, musical-key detection via Krumhansl-Schmuckler chroma — both cached in localStorage so each song is analyzed once. Tab-audio capture lets it visualize YouTube Music or Spotify; built-in canvas+audio recorder exports a .webm. Zero dependencies, no build step, ~52KB of one index.html.",
-    stack: ['Single-file HTML', 'Web Audio API', 'Canvas 2D', 'FFT / BPM / Key detection', 'localStorage cache', 'MediaRecorder'],
-    auth: 'Open source · MIT · Download index.html, double-click'
-  },
-  {
-    category: 'cat-csgames',
+    category: 'cat-products',
     to: '/projects/metaverse-origins',
     badge: 'Published software · Steam Early Access',
     title: 'Metaverse: Origins',
@@ -145,6 +123,36 @@ const PROJECTS = [
       'Penumbra.tech'
     ],
     auth: 'Live on Steam: paid, pre-alpha (read the EA framing)'
+  },
+  {
+    category: 'cat-products',
+    to: '/projects/trigonometry-tools',
+    badge: 'Published software · Steam',
+    title: 'Trigonometry Tools',
+    summary:
+      "A free educational game published to Steam in April 2025 under the Penumbra Productions name. Gamifies the unit-circle drill that precalculus students need to reach fluency (radians, sine, cosine at every standard angle) on a Steam-installed PC. Small on purpose, but it went through the full Steam release process: Steamworks app, store presence, public download.",
+    stack: ['Steam release', 'Education', 'Penumbra Productions'],
+    auth: 'Live on Steam, free download'
+  },
+  {
+    category: 'cat-csgames',
+    to: '/projects/theory-of-computation',
+    badge: 'Computer science depth',
+    title: 'Theory of Computation review tool',
+    summary:
+      "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Live themed build runs in the browser at /toc/; canonical offline build is on GitHub. Built to prove I can think about computability and complexity, not just stitch libraries.",
+    stack: ['Vanilla JS', 'KaTeX', 'Spaced repetition', 'Offline-first'],
+    auth: 'Live + offline (GitHub); see case study'
+  },
+  {
+    category: 'cat-csgames',
+    to: '/projects/music-visualizer',
+    badge: 'Single-file web app · Open source',
+    title: 'Penumbra Music Visualizer',
+    summary:
+      "I wanted a music visualizer that survived bad wifi at a party — no install, no cookies, no signup, no cloud dependency, just one HTML file you double-click. Drag a song onto it and nine reactive visualizers light up (three Penumbra-branded, six conventional spectrum treatments). From-scratch BPM detection via onset-envelope autocorrelation, musical-key detection via Krumhansl-Schmuckler chroma — both cached in localStorage so each song is analyzed once. Tab-audio capture lets it visualize YouTube Music or Spotify; built-in canvas+audio recorder exports a .webm. Zero dependencies, no build step, ~52KB of one index.html.",
+    stack: ['Single-file HTML', 'Web Audio API', 'Canvas 2D', 'FFT / BPM / Key detection', 'localStorage cache', 'MediaRecorder'],
+    auth: 'Open source · MIT · Download index.html, double-click'
   },
   {
     category: 'cat-client',
@@ -300,8 +308,9 @@ export default function Projects() {
               lineHeight: 1.6
             }}
           >
-            Each project below is running right now and you can click
-            into it. A few require sign-in (free, no spam) — that&apos;s
+            Each project below is either shipped as a real product you
+            can install, or running right now and you can click into
+            it. A few require sign-in (free, no spam) — that&apos;s
             because they save data to the database, which only makes
             sense per-user.
           </p>
