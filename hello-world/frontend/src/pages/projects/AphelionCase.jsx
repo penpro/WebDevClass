@@ -17,7 +17,7 @@
 // nginx config: frame-src must include https://penpro.github.io
 // (added in security-headers-snippet.conf).
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   colors,
@@ -65,6 +65,35 @@ export default function AphelionCase() {
   // the browser actually fetch the frame.
   const [iframeBust] = useState(() => Date.now());
   const iframeSrc = `${PRODUCT_SITE}?t=${iframeBust}`;
+
+  // Scoped scrollbar restyle: only while this route is mounted, override
+  // the parent page's browser-default scrollbar with the same corona/void
+  // treatment the embedded GH Pages doc uses (see docs/index.html in the
+  // Aphelion repo).  Without this, the parent page scrollbar reads as a
+  // stark system widget against the dark hero/iframe and visually clashes
+  // with the iframe's branded scrollbar.  Injected into document.head on
+  // mount and removed on unmount, so the rest of the site keeps its
+  // default scrollbar.
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.dataset.aphelionScrollbar = 'true';
+    style.textContent = `
+      html { scrollbar-width: thin; scrollbar-color: rgba(94,234,212,0.3) #07021a; }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: #07021a; }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(94,234,212,0.22);
+        border-radius: 5px;
+        border: 2px solid #07021a;
+      }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(94,234,212,0.5); }
+      ::-webkit-scrollbar-corner { background: #07021a; }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <>
