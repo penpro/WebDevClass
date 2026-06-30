@@ -45,6 +45,7 @@ const {
   router: paymentsRouter,
   webhookHandler: paymentsWebhookHandler
 } = require('./payments');
+const datarouterRouter = require('./datarouter');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -69,6 +70,26 @@ app.post(
   express.raw({ type: 'application/json' }),
   paymentsWebhookHandler
 );
+
+// ---------------------------------------------------------------------------
+// Unreal CrashReportClient ingest — also MUST be registered BEFORE
+// express.json()
+// ---------------------------------------------------------------------------
+// CRC POSTs a binary crash bundle (~5-50 MB) to /datarouter/crashes. The
+// route streams the raw request body straight to disk via pipeline(req,
+// fs.createWriteStream(...)); if express.json() runs first and matches
+// the content type, the body becomes a parsed object and the stream is
+// already drained. Rate-limited per-IP independently of the /api limiter
+// (this route is outside /api).
+const crashIngestLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Crash ingest rate limit exceeded' },
+  skip: () => rateLimiterState.isDisabled()
+});
+app.use('/datarouter', crashIngestLimiter, datarouterRouter);
 
 app.use(express.json());
 
