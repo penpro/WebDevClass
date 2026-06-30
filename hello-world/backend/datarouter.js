@@ -10,11 +10,14 @@
 //   /home/ubuntu/crash-dumps/{AppVersion}/{YYYY-MM-DD}/{uuid}.bin    raw bundle
 //   /home/ubuntu/crash-dumps/{AppVersion}/{YYYY-MM-DD}/{uuid}.json   sidecar metadata
 //
-// Auth: shared secret from CRASH_INGEST_KEY env var. Accept either the
-// X-Crash-Key request header or a ?key= query param (CRC's URL-only config
-// pattern needs the query option). 401 on miss — CRC retries on 5xx but
-// NOT on 4xx, which is what we want (a bad-key flood doesn't get amplified
-// into a retry storm).
+// Auth: shared secret from CRASH_INGEST_KEY env var, supplied as the path
+// segment after /crashes/.  Query-string auth would collide with the
+// "?AppID=...&AppVersion=..." that CRC unconditionally appends to whatever
+// URL is configured: two '?' separators in one URL → broken parsing.
+// Path-segment auth dodges that entirely and CRC's appended query string
+// rides along normally as req.query.  401 on miss — CRC retries on 5xx
+// but NOT on 4xx, which is what we want (a bad-key flood doesn't get
+// amplified into a retry storm).
 //
 // Mounted in server.js BEFORE express.json() so the raw stream stays
 // available — express.json() would consume the body for any
@@ -68,7 +71,7 @@ function sanitizeSegment(s, fallback) {
   return cleaned || fallback;
 }
 
-router.post('/crashes', async (req, res) => {
+router.post('/crashes/:key', async (req, res) => {
   const expected = process.env.CRASH_INGEST_KEY;
   if (!expected) {
     // Refuse to accept anything until the operator configures the key.
@@ -78,8 +81,7 @@ router.post('/crashes', async (req, res) => {
     return res.status(503).json({ error: 'crash ingest not configured' });
   }
 
-  const offered = req.header('x-crash-key') || req.query.key;
-  if (!safeCompare(offered, expected)) {
+  if (!safeCompare(req.params.key, expected)) {
     return res.status(401).json({ error: 'invalid key' });
   }
 
