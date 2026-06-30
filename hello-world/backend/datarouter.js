@@ -32,8 +32,22 @@ const DUMP_DIR = process.env.CRASH_DUMP_DIR || '/home/ubuntu/crash-dumps';
 
 // Hard cap. The spec says design for ~50 MB; we accept up to 60 to absorb
 // envelope overhead and the rare outlier without becoming a free upload
-// endpoint. A request that exceeds this gets the connection killed and a
-// 413; the half-written file is removed.
+// endpoint. The cap is enforced two ways, in this order:
+//
+//   1. Express checks Content-Length upfront and 413s without reading the
+//      body if it's declared and too large. This is the clean path real
+//      clients (including CRC, which always sets Content-Length) hit.
+//   2. nginx caps the actual byte count at 70 MB via client_max_body_size
+//      on the /datarouter/ location. This catches lying clients and
+//      chunked-encoding bodies with no Content-Length — nginx aborts the
+//      connection cleanly at the proxy layer, no half-written file on
+//      this side because the upstream stream never delivers more bytes
+//      than the cap.
+//
+// We don't try a mid-stream Express-level abort (req.destroy() during the
+// pipeline) because that closes the upstream socket while nginx is mid-
+// proxy and nginx returns 502 Bad Gateway to the client — a confusing
+// failure mode for what should be a clean 413.
 const MAX_BODY_BYTES = 60 * 1024 * 1024;
 
 function safeCompare(a, b) {
@@ -69,6 +83,13 @@ router.post('/crashes', async (req, res) => {
     return res.status(401).json({ error: 'invalid key' });
   }
 
+  // Upfront Content-Length check. Real CRC always sets it; this is the
+  // clean rejection path for outlier crashes that exceed our cap.
+  const declared = Number(req.header('content-length'));
+  if (Number.isFinite(declared) && declared > MAX_BODY_BYTES) {
+    return res.status(413).json({ error: 'body too large' });
+  }
+
   const appVersion = sanitizeSegment(req.query.AppVersion, 'unknown');
   const dateBucket = new Date().toISOString().slice(0, 10);
   const id = crypto.randomUUID();
@@ -84,17 +105,10 @@ router.post('/crashes', async (req, res) => {
   }
 
   let receivedBytes = 0;
-  let oversize = false;
-
-  // Enforce the cap as bytes arrive, not on Content-Length (a hostile or
-  // buggy client can lie about Content-Length, or chunked-transfer without
-  // declaring one at all).
+  // Count bytes as they arrive so the sidecar gets the actual size, which
+  // we trust over Content-Length when the two disagree.
   req.on('data', (chunk) => {
     receivedBytes += chunk.length;
-    if (receivedBytes > MAX_BODY_BYTES) {
-      oversize = true;
-      req.destroy();
-    }
   });
 
   const writeStream = fs.createWriteStream(binPath);
@@ -102,9 +116,6 @@ router.post('/crashes', async (req, res) => {
     await pipeline(req, writeStream);
   } catch (err) {
     fs.promises.unlink(binPath).catch(() => {});
-    if (oversize) {
-      return res.status(413).json({ error: 'body too large' });
-    }
     console.error('[crash] stream failed:', err);
     return res.status(500).json({ error: 'write failed' });
   }
