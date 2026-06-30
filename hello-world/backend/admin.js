@@ -10,6 +10,9 @@
 // of PM2 log rotation.
 
 const express = require('express');
+const fs = require('fs').promises;
+const path = require('path');
+const { spawn } = require('child_process');
 
 const pool = require('./db');
 const {
@@ -188,6 +191,133 @@ router.put('/users/:id/role', requireSuperAdmin, async (req, res) => {
   } catch (error) {
     console.error('Change role failed:', error);
     res.status(500).json({ error: 'Failed to change role' });
+  }
+});
+
+// --- Metaverse: Origins crash dump management ----------------------------
+//
+// CrashReportClient bundles land at /home/ubuntu/crash-dumps/{AppVersion}/
+// {YYYY-MM-DD}/{uuid}.{bin,json} via the /datarouter/crashes ingest route
+// (see datarouter.js).  These admin routes wrap the directory for hands-off
+// retrieval and cleanup so the operator can collect samples for the phase-2
+// decoder and clear the tree once done — without SSHing.  Both are super-
+// admin only; the bundles can contain client IPs, system info, and (in
+// .log files) user-typed text.
+
+const CRASH_DIR =
+  process.env.CRASH_DUMP_DIR || '/home/ubuntu/crash-dumps';
+
+// Walk the crash directory tree and return the file count.  Used to
+// populate the audit log entry on delete so we have a record of how many
+// bundles were destroyed.
+async function countFilesIn(dir) {
+  let count = 0;
+  let items;
+  try {
+    items = await fs.readdir(dir, { withFileTypes: true });
+  } catch (err) {
+    if (err.code === 'ENOENT') return 0;
+    throw err;
+  }
+  for (const item of items) {
+    if (item.isDirectory()) {
+      count += await countFilesIn(path.join(dir, item.name));
+    } else {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+// GET /api/admin/crashes/archive
+//
+// Streams a gzipped tarball of the entire crash-dumps directory back to the
+// admin's browser as an attachment.  Uses tar(1) via spawn so the whole
+// archive never has to materialize on disk or in Node memory — output
+// chunks flow tar → stdout → res as they're compressed.  Audit log is
+// written on successful close (exit code 0); a failed tar leaves no audit
+// row, which matches the existing "log on success" pattern.
+router.get('/crashes/archive', requireSuperAdmin, async (req, res) => {
+  try {
+    await fs.access(CRASH_DIR);
+  } catch {
+    return res.status(404).json({ error: 'crash directory not found' });
+  }
+
+  const date = new Date().toISOString().slice(0, 10);
+  const filename = `mo-crashes-${date}.tar.gz`;
+  const parent = path.dirname(CRASH_DIR);
+  const base = path.basename(CRASH_DIR);
+
+  res.setHeader('Content-Type', 'application/gzip');
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${filename}"`
+  );
+
+  const tar = spawn('tar', ['-czf', '-', '-C', parent, base], {
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+
+  tar.stderr.on('data', (chunk) => {
+    console.error('[admin] tar stderr:', chunk.toString().trim());
+  });
+
+  tar.stdout.pipe(res);
+
+  tar.on('close', async (code) => {
+    if (code === 0) {
+      await logAdminAction(
+        req.session.userId,
+        'crashes_download',
+        null,
+        { filename }
+      );
+    } else {
+      console.error(`[admin] tar exited with code ${code}`);
+    }
+  });
+});
+
+// DELETE /api/admin/crashes
+//
+// Removes every {AppVersion}/{date}/ subtree under CRASH_DIR, preserving
+// CRASH_DIR itself so the ingest endpoint can keep writing.  Files are
+// counted first so the audit log records what was destroyed.  No "are you
+// sure" confirmation server-side — that's the client's job before calling
+// the route.
+router.delete('/crashes', requireSuperAdmin, async (req, res) => {
+  try {
+    let entries;
+    try {
+      entries = await fs.readdir(CRASH_DIR);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return res.json({ ok: true, files_deleted: 0 });
+      }
+      throw err;
+    }
+
+    const filesDeleted = await countFilesIn(CRASH_DIR);
+
+    for (const entry of entries) {
+      await fs.rm(path.join(CRASH_DIR, entry), {
+        recursive: true,
+        force: true
+      });
+    }
+
+    await logAdminAction(
+      req.session.userId,
+      'crashes_delete',
+      null,
+      { files_deleted: filesDeleted }
+    );
+
+    res.json({ ok: true, files_deleted: filesDeleted });
+  } catch (err) {
+    console.error('[admin] crashes delete failed:', err);
+    res.status(500).json({ error: 'delete failed' });
   }
 });
 

@@ -41,6 +41,9 @@ export default function AdminPortal() {
   const [pendingRoles, setPendingRoles] = useState({})
   // Per-user-id role-change state: 'idle' | 'saving' | 'saved' | 'error'
   const [roleStates, setRoleStates] = useState({})
+  // M:O crash-log delete state: 'idle' | 'deleting' | 'deleted' | 'error'
+  const [crashDeleteState, setCrashDeleteState] = useState('idle')
+  const [crashDeleteMessage, setCrashDeleteMessage] = useState(null)
 
   if (loading) {
     return (
@@ -147,6 +150,29 @@ export default function AdminPortal() {
     }
   }
 
+  async function handleDeleteCrashes() {
+    const confirmed = window.confirm(
+      'Delete every crash bundle on the server? This is irreversible — make sure you have already downloaded any logs you need.'
+    )
+    if (!confirmed) return
+
+    setCrashDeleteState('deleting')
+    setCrashDeleteMessage(null)
+    try {
+      const res = await apiFetch('/api/admin/crashes', { method: 'DELETE' })
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`)
+      }
+      const data = await res.json()
+      setCrashDeleteState('deleted')
+      setCrashDeleteMessage(`Deleted ${data.files_deleted} file${data.files_deleted === 1 ? '' : 's'}.`)
+    } catch (err) {
+      console.error('Crash delete failed:', err)
+      setCrashDeleteState('error')
+      setCrashDeleteMessage(`Delete failed: ${err.message}`)
+    }
+  }
+
   function resetButtonLabel(userId) {
     const state = resetStates[userId]
     if (state === 'sending') return 'Sending…'
@@ -230,6 +256,85 @@ export default function AdminPortal() {
               <Button as={Link} to="/admin-portal/diagnostics">
                 Open Diagnostics →
               </Button>
+            </Card>
+          )}
+
+          {/* M:O crash logs — super_admin only.  The download is a plain
+              same-origin anchor so the session cookie rides along and the
+              browser handles the streamed tar.gz natively; the delete
+              calls the JSON endpoint with a confirm prompt. */}
+          {isSuperAdmin && (
+            <Card
+              variant="accent"
+              style={{
+                marginBottom: space.xl,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: space.md,
+                flexWrap: 'wrap'
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontFamily: fonts.heading,
+                    fontWeight: fontWeights.semibold,
+                    color: colors.text,
+                    fontSize: fontSizes.md,
+                    marginBottom: space.xs
+                  }}
+                >
+                  Metaverse: Origins crash logs
+                </div>
+                <div
+                  style={{
+                    fontSize: fontSizes.sm,
+                    color: colors.textSecondary,
+                    lineHeight: 1.55,
+                    maxWidth: '52ch'
+                  }}
+                >
+                  CrashReportClient bundles received from the live game.
+                  Download as a single gzipped tar (organized by app
+                  version + date) for analysis in WinDbg / Visual Studio,
+                  or wipe the directory once you&apos;re done.
+                </div>
+                {crashDeleteMessage && (
+                  <div
+                    style={{
+                      marginTop: space.sm,
+                      fontSize: fontSizes.sm,
+                      color:
+                        crashDeleteState === 'error'
+                          ? colors.danger
+                          : colors.accent
+                    }}
+                  >
+                    {crashDeleteMessage}
+                  </div>
+                )}
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: space.sm,
+                  flexWrap: 'wrap'
+                }}
+              >
+                <Button as="a" href="/api/admin/crashes/archive">
+                  Download M:O crash logs ↓
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleDeleteCrashes}
+                  disabled={crashDeleteState === 'deleting'}
+                >
+                  {crashDeleteState === 'deleting'
+                    ? 'Deleting…'
+                    : 'Delete logs'}
+                </Button>
+              </div>
             </Card>
           )}
 
