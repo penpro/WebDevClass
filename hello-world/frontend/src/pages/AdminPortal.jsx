@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api.js'
 import { useAuth } from '../AuthContext.jsx'
@@ -44,6 +44,43 @@ export default function AdminPortal() {
   // M:O crash-log delete state: 'idle' | 'deleting' | 'deleted' | 'error'
   const [crashDeleteState, setCrashDeleteState] = useState('idle')
   const [crashDeleteMessage, setCrashDeleteMessage] = useState(null)
+  // null = not yet loaded; object = { crash_count, total_bytes, latest_iso };
+  // 'error' = fetch failed; refetched after a successful delete.
+  const [crashStats, setCrashStats] = useState(null)
+
+  // Load the crash stats once on mount for super_admins.  Must live above
+  // the early-return guards below so hook order stays stable across
+  // renders (rules-of-hooks); the super_admin gate is inline on user.role
+  // since `isSuperAdmin` isn't derived until after the guards.
+  useEffect(() => {
+    if (user?.role !== 'super_admin') return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await apiFetch('/api/admin/crashes/count')
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const data = await res.json()
+        if (!cancelled) setCrashStats(data)
+      } catch (err) {
+        console.error('Crash stats fetch failed:', err)
+        if (!cancelled) setCrashStats('error')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [user?.role])
+
+  async function refreshCrashStats() {
+    try {
+      const res = await apiFetch('/api/admin/crashes/count')
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setCrashStats(await res.json())
+    } catch (err) {
+      console.error('Crash stats refetch failed:', err)
+      setCrashStats('error')
+    }
+  }
 
   if (loading) {
     return (
@@ -166,6 +203,7 @@ export default function AdminPortal() {
       const data = await res.json()
       setCrashDeleteState('deleted')
       setCrashDeleteMessage(`Deleted ${data.files_deleted} file${data.files_deleted === 1 ? '' : 's'}.`)
+      refreshCrashStats()
     } catch (err) {
       console.error('Crash delete failed:', err)
       setCrashDeleteState('error')
@@ -299,6 +337,23 @@ export default function AdminPortal() {
                   Download as a single gzipped tar (organized by app
                   version + date) for analysis in WinDbg / Visual Studio,
                   or wipe the directory once you&apos;re done.
+                </div>
+                <div
+                  style={{
+                    marginTop: space.sm,
+                    fontFamily: fonts.mono,
+                    fontSize: fontSizes.xs,
+                    color: colors.textMuted,
+                    letterSpacing: '0.04em'
+                  }}
+                >
+                  {crashStats === null && 'Counting…'}
+                  {crashStats === 'error' && 'Stats unavailable'}
+                  {crashStats &&
+                    typeof crashStats === 'object' &&
+                    (crashStats.crash_count === 0
+                      ? 'No crashes on disk yet'
+                      : `${crashStats.crash_count} crash${crashStats.crash_count === 1 ? '' : 'es'} · ${formatBytes(crashStats.total_bytes)} · latest ${formatLatest(crashStats.latest_iso)}`)}
                 </div>
                 {crashDeleteMessage && (
                   <div
@@ -565,6 +620,24 @@ const selectStyle = {
   fontFamily: fonts.body,
   fontSize: fontSizes.sm,
   cursor: 'pointer'
+}
+
+function formatBytes(n) {
+  if (typeof n !== 'number' || n < 0) return '0 B'
+  if (n < 1024) return `${n} B`
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+  if (n < 1024 * 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`
+  return `${(n / 1024 / 1024 / 1024).toFixed(2)} GB`
+}
+
+function formatLatest(iso) {
+  if (!iso) return 'never'
+  const ms = Date.now() - new Date(iso).getTime()
+  if (ms < 60 * 1000) return 'just now'
+  if (ms < 60 * 60 * 1000) return `${Math.floor(ms / 60000)}m ago`
+  if (ms < 24 * 60 * 60 * 1000) return `${Math.floor(ms / 3600000)}h ago`
+  if (ms < 7 * 24 * 60 * 60 * 1000) return `${Math.floor(ms / 86400000)}d ago`
+  return new Date(iso).toISOString().slice(0, 10)
 }
 
 function SectionTitle({ children }) {

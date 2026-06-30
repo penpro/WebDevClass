@@ -229,6 +229,57 @@ async function countFilesIn(dir) {
   return count;
 }
 
+// GET /api/admin/crashes/count
+//
+// Returns a quick summary of what's on disk so the admin UI can show
+// "12 crashes, 47 MB, last at ..." before they decide whether to
+// download.  Each crash is one .bin + one .json sidecar pair; we count
+// .bin files specifically as "crashes" and sum every file's size into
+// total_bytes (which approximates the eventual tar.gz size before
+// compression).
+router.get('/crashes/count', requireSuperAdmin, async (req, res) => {
+  try {
+    let crashCount = 0;
+    let totalBytes = 0;
+    let latestMtimeMs = null;
+
+    async function walk(dir) {
+      let items;
+      try {
+        items = await fs.readdir(dir, { withFileTypes: true });
+      } catch (err) {
+        if (err.code === 'ENOENT') return;
+        throw err;
+      }
+      for (const item of items) {
+        const full = path.join(dir, item.name);
+        if (item.isDirectory()) {
+          await walk(full);
+        } else {
+          const s = await fs.stat(full);
+          totalBytes += s.size;
+          if (item.name.endsWith('.bin')) {
+            crashCount += 1;
+            if (latestMtimeMs === null || s.mtimeMs > latestMtimeMs) {
+              latestMtimeMs = s.mtimeMs;
+            }
+          }
+        }
+      }
+    }
+    await walk(CRASH_DIR);
+
+    res.json({
+      crash_count: crashCount,
+      total_bytes: totalBytes,
+      latest_iso: latestMtimeMs ? new Date(latestMtimeMs).toISOString() : null
+    });
+  } catch (err) {
+    console.error('[admin] crash count failed:', err);
+    res.status(500).json({ error: 'count failed' });
+  }
+});
+
 // GET /api/admin/crashes/archive
 //
 // Streams a gzipped tarball of the entire crash-dumps directory back to the
