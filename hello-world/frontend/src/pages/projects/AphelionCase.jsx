@@ -66,6 +66,34 @@ export default function AphelionCase() {
   const [iframeBust] = useState(() => Date.now());
   const iframeSrc = `${PRODUCT_SITE}?t=${iframeBust}`;
 
+  // The embedded GH Pages doc postMessages its scrollHeight to us on
+  // load, resize, and every ResizeObserver tick (accordion expands,
+  // late image loads, changelog tile toggles).  Adopt whatever it
+  // reports so the iframe height matches its content exactly — no
+  // inner scrollbar, no wheel trap, no mid-line slice at the bottom.
+  // 4200 is the pre-message fallback: a Fable measurement of the
+  // current live content (~6889px) minus the trailing footer that
+  // rarely matters, hedged toward "some content still visible" for
+  // pre-hydration crawlers and browsers that don't run the script.
+  const [iframeHeight, setIframeHeight] = useState(4200);
+  useEffect(() => {
+    function onMessage(event) {
+      // Origin lockdown: the parent should only trust messages from the
+      // GH Pages origin we chose to embed, not from anything else that
+      // might have snuck a message onto the window.
+      if (event.origin !== 'https://penpro.github.io') return;
+      const data = event.data;
+      if (!data || data.type !== 'aphelion-height') return;
+      const h = Number(data.height);
+      // Sanity bounds: reject 0/negative (broken document) and >20000
+      // (accidental infinite grow loop from the child).
+      if (!Number.isFinite(h) || h < 100 || h > 20000) return;
+      setIframeHeight(Math.ceil(h));
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, []);
+
   // Scoped scrollbar restyle: only while this route is mounted, override
   // the parent page's browser-default scrollbar with the same corona/void
   // treatment the embedded GH Pages doc uses (see docs/index.html in the
@@ -292,7 +320,7 @@ export default function AphelionCase() {
               style={{
                 display: 'block',
                 width: '100%',
-                height: '3600px',
+                height: `${iframeHeight}px`,
                 border: 'none',
                 background: '#07021A'
               }}

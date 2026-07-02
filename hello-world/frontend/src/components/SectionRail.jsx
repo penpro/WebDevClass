@@ -168,13 +168,19 @@ export default function SectionRail({ sections }) {
           );
         })}
       </ol>
-      {/* Hide on narrow viewports where there's no room beside the
-          centered container. 1180px container + 220px rail + 24px gap
-          + a little breathing room ≈ 1450px minimum to look natural;
-          we drop earlier at 1180px since the rail is genuinely helpful
-          and most reading happens above that anyway. */}
+      {/* Hide when there's no room beside the centered container.
+          The rail is position:fixed at left:24 and 220px wide (right
+          edge at x=244); the Container is 1180px maxWidth centered on
+          the viewport, so its left edge is at x=(W-1180)/2.  For the
+          rail to NOT overlap the container the viewport has to be
+          wider than 244*2 + 1180 = 1668px, plus a bit of breathing
+          room.  The earlier 1180px breakpoint let the rail stay
+          visible on 13-15" laptops where it silently overlapped body
+          text — a Fable review measured collision at 1418px.  1700px
+          hides on all common laptop widths (1440/1512/1600) and shows
+          on 1728px+ MBPs and larger displays. */}
       <style>{`
-        @media (max-width: 1180px) {
+        @media (max-width: 1700px) {
           .penumbra-section-rail { display: none !important; }
         }
       `}</style>
