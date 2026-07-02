@@ -23,7 +23,7 @@
 // or a stub anyway.
 
 import { createServer } from 'node:http';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, copyFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve, dirname, join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -108,6 +108,13 @@ async function main() {
     console.error(`prerender: dist/ not found at ${DIST}. Run 'vite build' first.`);
     process.exit(1);
   }
+
+  // Preserve the pristine (pre-prerender) SPA shell before the '/' route
+  // overwrites dist/index.html with the rendered home page. The backend's
+  // blog HTML routes load this copy and inject per-post meta + article
+  // into it at request time — see hello-world/backend/blog.js.
+  await copyFile(join(DIST, 'index.html'), join(DIST, 'spa-shell.html'));
+  console.log('prerender: saved pristine shell to spa-shell.html');
 
   const server = await startServer();
   console.log(`prerender: serving dist/ on http://localhost:${PORT}`);

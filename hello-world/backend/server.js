@@ -46,6 +46,11 @@ const {
   webhookHandler: paymentsWebhookHandler
 } = require('./payments');
 const datarouterRouter = require('./datarouter');
+const {
+  publicRouter: blogPublicRouter,
+  adminRouter: blogAdminRouter,
+  htmlRouter: blogHtmlRouter
+} = require('./blog');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -310,7 +315,17 @@ app.use('/api/admin/diagnostics', diagnosticsRouter);
 // Admin contacts surface (list / patch) — mounted before the broader
 // admin router so its more specific path wins, like diagnostics.
 app.use('/api/admin/contacts', adminLimiter, contactAdminRouter);
+// Blog publishing console API — specific path before the broad /api/admin.
+app.use('/api/admin/blog', adminLimiter, blogAdminRouter);
 app.use('/api/admin', adminLimiter, adminRouter);
+// Blog public read API (list, single post, share-card PNG).
+app.use('/api/blog', blogPublicRouter);
+// Blog HTML pages + dynamic sitemap/llms-full. nginx proxies /blog,
+// /sitemap.xml, and /llms-full.txt here so a post published from the
+// Admin Portal is immediately crawler-correct (meta tags + article HTML
+// injected into the SPA shell) without waiting for the next deploy's
+// prerender pass. See blog.js for the full rationale.
+app.use(blogHtmlRouter);
 // Synthetic load-test endpoints. Header-gated; invisible to anyone who
 // isn't currently running a test through the diagnostics page.
 app.use('/api/loadtest', loadtestEndpoints);

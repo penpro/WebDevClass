@@ -23,6 +23,7 @@ import Container from './Container.jsx';
 const PUBLIC_LINKS = [
   { to: '/services', label: 'Services' },
   { to: '/projects', label: 'Projects' },
+  { to: '/blog', label: 'Blog' },
   { to: '/about', label: 'About' }
 ];
 

@@ -38,6 +38,8 @@ const About = lazy(() => import('./pages/About.jsx'))
 const Contact = lazy(() => import('./pages/Contact.jsx'))
 const Projects = lazy(() => import('./pages/Projects.jsx'))
 const Stack = lazy(() => import('./pages/Stack.jsx'))
+const Blog = lazy(() => import('./pages/Blog.jsx'))
+const BlogPost = lazy(() => import('./pages/BlogPost.jsx'))
 const Judgment = lazy(() => import('./pages/Judgment.jsx'))
 const Guide = lazy(() => import('./pages/Guide.jsx'))
 const SaasRescue = lazy(() => import('./pages/SaasRescue.jsx'))
@@ -99,6 +101,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               element={<AphelionCase />}
             />
             <Route path="about" element={<About />} />
+            <Route path="blog" element={<Blog />} />
+            <Route path="blog/:slug" element={<BlogPost />} />
             <Route path="contact" element={<Contact />} />
             <Route path="stack" element={<Stack />} />
             <Route path="judgment" element={<Judgment />} />

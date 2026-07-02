@@ -35,6 +35,15 @@ fi
 # perms; chmod is idempotent so this is free when it's already correct.
 [ -f "$BACKEND_DIR/.env" ] && chmod 600 "$BACKEND_DIR/.env"
 
+# Install the share-card fonts where fontconfig (used by sharp/librsvg
+# for the blog og.png renderer) can find them. Idempotent: cp -u only
+# copies when the source is newer.
+if compgen -G "$BACKEND_DIR/assets/fonts/*.ttf" > /dev/null; then
+  mkdir -p "$HOME/.fonts"
+  cp -u "$BACKEND_DIR"/assets/fonts/*.ttf "$HOME/.fonts/"
+  command -v fc-cache >/dev/null 2>&1 && fc-cache -f >/dev/null 2>&1 || true
+fi
+
 cd "$BACKEND_DIR"
 
 echo "==> Backend directory: $BACKEND_DIR"

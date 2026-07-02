@@ -15,6 +15,7 @@ import Card from '../components/Card.jsx'
 import Button from '../components/Button.jsx'
 import HudLabel from '../components/HudLabel.jsx'
 import CornerBrackets from '../components/CornerBrackets.jsx'
+import BlogConsole from '../components/admin/BlogConsole.jsx'
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin'])
 const ROLE_OPTIONS = [
@@ -52,14 +53,17 @@ export default function AdminPortal() {
   // the early-return guards below so hook order stays stable across
   // renders (rules-of-hooks); the super_admin gate is inline on user.role
   // since `isSuperAdmin` isn't derived until after the guards.
+  //
+  // apiFetch semantics: it prefixes /api itself and returns the PARSED
+  // body (throwing on non-2xx) — do not pass /api/... paths or expect a
+  // Response object. The first version of this card did both and showed
+  // a permanent "Stats unavailable".
   useEffect(() => {
     if (user?.role !== 'super_admin') return
     let cancelled = false
     ;(async () => {
       try {
-        const res = await apiFetch('/api/admin/crashes/count')
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const data = await res.json()
+        const data = await apiFetch('/admin/crashes/count')
         if (!cancelled) setCrashStats(data)
       } catch (err) {
         console.error('Crash stats fetch failed:', err)
@@ -73,9 +77,7 @@ export default function AdminPortal() {
 
   async function refreshCrashStats() {
     try {
-      const res = await apiFetch('/api/admin/crashes/count')
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      setCrashStats(await res.json())
+      setCrashStats(await apiFetch('/admin/crashes/count'))
     } catch (err) {
       console.error('Crash stats refetch failed:', err)
       setCrashStats('error')
@@ -196,11 +198,7 @@ export default function AdminPortal() {
     setCrashDeleteState('deleting')
     setCrashDeleteMessage(null)
     try {
-      const res = await apiFetch('/api/admin/crashes', { method: 'DELETE' })
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`)
-      }
-      const data = await res.json()
+      const data = await apiFetch('/admin/crashes', { method: 'DELETE' })
       setCrashDeleteState('deleted')
       setCrashDeleteMessage(`Deleted ${data.files_deleted} file${data.files_deleted === 1 ? '' : 's'}.`)
       refreshCrashStats()
@@ -392,6 +390,9 @@ export default function AdminPortal() {
               </div>
             </Card>
           )}
+
+          {/* Blog publishing console — super_admin only */}
+          {isSuperAdmin && <BlogConsole />}
 
           <SectionTitle>User search</SectionTitle>
 

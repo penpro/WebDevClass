@@ -11,6 +11,10 @@ The site is a React SPA with server-side pre-rendering — every public route re
 - [Services](https://penumbra-tech.com/services): Four engagement categories — custom software, cloud & backend, game development, performance & reliability.
 - [Contact](https://penumbra-tech.com/contact): Cal.com booking, brief-builder prompt for non-technical buyers, contact form, Kitsap location, phone.
 
+## Blog
+
+- [Blog](https://penumbra-tech.com/blog): Essays on AI and ownership, engineering judgment, and shipping real systems. Every post's full text is included in [/llms-full.txt](https://penumbra-tech.com/llms-full.txt), which is generated dynamically so new posts appear immediately.
+
 ## Long-form essays
 
 - [Judgment](https://penumbra-tech.com/judgment): "The judgement is the product." Why engineering judgment is what clients actually buy, with two independent LLM-authored writeups of the site itself integrated as proof artifacts.
