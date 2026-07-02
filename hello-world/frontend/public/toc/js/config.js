@@ -55,9 +55,10 @@
 
   TOC.rankOf = function (q) {
     if (q.rank != null) return q.rank;
+    if (q.type === "discussion") return 30;
     var lp = (q.prompt || "").toLowerCase();
     if (/in plain terms|what is a|what is an|what is the|what does .*(mean|denote|stand for)|shorthand for|\bis called\b|\bare called\b|called the|denoted|the term for|stands for/.test(lp)) return 0;
-    if (q.diagram) return 40;
+    if (q.diagram || q.grid) return 40;
     if (/\btrace\b|how many|\bcompute\b|plug in|pumped|which string|subset construction|configuration|leftmost|relatively prime|fill out the table/.test(lp)) return 40;
     if (/\bprove\b|reduction|reduce |np-complete|pspace-complete|nl-complete|why is|why does|\bconstruct\b/.test(lp)) return 40;
     if (q.type === "tf" || q.type === "fib") return 10;

@@ -120,8 +120,45 @@
   }
 
   // ---- selection ----------------------------------------------------------
-  function pickNext(bank, progress, settings, now, focus) {
+  // Weighted spaced-repetition pick from a pool: prefer due, low-box, never-seen
+  // (in the focus chapter), and previously-missed items. focusChapter may be null
+  // (e.g. a topic drill spanning chapters), in which case chapter bias is dropped.
+  function weightedPick(pool, progress, now, focusChapter) {
+    if (!pool.length) return null;
+    var due = pool.filter(function (q) { var s = progress[q.id]; return !s || (s.due || 0) <= now; });
+    var candidates = due.length ? due : pool;
+
+    function weight(q) {
+      var s = progress[q.id];
+      var box = s ? (s.box || 1) : 1;
+      var w = ({ 1: 12, 2: 7, 3: 4, 4: 2.5, 5: 1.5, 6: 0.8 })[box] || 1;
+      if (!s || s.seen === 0) w = (focusChapter != null && q.chapter === focusChapter) ? 9 : 3; // surface fresh material in focus
+      if (s && s.everWrong && !s.mastered) w *= 1.9;                         // emphasize past mistakes
+      if (s && s.mastered) w *= 0.5;                                         // keep mastered in rotation, lightly
+      if (focusChapter != null) w *= (q.chapter === focusChapter) ? 1.6 : (q.chapter < focusChapter ? 0.8 : 0.45);
+      if (s && s.lastSeen != null && (now - s.lastSeen) < 2) w *= 0.15;      // avoid echoing the same item
+      return Math.max(w, 0.01);
+    }
+
+    var total = 0, ws = candidates.map(function (q) { var w = weight(q); total += w; return w; });
+    var r = rand() * total;
+    for (var i = 0; i < candidates.length; i++) { r -= ws[i]; if (r <= 0) return candidates[i]; }
+    return candidates[candidates.length - 1];
+  }
+
+  function pickNext(bank, progress, settings, now, focus, topic) {
     var unlocked = unlockedChapterNums(bank, progress, settings);
+
+    // Topic drill: an explicit focused-study action, so hammer this one topic
+    // across ALL real chapters — bypassing chapter gating (like the go-to-# jump)
+    // and the difficulty ramp, with no chapter bias.
+    if (topic) {
+      var tpool = bank.filter(function (q) {
+        return !TOC.isExamBucket(q.chapter) && q.topic === topic;
+      });
+      return weightedPick(tpool, progress, now, null);
+    }
+
     var specific = focus != null && focus !== "auto" && focus !== "all";
     var focusNum = specific ? Number(focus) : null;
     var pool;
@@ -158,26 +195,7 @@
     }
 
     var focusChapter = specific ? focusNum : autoFocus(bank, progress, settings);
-
-    var due = pool.filter(function (q) { var s = progress[q.id]; return !s || (s.due || 0) <= now; });
-    var candidates = due.length ? due : pool;
-
-    function weight(q) {
-      var s = progress[q.id];
-      var box = s ? (s.box || 1) : 1;
-      var w = ({ 1: 12, 2: 7, 3: 4, 4: 2.5, 5: 1.5, 6: 0.8 })[box] || 1;
-      if (!s || s.seen === 0) w = (q.chapter === focusChapter) ? 9 : 3;     // surface fresh material in focus
-      if (s && s.everWrong && !s.mastered) w *= 1.9;                         // emphasize past mistakes
-      if (s && s.mastered) w *= 0.5;                                         // keep mastered in rotation, lightly
-      w *= (q.chapter === focusChapter) ? 1.6 : (q.chapter < focusChapter ? 0.8 : 0.45);
-      if (s && s.lastSeen != null && (now - s.lastSeen) < 2) w *= 0.15;      // avoid echoing the same item
-      return Math.max(w, 0.01);
-    }
-
-    var total = 0, ws = candidates.map(function (q) { var w = weight(q); total += w; return w; });
-    var r = rand() * total;
-    for (var i = 0; i < candidates.length; i++) { r -= ws[i]; if (r <= 0) return candidates[i]; }
-    return candidates[candidates.length - 1];
+    return weightedPick(pool, progress, now, focusChapter);
   }
 
   // overall mastery across real chapters, weighted by # of questions

@@ -12,7 +12,7 @@ var only = process.argv[2];
 var files = [];
 function add(name) { var p = path.join(__dirname, "..", "js", "questions", name + ".js"); if (fs.existsSync(p)) files.push([name, p]); }
 if (only) { var nm = only.replace(/^ch/, "").match(/^\d+$/) ? "ch" + only.replace(/^ch/, "") : only; add(nm); add(nm + "-defs"); }
-else { for (var i = 0; i <= 8; i++) { add("ch" + i); add("ch" + i + "-defs"); } add("exam1"); add("exam2"); add("final"); }
+else { for (var i = 0; i <= 8; i++) { add("ch" + i); add("ch" + i + "-defs"); add("ch" + i + "-hands-on"); } add("exam1"); add("exam2"); add("final"); add("discussions"); add("discussions2"); add("discussions3"); add("practical-regex"); add("proof-order"); }
 
 var errors = [], warnings = [];
 function err(id, m) { errors.push((id || "?") + ": " + m); }
@@ -45,7 +45,7 @@ function checkText(id, field, s) {
   }
 }
 
-var TYPES = { tf: 1, mc: 1, multi: 1, fib: 1, order: 1 };
+var TYPES = { tf: 1, mc: 1, multi: 1, fib: 1, order: 1, discussion: 1 };
 TOC.BANK.forEach(function (q) {
   var id = q.id;
   if (!id) { err(id, "missing id"); return; }
@@ -57,6 +57,8 @@ TOC.BANK.forEach(function (q) {
   if (!q.topic) warn(id, "missing topic label");
   checkText(id, "prompt", q.prompt);
   checkText(id, "explanation", q.explanation || "");
+  checkText(id, "whyMatters", q.whyMatters || "");
+  checkText(id, "realWorld", q.realWorld || "");
 
   if (q.type === "tf") {
     if (typeof q.answer !== "boolean") err(id, "tf needs boolean answer");
@@ -81,6 +83,23 @@ TOC.BANK.forEach(function (q) {
   } else if (q.type === "order") {
     if (!Array.isArray(q.items) || q.items.length < 2) err(id, "order needs >=2 items");
     else q.items.forEach(function (it, i) { checkText(id, "item[" + i + "]", it); });
+  } else if (q.type === "discussion") {
+    if (!Array.isArray(q.steps) || q.steps.length < 1) err(id, "discussion needs >=1 step");
+    else q.steps.forEach(function (s, si) {
+      var sid = id + " step[" + (si + 1) + "]";
+      if (!s.prompt) err(sid, "step missing prompt");
+      checkText(sid, "step.prompt", s.prompt || "");
+      checkText(sid, "step.explain", s.explain || "");
+      if (s.type === "tf") {
+        if (typeof s.answer !== "boolean") err(sid, "tf step needs boolean answer");
+      } else {
+        if (!Array.isArray(s.choices) || s.choices.length < 2) err(sid, "step needs >=2 choices");
+        else {
+          if (typeof s.answer !== "number" || s.answer < 0 || s.answer >= s.choices.length) err(sid, "step answer index out of range");
+          s.choices.forEach(function (c, ci) { checkText(sid, "step.choice[" + ci + "]", c); });
+        }
+      }
+    });
   }
 });
 

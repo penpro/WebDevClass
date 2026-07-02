@@ -5,7 +5,7 @@
   TOC.BANK = TOC.BANK || [];
   TOC._ids = TOC._ids || {};
 
-  var VALID_TYPES = { tf: 1, mc: 1, multi: 1, fib: 1, order: 1 };
+  var VALID_TYPES = { tf: 1, mc: 1, multi: 1, fib: 1, order: 1, discussion: 1 };
 
   TOC.addQuestions = function (arr) {
     if (!Array.isArray(arr)) { console.error("addQuestions expects an array"); return; }
