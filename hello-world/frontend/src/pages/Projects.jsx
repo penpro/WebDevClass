@@ -36,9 +36,10 @@ const SECTIONS = [
   { id: 'cat-client',     num: '02', label: 'Client work' },
   { id: 'cat-infra',      num: '03', label: 'Infrastructure' },
   { id: 'cat-apps',       num: '04', label: 'Web apps' },
-  { id: 'cat-csgames',    num: '05', label: 'CS & tools' },
-  { id: 'cat-reference',  num: '06', label: 'Source & docs' },
-  { id: 'book',           num: '07', label: 'Book a Call' }
+  { id: 'cat-study',      num: '05', label: 'Study tools' },
+  { id: 'cat-csgames',    num: '06', label: 'CS & tools' },
+  { id: 'cat-reference',  num: '07', label: 'Source & docs' },
+  { id: 'book',           num: '08', label: 'Book a Call' }
 ];
 
 const CATEGORIES = [
@@ -64,10 +65,16 @@ const CATEGORIES = [
     intro: 'Full-stack web apps with auth, MySQL, and the seams that always need work.'
   },
   {
+    id: 'cat-study',
+    label: 'Study tools',
+    intro:
+      'Two free, open-source study apps I built and gave away — no signup, no backend, fully offline, progress saved in your browser. A beginner on-ramp into discrete math, and its advanced follow-up for a theory-of-computation course. Launch either in the browser or read the source.'
+  },
+  {
     id: 'cat-csgames',
     label: 'Computer science & tools',
     intro:
-      'Pure-craft work: graduate-level theory of computation depth and zero-dependency browser tools.'
+      'Pure-craft work: zero-dependency, single-file browser tools built from scratch.'
   },
   {
     id: 'cat-reference',
@@ -135,14 +142,34 @@ const PROJECTS = [
     auth: 'Live on Steam, free download'
   },
   {
-    category: 'cat-csgames',
-    to: '/projects/theory-of-computation',
-    badge: 'Computer science depth',
-    title: 'Theory of Computation review tool',
+    category: 'cat-study',
+    tool: true,
+    order: 1,
+    launch: 'https://penpro.github.io/toddler-to-turing/',
+    source: 'https://github.com/penpro/toddler-to-turing',
+    badge: 'Free · Open source · Offline · No signup',
+    title: 'Toddler to Turing',
+    tagline:
+      'Discrete math from scratch — from “what does ∀ even mean?” to understanding a Turing machine.',
     summary:
-      "Self-contained offline study app for Sipser's graduate-level theory of computation course. 670+ original questions across Chapters 0–8 + three exam checkpoints, a custom Leitner + streak + mastery-gated SRS scheduler, state-diagram practice for DFAs and NFAs, KaTeX-rendered math. Live themed build runs in the browser at /toc/; canonical offline build is on GitHub. Built to prove I can think about computability and complexity, not just stitch libraries.",
-    stack: ['Vanilla JS', 'KaTeX', 'Spaced repetition', 'Offline-first'],
-    auth: 'Live + offline (GitHub); see case study'
+      'A gentle, gamified on-ramp into the discrete-math foundations of computer science, for anyone the notation has ever scared off. Eight gated modules — Symbols & Notation, Logic, Sets, Functions & Relations, Proofs & Induction, Strings & Languages, Graphs, and Machines & Algorithms — with 146 auto-graded questions, spaced repetition, plain-English “explain like I’m five” walkthroughs, Venn / graph / state-machine diagrams, a printable cheat sheet, and a timed quiz. Fully offline; progress saves in your browser. It ends by handing you off to the Theory of Computation review app.',
+    stack: ['Vanilla JS', 'KaTeX', '8 gated modules', '146 questions', 'Spaced repetition', 'Offline-first'],
+    beginner: true
+  },
+  {
+    category: 'cat-study',
+    tool: true,
+    order: 2,
+    launch: 'https://penpro.github.io/theory-of-computation-review/',
+    source: 'https://github.com/penpro/theory-of-computation-review',
+    caseStudy: '/projects/theory-of-computation',
+    badge: 'Free · Open source · Offline · Sipser 3rd ed.',
+    title: 'Theory of Computation Review',
+    tagline:
+      'An 859-question spaced-repetition review app for a Theory of Computation course (Sipser, 3rd ed.).',
+    summary:
+      'The advanced follow-up: comprehensive final-exam prep covering Sipser Chapters 0–8 plus exam checkpoints — regular & context-free languages, Turing machines, decidability, reducibility, and time & space complexity. Auto-graded questions on a custom Leitner + streak + mastery-gated scheduler, real-world discussion questions, DFA / NFA / TM state-diagram practice, a timed mock-exam mode, and a reference cheat sheet. Built to prove I can reason about computability and complexity, not just stitch libraries. A themed build also runs on this site at /toc/.',
+    stack: ['Vanilla JS', 'KaTeX', '859 questions', 'Mastery-gated SRS', 'Mock-exam mode', 'DFA / NFA / TM diagrams']
   },
   {
     category: 'cat-csgames',
@@ -471,7 +498,9 @@ export default function Projects() {
                   }}
                 >
                   {projectsInCat.map((p) =>
-                    p.href ? (
+                    p.tool ? (
+                      <ToolCard key={p.title} project={p} />
+                    ) : p.href ? (
                       <ExternalCard key={p.title} project={p} />
                     ) : (
                       <ProjectCard key={p.title} project={p} />
@@ -584,6 +613,152 @@ function ExternalCard({ project }) {
           Open on GitHub ↗
         </span>
       </a>
+    </Card>
+  );
+}
+
+// Launchable free tools: unlike the whole-card-link cards above, these carry
+// two distinct actions (Launch the live app + view Source), so the card can't
+// itself be a single link. Rendered as a static card with a button row that
+// bottom-aligns across the pair.
+function ToolCard({ project }) {
+  const linkStyle = {
+    color: colors.accent,
+    fontSize: fontSizes.sm,
+    fontWeight: fontWeights.semibold,
+    textDecoration: 'none'
+  };
+  return (
+    <Card
+      padding={space.lg}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
+      <div style={{ marginBottom: space.sm }}>
+        <span
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.xs,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            padding: '0.15rem 0.55rem',
+            borderRadius: radii.full,
+            border: `1px solid ${project.beginner ? colors.cyan : colors.border}`,
+            color: project.beginner ? colors.cyan : colors.textMuted
+          }}
+        >
+          {project.beginner ? '① Start here' : '② Follow-up'}
+        </span>
+      </div>
+
+      <span
+        style={{
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.xs,
+          color: colors.cyan,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em'
+        }}
+      >
+        {project.badge}
+      </span>
+
+      <h3
+        style={{
+          fontFamily: fonts.heading,
+          fontSize: fontSizes.lg,
+          fontWeight: fontWeights.semibold,
+          margin: `${space.sm} 0 0`,
+          color: colors.text
+        }}
+      >
+        {project.title}
+      </h3>
+
+      {project.tagline && (
+        <p
+          style={{
+            margin: `${space.xs} 0 0`,
+            fontSize: fontSizes.base,
+            lineHeight: 1.5,
+            fontWeight: fontWeights.medium,
+            color: colors.text
+          }}
+        >
+          {project.tagline}
+        </p>
+      )}
+
+      <p
+        style={{
+          margin: `${space.sm} 0 0`,
+          fontSize: fontSizes.sm,
+          lineHeight: 1.6,
+          color: colors.textSecondary
+        }}
+      >
+        {project.summary}
+      </p>
+
+      {project.stack && (
+        <div
+          style={{
+            marginTop: space.md,
+            display: 'flex',
+            gap: space.xs,
+            flexWrap: 'wrap'
+          }}
+        >
+          {project.stack.map((s) => (
+            <span
+              key={s}
+              style={{
+                fontFamily: fonts.mono,
+                fontSize: fontSizes.xs,
+                padding: '0.15rem 0.5rem',
+                background: colors.bg,
+                border: `1px solid ${colors.border}`,
+                borderRadius: radii.full,
+                color: colors.textSecondary
+              }}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div
+        style={{
+          marginTop: 'auto',
+          paddingTop: space.lg,
+          display: 'flex',
+          alignItems: 'center',
+          gap: space.lg,
+          flexWrap: 'wrap'
+        }}
+      >
+        <Button
+          as="a"
+          href={project.launch}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Launch ↗
+        </Button>
+        <a
+          href={project.source}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={linkStyle}
+        >
+          Source ↗
+        </a>
+        {project.caseStudy && (
+          <Link to={project.caseStudy} style={linkStyle}>
+            Read the write-up →
+          </Link>
+        )}
+      </div>
     </Card>
   );
 }

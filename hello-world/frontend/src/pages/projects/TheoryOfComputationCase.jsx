@@ -2,7 +2,7 @@
 //
 // Credibility piece. Built as a study aid for a graduate-level theory
 // course using Sipser's "Introduction to the Theory of Computation."
-// 670+ original questions, a custom spaced-repetition scheduler, KaTeX
+// 859 original questions, a custom spaced-repetition scheduler, KaTeX
 // math, state-diagram practice. Designed to do a job that a 12-week
 // bootcamp curriculum doesn't prepare anyone to do.
 
@@ -77,7 +77,7 @@ export default function TheoryOfComputationCase() {
   useDocumentMeta({
     title: 'Theory of Computation review tool case study | Penumbra Tech',
     description:
-      "Offline-first study app for Sipser's graduate Theory of Computation course. 670+ original questions, custom Leitner + streak SRS scheduler, DFA/NFA state-diagram practice, KaTeX-rendered math.",
+      "Offline-first study app for Sipser's graduate Theory of Computation course. 859 original questions, custom Leitner + streak SRS scheduler, DFA/NFA state-diagram practice, KaTeX-rendered math.",
     canonical: 'https://penumbra-tech.com/projects/theory-of-computation'
   });
   return (
@@ -125,7 +125,7 @@ export default function TheoryOfComputationCase() {
           >
             A self-contained offline study app I built to prepare for a
             graduate-level theory of computation course using Sipser&apos;s
-            textbook. <strong style={{ color: colors.text }}>670+ original
+            textbook. <strong style={{ color: colors.text }}>859 original
             questions</strong> across Chapters 0–8 and three exam
             checkpoints, a custom spaced-repetition scheduler, full
             concept explainers, state-diagram practice for DFAs and NFAs,
