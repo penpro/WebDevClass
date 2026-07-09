@@ -51,6 +51,10 @@ const {
   adminRouter: blogAdminRouter,
   htmlRouter: blogHtmlRouter
 } = require('./blog');
+const {
+  adminRouter: previewAdminRouter,
+  htmlRouter: previewHtmlRouter
+} = require('./previews');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -317,6 +321,9 @@ app.use('/api/admin/diagnostics', diagnosticsRouter);
 app.use('/api/admin/contacts', adminLimiter, contactAdminRouter);
 // Blog publishing console API — specific path before the broad /api/admin.
 app.use('/api/admin/blog', adminLimiter, blogAdminRouter);
+// Private preview-pages console API — also specific-before-broad. Upload is
+// multipart (multer), handled inside the router; everything else is JSON.
+app.use('/api/admin/previews', adminLimiter, previewAdminRouter);
 app.use('/api/admin', adminLimiter, adminRouter);
 // Blog public read API (list, single post, share-card PNG).
 app.use('/api/blog', blogPublicRouter);
@@ -326,6 +333,10 @@ app.use('/api/blog', blogPublicRouter);
 // injected into the SPA shell) without waiting for the next deploy's
 // prerender pass. See blog.js for the full rationale.
 app.use(blogHtmlRouter);
+// Private preview pages: /preview/<slug>/ + assets, served from disk with a
+// per-request lock check. nginx proxies /preview here (see ops/nginx). Kept
+// after the blog HTML router; both match disjoint path prefixes.
+app.use(previewHtmlRouter);
 // Synthetic load-test endpoints. Header-gated; invisible to anyone who
 // isn't currently running a test through the diagnostics page.
 app.use('/api/loadtest', loadtestEndpoints);

@@ -16,6 +16,7 @@ import Button from '../components/Button.jsx'
 import HudLabel from '../components/HudLabel.jsx'
 import CornerBrackets from '../components/CornerBrackets.jsx'
 import BlogConsole from '../components/admin/BlogConsole.jsx'
+import PrivatePagesConsole from '../components/admin/PrivatePagesConsole.jsx'
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin'])
 const ROLE_OPTIONS = [
@@ -393,6 +394,9 @@ export default function AdminPortal() {
 
           {/* Blog publishing console — super_admin only */}
           {isSuperAdmin && <BlogConsole />}
+
+          {/* Private preview-pages console — super_admin only */}
+          {isSuperAdmin && <PrivatePagesConsole />}
 
           <SectionTitle>User search</SectionTitle>
 
