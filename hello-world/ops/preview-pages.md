@@ -12,31 +12,46 @@ backend at `/preview/<slug>/`, stored on disk under `PREVIEW_ROOT`
 
 ## One-time nginx change
 
-Two edits to the site's server block (the same file that already proxies
-`/api` and `/blog`). Use the **same `proxy_pass` target as your existing
-`/blog` block** (shown here as `127.0.0.1:3000`).
+Two edits to the site's server block (`/etc/nginx/sites-available/hello-app`,
+the same file that already proxies `/api` and `/blog`). Use the **same
+`proxy_pass` target as your existing `/blog` block** (`127.0.0.1:3000`).
+
+**1) Raise the upload limit on `/api/`.** The console POSTs zip bundles to
+`/api/admin/previews`; the default `client_max_body_size` (~1 MB) 413s them.
+Add inside the existing `location /api/ { … }`:
 
 ```nginx
-# Inside  server { ... }  for penumbra-tech.com:
-
-# 1) Uploads can be large (zip bundles up to 80 MB). Without this nginx
-#    rejects them with 413 before they reach the backend. Put it at the
-#    server level so it also covers the /api/admin/previews upload.
-client_max_body_size 100M;
-
-# 2) Serve preview pages through the backend (it does the lock check).
-#    Prefix match, so it also covers /preview/<slug>/<assets>.
-location /preview/ {
-    proxy_pass http://127.0.0.1:3000;          # NO trailing slash/URI
-    proxy_http_version 1.1;
-    proxy_set_header Host              $host;
-    proxy_set_header X-Real-IP         $remote_addr;
-    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
+    client_max_body_size 100m;
 ```
 
-Then:
+**2) Add the `/preview/` location — with a permissive CSP.** This is the
+critical part. The site-wide CSP is strict (`script-src 'self'`,
+`font-src 'self'`), which **blocks the inline `<script>`, Google Fonts, and
+embeds that a self-contained client site needs — the page renders blank**.
+So `/preview/` gets a relaxed CSP scoped to itself, exactly like the
+existing `/visualizer/` block. Because *any* `add_header` in a location
+drops the inherited ones (nginx inheritance trap), the other security
+headers are re-added here. Insert before the `location / {` SPA fallback:
+
+```nginx
+    location /preview/ {
+        client_max_body_size 100m;
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; connect-src 'self' https: blob:; frame-src 'self' https:; frame-ancestors 'self'" always;
+        proxy_pass http://127.0.0.1:3000;          # NO trailing slash/URI
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+```
+
+The relaxed CSP is safe here because only the super_admin uploads previews
+(trusted content). The main app keeps its strict CSP. Then:
 
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
