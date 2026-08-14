@@ -192,6 +192,16 @@ const PROJECTS = [
     auth: 'Live site link inside the case study'
   },
   {
+    category: 'cat-client',
+    to: '/projects/yuki',
+    badge: 'Client work · brand + full-stack',
+    title: "Yūki's Sacred Space",
+    summary:
+      "Yūki does distance reiki, spirit guidance, and death doula work, which is about as non-technical as a business gets. The whole job was making it read as legit, and the trust all comes from the engineering. Five free printable CBT workbooks (one file, branded on screen and printer-friendly with real lines to write on, 988 crisis lines on the heavy ones). The same Node + MySQL + nginx stack I'd give a software client. Her Square checkout left exactly where it already worked. And the witchy background (aura, kanji watermark, spiders on threads) built with reduced-motion and checked at real screen sizes instead of just thrown on top. Live at yukis.space.",
+    stack: ['Node + Express', 'MySQL', 'nginx + PM2', 'Accessibility', 'SEO', 'Printable CBT workbooks'],
+    auth: 'Live site (yukis.space) link inside the case study'
+  },
+  {
     category: 'cat-apps',
     to: '/projects/tasktrackr',
     fallback: '/tasktrackr',
