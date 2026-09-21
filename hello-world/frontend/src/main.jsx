@@ -49,6 +49,7 @@ const DiagnosticsCase = lazy(() => import('./pages/projects/DiagnosticsCase.jsx'
 const TheoryOfComputationCase = lazy(() => import('./pages/projects/TheoryOfComputationCase.jsx'))
 const Repair360Case = lazy(() => import('./pages/projects/Repair360Case.jsx'))
 const YukiCase = lazy(() => import('./pages/projects/YukiCase.jsx'))
+const Ata202Case = lazy(() => import('./pages/projects/Ata202Case.jsx'))
 const TrigonometryToolsCase = lazy(() => import('./pages/projects/TrigonometryToolsCase.jsx'))
 const MetaverseOriginsCase = lazy(() => import('./pages/projects/MetaverseOriginsCase.jsx'))
 const MusicVisualizerCase = lazy(() => import('./pages/projects/MusicVisualizerCase.jsx'))
@@ -86,6 +87,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             />
             <Route path="projects/repair360-auto" element={<Repair360Case />} />
             <Route path="projects/yuki" element={<YukiCase />} />
+            <Route path="projects/ata-202" element={<Ata202Case />} />
             <Route
               path="projects/trigonometry-tools"
               element={<TrigonometryToolsCase />}

@@ -1,8 +1,8 @@
 // Projects / portfolio index.
 //
 // Each project carries a `category` field. The page groups them into
-// titled sections — Client work, Infrastructure & SaaS, Web apps,
-// Computer science & games, Reference — and the SectionRail on the
+// titled sections, Client work, Infrastructure & SaaS, Web apps,
+// Computer science & games, Reference, and the SectionRail on the
 // left gets a stop per category so a buyer can jump straight to the
 // kind of evidence they care about.
 //
@@ -47,7 +47,7 @@ const CATEGORIES = [
     id: 'cat-products',
     label: 'Products',
     intro:
-      'Shipped, downloadable software — Steam releases and installable Windows apps under the Penumbra family of studios.'
+      'Shipped, downloadable software, Steam releases and installable Windows apps under the Penumbra family of studios.'
   },
   {
     id: 'cat-client',
@@ -57,7 +57,7 @@ const CATEGORIES = [
   {
     id: 'cat-infra',
     label: 'Infrastructure & SaaS',
-    intro: 'The plumbing — load testing, payments, deploys, SaaS rescue patterns.'
+    intro: 'The plumbing, load testing, payments, deploys, SaaS rescue patterns.'
   },
   {
     id: 'cat-apps',
@@ -68,7 +68,7 @@ const CATEGORIES = [
     id: 'cat-study',
     label: 'Study tools',
     intro:
-      'Two free, open-source study apps I built and gave away — no signup, no backend, fully offline, progress saved in your browser. A beginner on-ramp into discrete math, and its advanced follow-up for a theory-of-computation course. Launch either in the browser or read the source.'
+      'Two free, open-source study apps I built and gave away, no signup, no backend, fully offline, progress saved in your browser. A beginner on-ramp into discrete math, and its advanced follow-up for a theory-of-computation course. Launch either in the browser or read the source.'
   },
   {
     id: 'cat-csgames',
@@ -110,7 +110,7 @@ const PROJECTS = [
     badge: 'Penumbra product · Open source · Windows',
     title: 'Aphelion: local AI desktop app',
     summary:
-      "A free, open-source Windows desktop app that runs powerful LLMs entirely on the user's own machine. Tauri v2 (Rust + React + TypeScript) shell around a bundled llama.cpp engine (Vulkan), GGUF models auto-fit to the GPU's reported VRAM. One installer, no servers, no Docker, no account, no telemetry, no phone-home. Five workspaces share the same loaded engine: chat, characters & roleplay, story writing, dialogue trees, code assistant. Aphelion (n.) — the orbital point farthest from the sun; your AI, at the farthest point from the cloud.",
+      "A free, open-source Windows desktop app that runs powerful LLMs entirely on the user's own machine. Tauri v2 (Rust + React + TypeScript) shell around a bundled llama.cpp engine (Vulkan), GGUF models auto-fit to the GPU's reported VRAM. One installer, no servers, no Docker, no account, no telemetry, no phone-home. Five workspaces share the same loaded engine: chat, characters & roleplay, story writing, dialogue trees, code assistant. Aphelion (n.), the orbital point farthest from the sun; your AI, at the farthest point from the cloud.",
     stack: ['Tauri v2', 'Rust', 'React + TypeScript + Vite', 'llama.cpp + Vulkan', 'GGUF models', '100% offline'],
     auth: 'Free download · Windows installer · MIT'
   },
@@ -150,9 +150,9 @@ const PROJECTS = [
     badge: 'Free · Open source · Offline · No signup',
     title: 'Toddler to Turing',
     tagline:
-      'Discrete math from scratch — from “what does ∀ even mean?” to understanding a Turing machine.',
+      'Discrete math from scratch, from “what does ∀ even mean?” to understanding a Turing machine.',
     summary:
-      'A gentle, gamified on-ramp into the discrete-math foundations of computer science, for anyone the notation has ever scared off. Eight gated modules — Symbols & Notation, Logic, Sets, Functions & Relations, Proofs & Induction, Strings & Languages, Graphs, and Machines & Algorithms — with 146 auto-graded questions, spaced repetition, plain-English “explain like I’m five” walkthroughs, Venn / graph / state-machine diagrams, a printable cheat sheet, and a timed quiz. Fully offline; progress saves in your browser. It ends by handing you off to the Theory of Computation review app.',
+      'A gentle, gamified on-ramp into the discrete-math foundations of computer science, for anyone the notation has ever scared off. Eight gated modules, Symbols & Notation, Logic, Sets, Functions & Relations, Proofs & Induction, Strings & Languages, Graphs, and Machines & Algorithms, with 146 auto-graded questions, spaced repetition, plain-English “explain like I’m five” walkthroughs, Venn / graph / state-machine diagrams, a printable cheat sheet, and a timed quiz. Fully offline; progress saves in your browser. It ends by handing you off to the Theory of Computation review app.',
     stack: ['Vanilla JS', 'KaTeX', '8 gated modules', '146 questions', 'Spaced repetition', 'Offline-first'],
     beginner: true
   },
@@ -168,7 +168,7 @@ const PROJECTS = [
     tagline:
       'An 859-question spaced-repetition review app for a Theory of Computation course (Sipser, 3rd ed.).',
     summary:
-      'The advanced follow-up: comprehensive final-exam prep covering Sipser Chapters 0–8 plus exam checkpoints — regular & context-free languages, Turing machines, decidability, reducibility, and time & space complexity. Auto-graded questions on a custom Leitner + streak + mastery-gated scheduler, real-world discussion questions, DFA / NFA / TM state-diagram practice, a timed mock-exam mode, and a reference cheat sheet. Built to prove I can reason about computability and complexity, not just stitch libraries. A themed build also runs on this site at /toc/.',
+      'The advanced follow-up: comprehensive final-exam prep covering Sipser Chapters 0–8 plus exam checkpoints, regular & context-free languages, Turing machines, decidability, reducibility, and time & space complexity. Auto-graded questions on a custom Leitner + streak + mastery-gated scheduler, real-world discussion questions, DFA / NFA / TM state-diagram practice, a timed mock-exam mode, and a reference cheat sheet. Built to prove I can reason about computability and complexity, not just stitch libraries. A themed build also runs on this site at /toc/.',
     stack: ['Vanilla JS', 'KaTeX', '859 questions', 'Mastery-gated SRS', 'Mock-exam mode', 'DFA / NFA / TM diagrams']
   },
   {
@@ -177,7 +177,7 @@ const PROJECTS = [
     badge: 'Single-file web app · Open source',
     title: 'Penumbra Music Visualizer',
     summary:
-      "I wanted a music visualizer that survived bad wifi at a party — no install, no cookies, no signup, no cloud dependency, just one HTML file you double-click. Drag a song onto it and nine reactive visualizers light up (three Penumbra-branded, six conventional spectrum treatments). From-scratch BPM detection via onset-envelope autocorrelation, musical-key detection via Krumhansl-Schmuckler chroma — both cached in localStorage so each song is analyzed once. Tab-audio capture lets it visualize YouTube Music or Spotify; built-in canvas+audio recorder exports a .webm. Zero dependencies, no build step, ~52KB of one index.html.",
+      "I wanted a music visualizer that survived bad wifi at a party, no install, no cookies, no signup, no cloud dependency, just one HTML file you double-click. Drag a song onto it and nine reactive visualizers light up (three Penumbra-branded, six conventional spectrum treatments). From-scratch BPM detection via onset-envelope autocorrelation, musical-key detection via Krumhansl-Schmuckler chroma, both cached in localStorage so each song is analyzed once. Tab-audio capture lets it visualize YouTube Music or Spotify; built-in canvas+audio recorder exports a .webm. Zero dependencies, no build step, ~52KB of one index.html.",
     stack: ['Single-file HTML', 'Web Audio API', 'Canvas 2D', 'FFT / BPM / Key detection', 'localStorage cache', 'MediaRecorder'],
     auth: 'Open source · MIT · Download index.html, double-click'
   },
@@ -190,6 +190,16 @@ const PROJECTS = [
       "Client kept their Wix host because their booking app, email, and listings were already wired to it. Built a hand-written dependency-free single-file front-end (~160 KB, no framework, no build step) embedded in a Wix HTML/Iframe panel, plus the harder hidden work: reverse-engineering the brand from social-media flyers, JPEG-to-SVG logo recovery, defeating a UTF-8 mojibake bug in the delivery pipeline, and fixing the iframe SEO-invisibility trap with AutoRepair JSON-LD and native host elements. Calls and car count went from 20-30/wk to 40-50/wk.",
     stack: ['Vanilla JS', 'Responsive CSS', 'SVG vectorization', 'JSON-LD', 'Wix embed'],
     auth: 'Live site link inside the case study'
+  },
+  {
+    category: 'cat-client',
+    to: '/projects/ata-202',
+    badge: 'Client work · nonprofit · full-stack',
+    title: 'Tug Comanche (ATA-202)',
+    summary:
+      "tug202.org, for the volunteer nonprofit keeping the 1944 Navy ocean tug Comanche (later USCGC WMEC-202) afloat and underway on Puget Sound. A rescue like that runs on money and volunteers, so the site is really an operations backend wearing a museum-ship front end. Donations through Givebutter, branded email blasts on Amazon SES with automatic bounce handling, volunteer and partner and grant intake, a board portal the crew logs into (roles, invite links, password resets), grant proposals that render their own budget PDFs, and a supporter list I built by transcribing 159 people off a box of old paper sign-in sheets. Same Node + MySQL + nginx stack as the rest. Live at tug202.org.",
+    stack: ['Node + Express', 'MySQL', 'Givebutter', 'Amazon SES', 'Board portal', 'Grant PDFs'],
+    auth: 'Live site (tug202.org) link inside the case study'
   },
   {
     category: 'cat-client',
@@ -292,7 +302,7 @@ export default function Projects() {
   useDocumentMeta({
     title: 'Live projects and case studies | Penumbra Tech',
     description:
-      'Live, exercisable evidence — case studies and running demos across client work, SaaS infrastructure, performance engineering, computer science depth, and Steam-published software.',
+      'Live, exercisable evidence, case studies and running demos across client work, SaaS infrastructure, performance engineering, computer science depth, and Steam-published software.',
     canonical: 'https://penumbra-tech.com/projects'
   });
 
@@ -347,12 +357,12 @@ export default function Projects() {
           >
             Each project below is either shipped as a real product you
             can install, or running right now and you can click into
-            it. A few require sign-in (free, no spam) — that&apos;s
+            it. A few require sign-in (free, no spam), that&apos;s
             because they save data to the database, which only makes
             sense per-user.
           </p>
 
-          {/* Search bar — substring match across title, summary, stack,
+          {/* Search bar, substring match across title, summary, stack,
               badge. Plain controlled input, no fancy fuzzy library. */}
           <div
             style={{

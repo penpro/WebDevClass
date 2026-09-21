@@ -47,6 +47,7 @@ const ROUTES = [
   '/projects/theory-of-computation',
   '/projects/repair360-auto',
   '/projects/yuki',
+  '/projects/ata-202',
   '/projects/trigonometry-tools',
   '/projects/metaverse-origins',
   '/projects/music-visualizer',
