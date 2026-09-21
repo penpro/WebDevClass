@@ -342,7 +342,7 @@ CSS and JS inlined, logo embedded as inline SVG, fonts from
       <ChallengeSection
         eyebrow="Challenge 4: Mojibake nobody warns you about"
         tone="cyan"
-        title="UTF-8 turned to soup somewhere between editor and clipboard."
+        title="The paste corrupted every non-ASCII character."
       >
         <p>
           First paste into Wix came out full of garbage characters, em
@@ -369,7 +369,7 @@ CSS and JS inlined, logo embedded as inline SVG, fonts from
         background={colors.bgSoft}
         eyebrow="Challenge 5: The invisible-website trap"
         tone="magenta"
-        title="Pixel-perfect, and effectively unindexable."
+        title="Pixel-perfect in the frame, invisible to Google."
       >
         <p>
           This is the one most builders miss, and it&apos;s the most
@@ -431,8 +431,7 @@ an H1, the service list, and the full name/address/phone (the
       >
         <Container>
           <div style={{ maxWidth: '60ch', marginBottom: space['2xl'] }}>
-            <HudLabel tone="corona">Lessons that travel</HudLabel>
-            <h2 style={sectionTitleStyle}>Patterns worth keeping.</h2>
+            <HudLabel tone="corona">Lessons</HudLabel>
           </div>
 
           <div
@@ -443,20 +442,20 @@ an H1, the service list, and the full name/address/phone (the
             }}
           >
             <PitchCard
-              title="Hosting choices are business decisions"
-              body="A client who's productive on a no-code platform isn't wrong to stay there. A custom front-end inside their host is usually cheaper, faster, and lower-risk than a migration."
+              title="Staying on their no-code host was the right call"
+              body="A client who's productive on Wix isn't wrong to stay there. A custom front-end inside their host is usually cheaper, faster, and lower-risk than a migration."
             />
             <PitchCard
-              title='"Looks done" isn&apos;t "gets found"'
-              body="An embedded site can be pixel-perfect and still invisible to search, the frame doesn't carry your SEO. Verify crawlability and solve it natively in the host: headings, NAP, structured data. Never assume."
+              title="An embed can be invisible to search"
+              body="An embedded site can be pixel-perfect and still get zero search traffic, because the frame doesn't carry your SEO. Check what a crawler actually sees, then fix it natively in the host: headings, NAP, structured data."
             />
             <PitchCard
-              title="The delivery pipeline is part of the product"
-              body="A file that's correct in your editor can be corrupted by the channel that carries it. When you don't control the pipe, ship something robust to it, pure ASCII travels everywhere intact."
+              title="The delivery channel can corrupt the file"
+              body="A file that's correct in your editor can be mangled by whatever carries it. When you don't control the pipe, ship something it can't break, pure ASCII travels everywhere intact."
             />
             <PitchCard
-              title="Know when not to over-engineer"
-              body="Manual full-height panel sizing and a tagline-instead-of-nav held up fine. I spent the effort where it actually mattered, encoding, SEO, brand consistency, not on machinery the project didn't need."
+              title="Don't over-engineer what doesn't need it"
+              body="Manual full-height panel sizing and a tagline instead of a nav held up fine. I spent the effort where it mattered, encoding, SEO, brand consistency, not on machinery the project didn't need."
             />
           </div>
 

@@ -273,7 +273,7 @@ export default function MusicVisualizerCase() {
       <ChallengeSection
         eyebrow="Why this exists"
         tone="cyan"
-        title="The constraint was the design."
+        title="The no-install rule shaped every decision."
       >
         <p>
           Most music visualizers fall into one of two buckets. Either

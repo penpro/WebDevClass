@@ -538,7 +538,7 @@ if it&apos;s useful to you, anything helps.
         <Container>
           <div style={{ maxWidth: '64ch' }}>
             <HudLabel tone="magenta">Brand family</HudLabel>
-            <h2 style={sectionTitleStyle}>Same eclipse, different orbit.</h2>
+            <h2 style={sectionTitleStyle}>What's coming next.</h2>
             <p
               style={{
                 marginTop: space.md,
