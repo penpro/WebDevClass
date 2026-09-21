@@ -57,11 +57,11 @@ const codeStyle = {
 // stop reading as "default bootstrap badges."
 function Method({ verb }) {
   const methodColors = {
-    GET: theme.accent,         // corona — safe, idempotent
-    POST: theme.cyan,          // cyan — creation
-    PUT: theme.warning,        // amber — mutation
+    GET: theme.accent,         // corona, safe, idempotent
+    POST: theme.cyan,          // cyan, creation
+    PUT: theme.warning,        // amber, mutation
     PATCH: theme.warning,
-    DELETE: theme.danger       // red — destructive
+    DELETE: theme.danger       // red, destructive
   }
   const bg = methodColors[verb] || theme.surface
   return (
@@ -120,7 +120,7 @@ export default function ApiGuide() {
   useDocumentMeta({
     title: 'Public API reference | Penumbra Tech',
     description:
-      "Reference for every public endpoint on this site — REST conventions, status codes, role requirements, rate-limit tiers. Both documentation and evidence that the API has been thoughtfully designed.",
+      "Reference for every public endpoint on this site, REST conventions, status codes, role requirements, rate-limit tiers. Both documentation and evidence that the API has been thoughtfully designed.",
     canonical: 'https://penumbra-tech.com/api-guide'
   })
   return (
@@ -207,7 +207,7 @@ export default function ApiGuide() {
           <code style={codeStyle}>mysql2/promise</code></li>
         <li><strong>Sessions:</strong>{' '}
           <code style={codeStyle}>express-session</code> with{' '}
-          <code style={codeStyle}>express-mysql-session</code> store —{' '}
+          <code style={codeStyle}>express-mysql-session</code> store, {' '}
           cookies are{' '}
           <code style={codeStyle}>HttpOnly + SameSite=Lax + Secure</code>{' '}
           (over HTTPS)</li>
@@ -260,7 +260,7 @@ export default function ApiGuide() {
       </table>
       <p style={{ fontSize: '0.9rem', color: theme.textMuted }}>
         <em>Idempotent</em> means calling N times produces the same end-state as
-        calling once — important so a network blip retry can't compound damage.
+        calling once, important so a network blip retry can't compound damage.
         Only POST is non-idempotent here (you really do create a new note each time).
       </p>
 
@@ -304,7 +304,7 @@ export default function ApiGuide() {
         Every request after login automatically carries the cookie. Browsers handle
         this; from <code style={codeStyle}>fetch()</code> include{' '}
         <code style={codeStyle}>credentials: 'include'</code>. The session itself
-        lives in the <code style={codeStyle}>sessions</code> table in MySQL —
+        lives in the <code style={codeStyle}>sessions</code> table in MySQL, 
         destroying the row (via logout) immediately revokes the session.
       </p>
       <p>
@@ -314,7 +314,7 @@ export default function ApiGuide() {
       </p>
       <p>
         Password reset uses one-hour, single-use tokens. Only their{' '}
-        <code style={codeStyle}>sha256</code> hash is stored — the plaintext only
+        <code style={codeStyle}>sha256</code> hash is stored, the plaintext only
         exists in the email sent to the user.
       </p>
 
@@ -323,7 +323,7 @@ export default function ApiGuide() {
       <p>
         The <code style={codeStyle}>users.role</code> column is a four-tier hierarchy.
         Each tier inherits everything below it. The role is re-read from the database
-        on every gated request — never cached in the session — so a demotion takes
+        on every gated request, never cached in the session, so a demotion takes
         effect immediately.
       </p>
       <table style={tableStyle}>
@@ -462,7 +462,7 @@ export default function ApiGuide() {
       <p style={{ fontSize: '0.9rem', color: theme.textMuted }}>
         Subscription billing for the Premium tier, integrated with Stripe.
         The frontend uses Stripe Elements (Payment Element) so card details
-        are sent directly from the browser to Stripe — they never touch this
+        are sent directly from the browser to Stripe, they never touch this
         server, which keeps PCI compliance scope at SAQ-A. The role flip
         from <code style={codeStyle}>user</code> to{' '}
         <code style={codeStyle}>premium</code> happens in the webhook
@@ -483,7 +483,7 @@ export default function ApiGuide() {
         <code style={codeStyle}>express.raw()</code> in{' '}
         <code style={codeStyle}>server.js</code> BEFORE the global{' '}
         <code style={codeStyle}>express.json()</code> middleware, because
-        Stripe signs the raw request bytes — pre-parsed JSON would fail
+        Stripe signs the raw request bytes, pre-parsed JSON would fail
         signature verification.
       </p>
 
@@ -510,7 +510,7 @@ export default function ApiGuide() {
         <li>
           <strong>DELETE on a non-existent resource returns 404 instead of 204.</strong>{' '}
           This breaks the strict "DELETE is idempotent" contract slightly. We picked
-          404 for honesty — if the client thought it existed and it doesn't, that's
+          404 for honesty, if the client thought it existed and it doesn't, that's
           worth surfacing.
         </li>
         <li>

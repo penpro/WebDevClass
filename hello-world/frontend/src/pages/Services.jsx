@@ -87,7 +87,7 @@ const SERVICES = [
 
 export default function Services() {
   useDocumentMeta({
-    title: 'Services — custom software, AWS, Unreal, performance | Penumbra Tech',
+    title: 'Services, custom software, AWS, Unreal, performance | Penumbra Tech',
     description:
       'Four engagement categories: custom web apps (React + Express + MySQL), AWS infrastructure (EC2/Lambda/DynamoDB/S3), Unreal Engine systems, and performance + reliability work (k6 load testing, profiling, incident response). Fixed scope or hourly.',
     canonical: 'https://penumbra-tech.com/services'

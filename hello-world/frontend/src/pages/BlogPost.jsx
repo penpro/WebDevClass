@@ -1,4 +1,4 @@
-// Blog post — /blog/:slug.
+// Blog post, /blog/:slug.
 //
 // Fetches the server-rendered HTML (markdown is converted by the backend
 // with marked; content is authored only by the super_admin) and displays
@@ -6,7 +6,7 @@
 // shell-injection route so crawlers get correct per-post meta (including
 // the generated og.png share card) without a redeploy.
 //
-// The share row is plain intent links — no SDKs, no scripts, CSP-clean.
+// The share row is plain intent links, no SDKs, no scripts, CSP-clean.
 // The teaser card preview below it shows exactly what platforms will
 // attach when the link is shared, and can be downloaded for manual posts.
 
@@ -261,7 +261,7 @@ export default function BlogPost() {
               letterSpacing: '0.04em'
             }}
           >
-            The card platforms attach when this link is shared — or{' '}
+            The card platforms attach when this link is shared, or{' '}
             <a
               href={cardUrl}
               download={`${slug}-card.png`}

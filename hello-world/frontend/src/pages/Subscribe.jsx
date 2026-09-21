@@ -51,8 +51,8 @@ export default function Subscribe() {
 
   // Returning from a Stripe redirect? confirmPayment redirects to
   // ?payment_intent=...&redirect_status=succeeded after the card is
-  // authorized. We don't have to do anything special — the webhook
-  // updates the role server-side — but a friendly success message is
+  // authorized. We don't have to do anything special, the webhook
+  // updates the role server-side, but a friendly success message is
   // nice. We also re-fetch /auth/me so the role badge in the header
   // updates without requiring a full page reload.
   const [redirectStatus] = useState(params.get('redirect_status'))
@@ -110,7 +110,7 @@ export default function Subscribe() {
           // Webhook also updated the user's role; refetch /auth/me so
           // the role badge in the header flips without a full page reload.
           apiFetch('/auth/me').catch(() => {})
-          return // done — no more polls
+          return // done, no more polls
         }
       } catch {
         // Swallow transient errors; the next tick will retry.
@@ -192,7 +192,7 @@ export default function Subscribe() {
 
   // ---- render branches ----------------------------------------------------
 
-  // 0. Mid-activation — Stripe redirected back but the webhook hasn't
+  // 0. Mid-activation, Stripe redirected back but the webhook hasn't
   // finished flipping the status to 'active' yet. Show a friendly
   // interim screen instead of the default Upgrade pitch so the user
   // doesn't think the payment failed.
@@ -202,7 +202,7 @@ export default function Subscribe() {
         <h1>Activating your subscription…</h1>
         <p>
           Stripe confirmed your payment. We're waiting for the activation
-          signal to land on our side — this usually takes a couple of
+          signal to land on our side, this usually takes a couple of
           seconds.
         </p>
         <p style={{ color: colors.textMuted, fontSize: '0.9rem' }}>
@@ -224,7 +224,7 @@ export default function Subscribe() {
         <h1>Subscription is still activating</h1>
         <p>
           Stripe sent you back here a while ago but our backend hasn't
-          received the activation event yet. This is unusual — refresh
+          received the activation event yet. This is unusual, refresh
           the page in a moment, or check the Stripe dashboard if it
           persists.
         </p>
@@ -249,7 +249,7 @@ export default function Subscribe() {
     )
   }
 
-  // 1. Active subscription — show status + cancel option.
+  // 1. Active subscription, show status + cancel option.
   if (subStatus && subStatus.is_active) {
     return (
       <div style={PAGE_STYLE}>
@@ -309,7 +309,7 @@ export default function Subscribe() {
     )
   }
 
-  // 2. We have a client_secret — render Stripe Elements for card collection.
+  // 2. We have a client_secret, render Stripe Elements for card collection.
   if (clientSecret) {
     const stripe = getStripe(publishableKey)
     if (!stripe) {

@@ -1,8 +1,8 @@
-// Penumbra Music Visualizer — open-source case study.
+// Penumbra Music Visualizer, open-source case study.
 //
 // A single-file in-browser music visualizer. The "no cookies, no
 // install, no wifi" framing is the actual reason this project exists
-// — Wesley wanted something he could double-click on a laptop at a
+//, Wesley wanted something he could double-click on a laptop at a
 // party and not worry about a dropped internet connection or some
 // cloud auth flow ruining the moment. Everything runs locally,
 // including the BPM and key analysis.
@@ -10,7 +10,7 @@
 // Case study positions it as: same Penumbra-brand aesthetic as the
 // streaming overlay and this site (corona teal, eclipse motifs, the
 // JetBrains-Rider HUD chrome), but a meaningfully different problem
-// shape — real-time audio DSP in Canvas 2D with zero build pipeline.
+// shape, real-time audio DSP in Canvas 2D with zero build pipeline.
 
 import { Link } from 'react-router-dom';
 import {
@@ -47,19 +47,19 @@ const DEMO_THUMB = 'https://img.youtube.com/vi/qXSvnXlZAhg/maxresdefault.jpg';
 const LIVE_URL = '/visualizer/';
 
 const SCREENSHOTS = [
-  { src: `${RAW_URL}/docs/01-triangular-peaks.png`, label: 'Triangular Peaks — a 3D perspective lattice of equilateral triangles, spectrum radiating from the center' },
-  { src: `${RAW_URL}/docs/02-eclipse-core.png`,     label: 'Eclipse Core — corona ring with the spectrum drawn as corona spikes' },
-  { src: `${RAW_URL}/docs/03-aurora.png`,           label: 'Aurora Flow — curtain-shaped low-frequency response with hue-cycling' },
-  { src: `${RAW_URL}/docs/04-code-rain.png`,        label: 'Code Rain — Matrix-style C++/hex glyphs whose fall speed tracks the music' },
-  { src: `${RAW_URL}/docs/05-radial-spectrum.png`,  label: 'Radial Spectrum — frequency bins drawn as bars sweeping out from the center' },
-  { src: `${RAW_URL}/docs/06-particle-burst.png`,   label: 'Particle Burst — onset-driven particle field; transients spawn new emitters' }
+  { src: `${RAW_URL}/docs/01-triangular-peaks.png`, label: 'Triangular Peaks, a 3D perspective lattice of equilateral triangles, spectrum radiating from the center' },
+  { src: `${RAW_URL}/docs/02-eclipse-core.png`,     label: 'Eclipse Core, corona ring with the spectrum drawn as corona spikes' },
+  { src: `${RAW_URL}/docs/03-aurora.png`,           label: 'Aurora Flow, curtain-shaped low-frequency response with hue-cycling' },
+  { src: `${RAW_URL}/docs/04-code-rain.png`,        label: 'Code Rain, Matrix-style C++/hex glyphs whose fall speed tracks the music' },
+  { src: `${RAW_URL}/docs/05-radial-spectrum.png`,  label: 'Radial Spectrum, frequency bins drawn as bars sweeping out from the center' },
+  { src: `${RAW_URL}/docs/06-particle-burst.png`,   label: 'Particle Burst, onset-driven particle field; transients spawn new emitters' }
 ];
 
 export default function MusicVisualizerCase() {
   useDocumentMeta({
-    title: 'Penumbra Music Visualizer — offline-first single-file app | Penumbra Tech',
+    title: 'Penumbra Music Visualizer, offline-first single-file app | Penumbra Tech',
     description:
-      "Single-file in-browser music visualizer. No install, no cookies, no wifi — drag an mp3 onto the page and 9 reactive visualizers (Triangular Peaks, Eclipse Core, Code Rain, more) light up. Includes from-scratch BPM and musical-key detection, all running in Web Audio + Canvas 2D with zero dependencies.",
+      "Single-file in-browser music visualizer. No install, no cookies, no wifi, drag an mp3 onto the page and 9 reactive visualizers (Triangular Peaks, Eclipse Core, Code Rain, more) light up. Includes from-scratch BPM and musical-key detection, all running in Web Audio + Canvas 2D with zero dependencies.",
     canonical: 'https://penumbra-tech.com/projects/music-visualizer'
   });
 
@@ -114,7 +114,7 @@ export default function MusicVisualizerCase() {
             dependency. The whole thing is one <code style={inlineCodeStyle}>index.html</code>
             {' '}file (~52KB) you save to your desktop, double-click,
             and drag a song onto. It analyses the audio locally and
-            reacts in real time — nine custom visualizers, on-brand
+            reacts in real time, nine custom visualizers, on-brand
             with the rest of Penumbra Tech (corona teal, eclipse
             motifs, debug-HUD chrome).
           </p>
@@ -280,7 +280,7 @@ export default function MusicVisualizerCase() {
           they&apos;re heavyweight desktop apps (MilkDrop,{' '}
           <code style={inlineCodeStyle}>projectM</code>, the various
           Spotify add-ons) that take a real install and break on the
-          machine you didn&apos;t plan for — or they&apos;re web apps
+          machine you didn&apos;t plan for, or they&apos;re web apps
           that need an account, a cloud service, an active connection
           to a streaming API, and a browser permission dance every
           time. Both fail the &ldquo;5pm at the cabin with spotty wifi
@@ -320,7 +320,7 @@ export default function MusicVisualizerCase() {
         </p>
         <p>
           The three Penumbra-branded modes (Triangular Peaks, Eclipse
-          Core, Code Rain) match the streaming overlay and this site —
+          Core, Code Rain) match the streaming overlay and this site, 
           same corona teal, same eclipse silhouette, same debug-HUD
           chrome with a live <code style={inlineCodeStyle}>void
           MEDIA::Playing(&quot;track&quot;)</code> readout, BASS/LVL
@@ -362,8 +362,8 @@ export default function MusicVisualizerCase() {
                 lineHeight: 1.7
               }}
             >
-              Stills don&apos;t do them justice — the visualizers are
-              live reactive — but they show the shape and palette of
+              Stills don&apos;t do them justice, the visualizers are
+              live reactive, but they show the shape and palette of
               each. Full video demo is on{' '}
               <a
                 href={DEMO_VIDEO_URL}
@@ -420,7 +420,7 @@ export default function MusicVisualizerCase() {
         title="The interesting bits are all in the audio analysis."
       >
         <p>
-          The rendering is honest Canvas 2D — an offscreen FX layer
+          The rendering is honest Canvas 2D, an offscreen FX layer
           composited with{' '}
           <code style={inlineCodeStyle}>lighten</code> /{' '}
           <code style={inlineCodeStyle}>screen</code> blend modes for
@@ -439,8 +439,8 @@ export default function MusicVisualizerCase() {
           <li>
             <strong style={{ color: colors.text }}>
               Web Audio routing
-            </strong>{' '}
-            — a single{' '}
+            </strong>,
+a single{' '}
             <code style={inlineCodeStyle}>AnalyserNode</code> sits
             inline between whichever source is live ({' '}
             <code style={inlineCodeStyle}>MediaElementSource</code> for
@@ -470,8 +470,8 @@ export default function MusicVisualizerCase() {
           <li style={{ marginTop: space.sm }}>
             <strong style={{ color: colors.text }}>
               Recording path
-            </strong>{' '}
-            — the canvas{' '}
+            </strong>,
+the canvas{' '}
             <code style={inlineCodeStyle}>captureStream()</code> is
             merged with the audio destination via a{' '}
             <code style={inlineCodeStyle}>MediaStreamDestination</code>
@@ -524,7 +524,7 @@ export default function MusicVisualizerCase() {
           >
             Free, open source, MIT-licensed. If you want a similar
             zero-install browser tool built for your own brand or use
-            case — single file, no backend, runs from a USB stick —
+            case, single file, no backend, runs from a USB stick, 
             that&apos;s a real shape of engagement; book a call below.
           </p>
           <div
@@ -606,7 +606,7 @@ function DemoEmbed({ src, href }) {
           <Card padding={0} interactive style={{ overflow: 'hidden' }}>
             <img
               src={src}
-              alt="Penumbra Music Visualizer — demo video thumbnail (click to watch on YouTube)"
+              alt="Penumbra Music Visualizer, demo video thumbnail (click to watch on YouTube)"
               loading="lazy"
               style={{
                 display: 'block',

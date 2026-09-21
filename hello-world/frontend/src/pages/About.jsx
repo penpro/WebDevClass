@@ -1,4 +1,4 @@
-// About / story page. Kept readable-width (Container narrow) — this is
+// About / story page. Kept readable-width (Container narrow), this is
 // the most text-heavy page on the site and shouldn't sprawl across a
 // 1180px viewport.
 //
@@ -87,7 +87,7 @@ const PROOFS = [
 
 export default function About() {
   useDocumentMeta({
-    title: 'About Wesley Weaver Jr. — generalist engineer | Penumbra Tech',
+    title: 'About Wesley Weaver Jr., generalist engineer | Penumbra Tech',
     description:
       "Single-engineer consulting practice run by Wesley Weaver Jr. Navy nuclear pipeline background, founder of Penumbra Group / PC / Productions since 2016, based in Kitsap County WA. The engineer who works in the seams between front-end, back-end, cloud, and operations.",
     canonical: 'https://penumbra-tech.com/about'

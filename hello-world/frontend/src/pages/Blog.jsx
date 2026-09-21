@@ -1,4 +1,4 @@
-// Blog index — /blog.
+// Blog index, /blog.
 //
 // Lists published posts newest-first from GET /api/blog. Direct loads of
 // this URL are served by the backend (nginx proxies /blog there), which

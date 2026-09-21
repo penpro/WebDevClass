@@ -60,7 +60,7 @@ export default function HudLabel({
         />
       )}
       <span>{children}</span>
-      <span style={{ opacity: 0.7 }}>—</span>
+      <span style={{ opacity: 0.7 }}>·</span>
       <span style={{ opacity: 0.7 }}>]</span>
     </span>
   );

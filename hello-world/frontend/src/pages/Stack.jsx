@@ -1,4 +1,4 @@
-// Under the hood — what penumbra-tech.com runs on and what it costs.
+// Under the hood, what penumbra-tech.com runs on and what it costs.
 //
 // Marketing page that turns the "this looks like a lot, how much does
 // it cost?" objection into a credibility play. Itemises every line of
@@ -39,7 +39,7 @@ const SECTIONS = [
 ];
 
 // All numbers in USD, current as of 2026 us-east-2 list pricing.
-// Conservative end of the realistic range — actual bill at current
+// Conservative end of the realistic range, actual bill at current
 // traffic comes in a few dollars below this every month.
 const COST_ROWS = [
   {
@@ -158,7 +158,7 @@ const monoNumberStyle = {
 
 export default function Stack() {
   useDocumentMeta({
-    title: 'What this site runs on — the actual AWS bill | Penumbra Tech',
+    title: 'What this site runs on, the actual AWS bill | Penumbra Tech',
     description:
       'Cost transparency: the $15/month AWS bill behind this site, what it actually buys, and why a small custom stack on EC2 can be cheaper and more controllable than $30-$300/month SaaS site builders.',
     canonical: 'https://penumbra-tech.com/stack'
@@ -209,8 +209,8 @@ export default function Stack() {
             cost? The honest answer is{' '}
             <strong style={{ color: colors.text, fontWeight: fontWeights.semibold }}>
               about fifteen dollars a month
-            </strong>
-            , and the only reason that&apos;s surprising is that the
+            </strong>,
+            and the only reason that&apos;s surprising is that the
             managed platforms most people benchmark against are designed
             to make their real cost hard to read.
           </p>

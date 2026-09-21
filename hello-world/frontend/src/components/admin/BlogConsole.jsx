@@ -1,11 +1,11 @@
-// BlogConsole — the Admin Portal's publishing surface (super_admin only;
+// BlogConsole, the Admin Portal's publishing surface (super_admin only;
 // the parent gates rendering).
 //
 // Flow: drop or pick a .md file (or paste markdown), the console derives
 // title / slug / description from the text the same way the backend does
 // (first `# heading` = title; first paragraph = description), all three
 // stay editable, then Publish POSTs to /api/admin/blog. The moment that
-// returns, the post is live at /blog/<slug> with working share cards —
+// returns, the post is live at /blog/<slug> with working share cards, 
 // the backend serves blog HTML dynamically, so there is no deploy step.
 //
 // Below the composer: every existing post with view / share-card /
@@ -33,7 +33,7 @@ function slugify(s) {
     .slice(0, 120);
 }
 
-// Mirror of the backend's deriveFromMarkdown — used only to prefill the
+// Mirror of the backend's deriveFromMarkdown, used only to prefill the
 // editable fields so the admin sees what will happen before publishing.
 function derive(md) {
   const text = String(md).replace(/\r\n/g, '\n').trim();
@@ -189,7 +189,7 @@ export default function BlogConsole() {
       >
         Drop a .md file (or paste markdown), check the derived title, slug,
         and description, and publish. The post is live at /blog/&lt;slug&gt;
-        immediately, share card included — no deploy needed.
+        immediately, share card included, no deploy needed.
       </div>
 
       <div style={{ display: 'flex', gap: space.sm, flexWrap: 'wrap', marginBottom: space.sm }}>
@@ -242,7 +242,7 @@ export default function BlogConsole() {
           />
         </label>
         <label style={fieldLabelStyle}>
-          Slug — /blog/{slug || '…'}
+          Slug, /blog/{slug || '…'}
           <input
             type="text"
             value={slug}
@@ -292,7 +292,7 @@ export default function BlogConsole() {
         )}
         {posts && posts.length === 0 && (
           <span style={{ color: colors.textMuted, fontSizes: fontSizes.sm }}>
-            No posts yet — the one above will be the first.
+            No posts yet, the one above will be the first.
           </span>
         )}
         {posts &&

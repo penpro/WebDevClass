@@ -2,10 +2,10 @@
 // hello-world/backend/contact.js once task #3 lands).
 //
 // Fields:
-//   name      — string, required, 1–80 chars
-//   email     — string, required, validated against a basic regex
-//   subject   — string, optional, 0–120 chars
-//   message   — string, required, 10–4000 chars
+//   name, string, required, 1–80 chars
+//   email, string, required, validated against a basic regex
+//   subject, string, optional, 0–120 chars
+//   message, string, required, 10–4000 chars
 //
 // On success the form swaps to a thank-you state. On failure the form
 // shows the error and keeps the user's input intact so they can retry.
@@ -37,7 +37,7 @@ const SECTIONS = [
   { id: 'form',          num: '03', label: 'Written brief' }
 ];
 
-// Mirrors PenumbraHome.jsx — keep both in sync if the booking event slug
+// Mirrors PenumbraHome.jsx, keep both in sync if the booking event slug
 // changes. (Worth extracting to a shared site.config.js if we add a
 // third reference.)
 const CAL_BOOKING_URL = 'https://cal.com/wesley-weaver-avi7mu/30min';

@@ -1,4 +1,4 @@
-// The SaaS-rescue playbook — Maya's page.
+// The SaaS-rescue playbook, Maya's page.
 //
 // Vertical-specific long-form aimed at the persona that arrived
 // scoring 64% in the round-2 audit but couldn't sign because there
@@ -8,7 +8,7 @@
 //
 // Format: same TOC + print-to-PDF as /guide, but tighter (~5K words,
 // 8 chapters). Each chapter ends with a "What hiring me looks like
-// in this week" callout that's the conversion reframe — the page
+// in this week" callout that's the conversion reframe, the page
 // gives away the recipe and sells the execution.
 
 import useDocumentMeta from '../hooks/useDocumentMeta.js';
@@ -39,7 +39,7 @@ const CHAPTERS = [
 ];
 
 // ---------------------------------------------------------------------- //
-// Helpers (mirror Guide.jsx — kept inline so the file is self-contained)
+// Helpers (mirror Guide.jsx, kept inline so the file is self-contained)
 // ---------------------------------------------------------------------- //
 
 function ChapterTitle({ num, title, id }) {
@@ -283,7 +283,7 @@ function UL({ children }) {
 
 export default function SaasRescue() {
   useDocumentMeta({
-    title: 'The 6-week SaaS-rescue playbook — Penumbra Tech',
+    title: 'The 6-week SaaS-rescue playbook | Penumbra Tech',
     description:
       "8 chapters for solo SaaS founders whose backend is on fire. Real code: Stripe webhook ordering, nightly mysqldump, /api/health, nginx security headers. Free if you have the time, $10K-$25K if you don't.",
     canonical: 'https://penumbra-tech.com/saas-rescue'
@@ -579,9 +579,9 @@ export default function SaasRescue() {
             </HireReframe>
           </section>
 
-          {/* =========================== Week 0 — the audit =========================== */}
+          {/* =========================== Week 0, the audit =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="1" id="audit" title="Week 0 — the 30-minute audit" />
+            <ChapterTitle num="1" id="audit" title="Week 0, the 30-minute audit" />
             <P>
               Before any work begins, the audit. You can do this on
               your own codebase in half an hour with grep and a
@@ -651,9 +651,9 @@ find . -name "*.sh" -path "*backup*" 2>/dev/null`}
             </HireReframe>
           </section>
 
-          {/* =========================== Week 1 — secrets =========================== */}
+          {/* =========================== Week 1, secrets =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="2" id="secrets" title="Week 1 — secrets, auth, rate limits" />
+            <ChapterTitle num="2" id="secrets" title="Week 1, secrets, auth, rate limits" />
             <P>
               The first week of real work is the security baseline.
               Three changes that together close the largest blast
@@ -671,7 +671,7 @@ find . -name "*.sh" -path "*backup*" 2>/dev/null`}
               boots with a hardcoded secret that is public on GitHub.
               Refuse to start instead.
             </P>
-            <CodeBlock label="server.js — top of the file, before requires">
+            <CodeBlock label="server.js, top of the file, before requires">
 {`if (process.env.NODE_ENV === 'production') {
   const secret = process.env.SESSION_SECRET;
   if (!secret || /change-me|insecure|example/i.test(secret)) {
@@ -763,9 +763,9 @@ app.use('/api/auth/forgot-password', forgotPasswordLimiter);`}
             </HireReframe>
           </section>
 
-          {/* =========================== Week 2 — Stripe =========================== */}
+          {/* =========================== Week 2, Stripe =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="3" id="payments" title="Week 2 — Stripe (and what comes after Stripe)" />
+            <ChapterTitle num="3" id="payments" title="Week 2, Stripe (and what comes after Stripe)" />
             <P>
               If your SaaS takes payments via Stripe, there is exactly
               one mistake that will quietly burn three hours of your
@@ -782,7 +782,7 @@ app.use('/api/auth/forgot-password', forgotPasswordLimiter);`}
               silently fails forever. The fix is one line of careful
               ordering.
             </P>
-            <CodeBlock label="server.js — order matters">
+            <CodeBlock label="server.js, order matters">
 {`// Stripe webhook MUST be mounted BEFORE express.json():
 app.post(
   '/api/payments/webhook',
@@ -864,9 +864,9 @@ await pool.query(
             </HireReframe>
           </section>
 
-          {/* =========================== Week 3 — deploys =========================== */}
+          {/* =========================== Week 3, deploys =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="4" id="deploys" title="Week 3 — deploys without 3am surprises" />
+            <ChapterTitle num="4" id="deploys" title="Week 3, deploys without 3am surprises" />
             <P>
               Most solo SaaS deploys are some variant of &ldquo;SSH
               in, git pull, npm install, restart pm2 with my fingers
@@ -952,9 +952,9 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab`}
             </HireReframe>
           </section>
 
-          {/* =========================== Week 4 — monitoring =========================== */}
+          {/* =========================== Week 4, monitoring =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="5" id="monitor" title="Week 4 — monitoring you will actually answer" />
+            <ChapterTitle num="5" id="monitor" title="Week 4, monitoring you will actually answer" />
             <P>
               Most solo SaaS monitoring stories are &ldquo;a customer
               emails me when the site is down.&rdquo; That is not a
@@ -1056,9 +1056,9 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
             </HireReframe>
           </section>
 
-          {/* =========================== Week 5 — backups =========================== */}
+          {/* =========================== Week 5, backups =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="6" id="backups" title="Week 5 — backups and the recovery test" />
+            <ChapterTitle num="6" id="backups" title="Week 5, backups and the recovery test" />
             <P>
               A backup that has never been restored is a file, not a
               backup. Two pieces: a nightly automated dump, and a
@@ -1137,8 +1137,8 @@ sudo mysql -e "DROP DATABASE recovery_test;"`}
                 <C>--no-tablespaces</C> and the dump succeeds without
                 the warning. Skipping that flag produces a scary
                 &ldquo;Access denied&rdquo; line on every nightly run
-                that turns into log noise you eventually stop reading
-                — which is the same as not having a backup.
+                that turns into log noise you eventually stop reading,
+which is the same as not having a backup.
               </P>
             </Gotcha>
 
@@ -1153,9 +1153,9 @@ sudo mysql -e "DROP DATABASE recovery_test;"`}
             </HireReframe>
           </section>
 
-          {/* =========================== Week 6 — headers + handover =========================== */}
+          {/* =========================== Week 6, headers + handover =========================== */}
           <section className="saas-chapter">
-            <ChapterTitle num="7" id="handover" title="Week 6 — security headers and the handover" />
+            <ChapterTitle num="7" id="handover" title="Week 6, security headers and the handover" />
             <P>
               The last week is the part most engagements skip and the
               part that decides whether the engagement was worth what
@@ -1218,7 +1218,7 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' https:
             <P>
               A single Markdown file at the root of your repo. Six
               sections, each one short. The point is not to be
-              comprehensive — it is to be findable when something
+              comprehensive, it is to be findable when something
               breaks and the engineer is panicking.
             </P>
             <CodeBlock label="ops/RUNBOOK.md (template)">
@@ -1229,7 +1229,7 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' https:
 reloads nginx, smoke-tests /api/health. Logs to /var/log/deploy.log.
 
 ## How to roll back
-\`sudo ln -sfn /var/www/myapp-PREVIOUS /var/www/myapp\` — instant.
+\`sudo ln -sfn /var/www/myapp-PREVIOUS /var/www/myapp\`, instant.
 Find PREVIOUS with \`ls -t /var/www/myapp-* | head\`.
 
 ## Common incidents
@@ -1276,7 +1276,7 @@ Test restore quarterly with the script in ops/restore-drill.sh.
               actually uses (Stripe, analytics, fonts), and the
               runbook above filled in with your real paths,
               dashboards, and contact info. Plus a one-week
-              bug-fix coverage window after handover — anything
+              bug-fix coverage window after handover, anything
               that breaks because of work I did in the sprint gets
               fixed at no charge for seven days.
             </HireReframe>
@@ -1294,8 +1294,8 @@ Test restore quarterly with the script in ops/restore-drill.sh.
 
             <H3>If you DIY this</H3>
             <P>
-              Expect 60-100 hours of real work. Not 60 hours of typing
-              — 60 hours of typing, waiting, googling error messages,
+              Expect 60-100 hours of real work. Not 60 hours of typing,
+60 hours of typing, waiting, googling error messages,
               trying fixes that don&apos;t work, eventually finding
               the right one. The chapters above are the recipe; what
               you cannot see in the recipe is the time between the
@@ -1334,7 +1334,7 @@ Test restore quarterly with the script in ops/restore-drill.sh.
               Speed. A consultant who has done this twenty times
               ships week 1&apos;s work in a day. You will ship the
               same work in a week the first time. That is not a
-              criticism — it is what learning costs. The consultant
+              criticism, it is what learning costs. The consultant
               is the one who already paid.
             </P>
             <P>
@@ -1351,7 +1351,7 @@ Test restore quarterly with the script in ops/restore-drill.sh.
             <P>
               A second pair of eyes. The most useful thing about
               hiring somebody for a 6-week sprint is not the code
-              they write — it is the questions they ask in week 1.
+              they write, it is the questions they ask in week 1.
               The ones that go &ldquo;wait, what happens if a user
               deletes their account while a Stripe webhook is in
               flight?&rdquo; The chapters above will not catch every
@@ -1363,7 +1363,7 @@ Test restore quarterly with the script in ops/restore-drill.sh.
               We walk through your stack, what you have done, what
               you are stuck on, and I tell you honestly whether
               hiring me makes sense for your situation. Sometimes
-              it does not — your app is conventional enough that
+              it does not, your app is conventional enough that
               the chapters above are everything you need, or you
               have a friend who already does this work and the
               right move is to ask them for two days. I will tell

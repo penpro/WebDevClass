@@ -1,4 +1,4 @@
-// Penumbra Tech landing page — second pass.
+// Penumbra Tech landing page, second pass.
 //
 // This version pulls in the streaming overlay's visual vocabulary so the
 // website actually feels like Penumbra rather than a generic dark-mode
@@ -137,9 +137,9 @@ const FEATURED = [
   }
 ];
 
-// Real snippet from diagnostics.js — the SSE bucket flusher that
+// Real snippet from diagnostics.js, the SSE bucket flusher that
 // powers the live latency charts. Functional code; not a mock.
-const HERO_CODE = `// 1-second SSE flush — keeps the chart smooth even at 1500 req/s.
+const HERO_CODE = `// 1-second SSE flush, keeps the chart smooth even at 1500 req/s.
 function flushK6Bucket(run, now) {
   const a = run.k6Bucket;
   if (a.count === 0) return;
@@ -164,7 +164,7 @@ function flushK6Bucket(run, now) {
 
 export default function PenumbraHome() {
   useDocumentMeta({
-    title: 'Penumbra Tech — Custom software, AWS, and reliability consulting',
+    title: 'Penumbra Tech | Custom software, AWS, and reliability consulting',
     description:
       "Single-engineer consulting practice run by Wesley Weaver Jr. Custom web apps, AWS infrastructure, Unreal Engine systems, and the performance / reliability tooling that keeps it from quietly falling over. $5K Diagnostic Week, $10K-25K Build Sprint, $250/hr retainer.",
     canonical: 'https://penumbra-tech.com/'
@@ -274,7 +274,7 @@ export default function PenumbraHome() {
           </div>
         </Container>
 
-        {/* Hide the eclipse on narrow viewports — at phone widths the
+        {/* Hide the eclipse on narrow viewports, at phone widths the
             hero text needs the full canvas. */}
         <style>{`
           @media (max-width: 900px) {
@@ -393,7 +393,7 @@ export default function PenumbraHome() {
           <SectionHeading
             eyebrow="How engagements start"
             title="Three ways to work together"
-            body="Concrete shapes with concrete prices. Pick one or ask me which fits — I'll tell you if neither does."
+            body="Concrete shapes with concrete prices. Pick one, or ask me which fits and I'll tell you if neither does."
             tone="cyan"
           />
           <div
@@ -1011,7 +1011,7 @@ function SectionHeading({ eyebrow, title, body, tone = 'cyan' }) {
   );
 }
 
-// Service icons rebuilt as cleaner geometric forms — the previous
+// Service icons rebuilt as cleaner geometric forms, the previous
 // gamepad and a few others were squished. These all share the same
 // 22px viewBox so they line up in the card grid.
 function IconWrap({ children }) {
@@ -1065,7 +1065,7 @@ function CloudIcon() {
   );
 }
 
-// New, simpler joystick icon — the previous gamepad path rendered
+// New, simpler joystick icon, the previous gamepad path rendered
 // uneven. This one is a single d-pad + button cluster, reads cleanly.
 function GamepadIcon() {
   return (

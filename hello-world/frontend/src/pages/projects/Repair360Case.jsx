@@ -1,4 +1,4 @@
-// Repair360 Auto — case study.
+// Repair360 Auto, case study.
 //
 // The visible work is a custom auto-repair-shop site living inside a
 // Wix HTML/Iframe panel. The interesting work is everything that had
@@ -9,7 +9,7 @@
 // single ~160 KB file, no framework, no build step. Earlier drafts of
 // this case study claimed React and an active postMessage size-
 // negotiation layer; both were wrong. This version is honest about
-// what shipped — the actual story is more interesting anyway.
+// what shipped, the actual story is more interesting anyway.
 
 import { Link } from 'react-router-dom';
 import {
@@ -41,22 +41,22 @@ const SECTIONS = [
 const SITE_URL = 'https://www.repair360auto.com/';
 
 // Screenshots live at public/projects/repair360/. Drop any PNG/JPG of
-// the live site in there and add an entry below — order is preserved.
+// the live site in there and add an entry below, order is preserved.
 // Captions are short by design; the case study text carries the story.
 const SCREENSHOTS = [
   {
     src: '/projects/repair360/desktop-hero.png',
     caption:
-      'Hero — "Covering 360° of your vehicle." Brand orange against near-black, vectorised logo, condensed-bold display type reverse-engineered from the client\'s flyers.'
+      'Hero, "Covering 360° of your vehicle." Brand orange against near-black, vectorised logo, condensed-bold display type reverse-engineered from the client\'s flyers.'
   },
   {
     src: '/projects/repair360/services.png',
     caption:
-      'Full Detailing Service section — Exterior / Interior / Extras lists with a $249 starting-at price card. All the brand work (palette, type, hierarchy) lands here.'
+      'Full Detailing Service section, Exterior / Interior / Extras lists with a $249 starting-at price card. All the brand work (palette, type, hierarchy) lands here.'
   }
 ];
 
-// Real snippet — the AutoRepair JSON-LD that makes the embed visible to
+// Real snippet, the AutoRepair JSON-LD that makes the embed visible to
 // Google despite living inside an iframe. The same shape lives in the
 // host page's <head>, not inside the iframe (the iframe doesn't carry
 // its own SEO).
@@ -82,7 +82,7 @@ const JSONLD_CODE = `<script type="application/ld+json">
 
 export default function Repair360Case() {
   useDocumentMeta({
-    title: 'Repair360 Auto — Wix embed brand rescue | Penumbra Tech',
+    title: 'Repair360 Auto, Wix embed brand rescue | Penumbra Tech',
     description:
       "Client case study: hand-written vanilla JS frontend embedded in a Wix HTML/Iframe panel, JSON-LD SEO recovery, JPEG-to-SVG logo rebuild, and mojibake fixes. Calls and car count went from 20-30/wk to 40-50/wk.",
     canonical: 'https://penumbra-tech.com/projects/repair360-auto'
@@ -266,7 +266,7 @@ export default function Repair360Case() {
         <p>
           The deliverable I was handed was three social-media flyers and
           a logo. No palette, no type spec, no copy deck, no component
-          library — just the raw artwork the client already had. So
+          library, just the raw artwork the client already had. So
           before I could build the page I had to reverse-engineer the
           brand from the artwork: extract the orange{' '}
           <code style={inlineCodeStyle}>#F47A1F</code> against near-black,
@@ -291,13 +291,13 @@ export default function Repair360Case() {
       >
         <p>
           The supplied logo was a JPEG, not an SVG, and it had a baked-in
-          black background — lossy compression artefacts around every
+          black background, lossy compression artefacts around every
           edge and no transparency, so it sat in an ugly opaque box on a
           dark page.
         </p>
         <p>
           The fix was two passes. First, key the black out to recover a
-          clean transparent PNG — treating the image as
+          clean transparent PNG, treating the image as
           premultiplied-over-black so the alpha channel could be
           extracted properly rather than hard-edge keying every pixel.
           Then vectorise to SVG: posterise the result to flat brand
@@ -316,15 +316,15 @@ export default function Repair360Case() {
         title="One self-contained file, no framework, no build step."
       >
         <p>
-          The whole front-end ships as a single self-contained HTML file
-          — CSS and JS inlined, logo embedded as inline SVG, fonts from
-          a CDN — and gets dropped into a Wix HTML/Iframe panel. No
+          The whole front-end ships as a single self-contained HTML file,
+CSS and JS inlined, logo embedded as inline SVG, fonts from
+          a CDN, and gets dropped into a Wix HTML/Iframe panel. No
           React, no Vue, no bundler, no build step. About 160 KB,
           paste-anywhere, framework-free.
         </p>
         <p>
           That&apos;s a stronger answer for an embed than React would have
-          been. The framework runtime would have been pure tax — the
+          been. The framework runtime would have been pure tax, the
           page has no state to model, no client-side routing, no
           re-render cycle. Mobile-first CSS handles the responsiveness;
           the panel is sized to fit the content.
@@ -345,17 +345,17 @@ export default function Repair360Case() {
         title="UTF-8 turned to soup somewhere between editor and clipboard."
       >
         <p>
-          First paste into Wix came out full of garbage characters — em
+          First paste into Wix came out full of garbage characters, em
           dashes, degree signs, and icons all corrupted. The root cause
           wasn&apos;t in the code; it was in the delivery pipeline.
           PowerShell was reading a UTF-8 file as Windows-1252 on its way
           to the clipboard, so every multi-byte UTF-8 sequence was being
           interpreted one byte at a time. The tell was that the
           clipboard&apos;s character count exactly equalled the file&apos;s
-          byte count — a giveaway that the encoding step had collapsed.
+          byte count, a giveaway that the encoding step had collapsed.
         </p>
         <p>
-          The fix wasn&apos;t to harden the pipeline — I don&apos;t own
+          The fix wasn&apos;t to harden the pipeline, I don&apos;t own
           the Wix paste path. The fix was to make the artefact immune to
           its own delivery: compile the entire embed to pure ASCII. HTML
           numeric entities in the markup, unicode escapes in the CSS, so
@@ -377,16 +377,16 @@ export default function Repair360Case() {
           content inside an iframe is a <em>separate document</em>, and
           Google doesn&apos;t credit it to the host page. I audited the
           live site the way a crawler sees it and the worst case was
-          confirmed — the host page had zero headings, no body text, a
+          confirmed, the host page had zero headings, no body text, a
           default <code style={inlineCodeStyle}>Home | 360 Automotive</code>{' '}
           title, no meta description. Pixel-perfect inside the frame,
           invisible to search outside it.
         </p>
         <p>
           Fixing it didn&apos;t require leaving Wix. The substantive,
-          visible content went into <strong>native host elements</strong>{' '}
-          — an H1, the service list, and the full name/address/phone (the
-          NAP triple every local-search algorithm wants) — and the host
+          visible content went into <strong>native host elements</strong>,
+an H1, the service list, and the full name/address/phone (the
+          NAP triple every local-search algorithm wants), and the host
           page got{' '}
           <a
             href="https://schema.org/AutoRepair"
@@ -398,7 +398,7 @@ export default function Repair360Case() {
             structured data
           </a>{' '}
           plus a real title and meta description. The site went from
-          invisible-to-Google to fully crawlable — same host, same
+          invisible-to-Google to fully crawlable, same host, same
           design, dramatically different findability.
         </p>
         <p style={{ marginTop: space.lg, marginBottom: 0 }}>
@@ -448,15 +448,15 @@ export default function Repair360Case() {
             />
             <PitchCard
               title='"Looks done" isn&apos;t "gets found"'
-              body="An embedded site can be pixel-perfect and still invisible to search — the frame doesn't carry your SEO. Verify crawlability and solve it natively in the host: headings, NAP, structured data. Never assume."
+              body="An embedded site can be pixel-perfect and still invisible to search, the frame doesn't carry your SEO. Verify crawlability and solve it natively in the host: headings, NAP, structured data. Never assume."
             />
             <PitchCard
               title="The delivery pipeline is part of the product"
-              body="A file that's correct in your editor can be corrupted by the channel that carries it. When you don't control the pipe, ship something robust to it — pure ASCII travels everywhere intact."
+              body="A file that's correct in your editor can be corrupted by the channel that carries it. When you don't control the pipe, ship something robust to it, pure ASCII travels everywhere intact."
             />
             <PitchCard
               title="Know when not to over-engineer"
-              body="Manual full-height panel sizing and a tagline-instead-of-nav held up fine. I spent the effort where it actually mattered — encoding, SEO, brand consistency — not on machinery the project didn't need."
+              body="Manual full-height panel sizing and a tagline-instead-of-nav held up fine. I spent the effort where it actually mattered, encoding, SEO, brand consistency, not on machinery the project didn't need."
             />
           </div>
 

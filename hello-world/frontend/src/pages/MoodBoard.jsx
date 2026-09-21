@@ -29,9 +29,9 @@ export default function MoodBoard() {
   const [brokenImageIds, setBrokenImageIds] = useState(() => new Set())
 
   // Collage generation state:
-  //   null        — idle (no overlay)
-  //   'generating' — loading images + drawing canvas
-  //   { previewUrl, canvas, included, skipped } — ready for download
+  //   null, idle (no overlay)
+  //   'generating', loading images + drawing canvas
+  //   { previewUrl, canvas, included, skipped }, ready for download
   const [collageState, setCollageState] = useState(null)
 
   // Collage style options (persisted in component state between generates)
@@ -651,7 +651,7 @@ export default function MoodBoard() {
                 margin: '0.75rem 0'
               }}
             >
-              Collage ready for download — do not refresh before downloading
+              Collage ready for download, do not refresh before downloading
               or collage will need to be regenerated
             </p>
             <div

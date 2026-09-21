@@ -1,8 +1,8 @@
-// PrivatePagesConsole — the Admin Portal's "Private pages" surface
+// PrivatePagesConsole, the Admin Portal's "Private pages" surface
 // (super_admin only; the parent gates rendering).
 //
 // Upload a self-contained .html file or a .zip static-site bundle; each is
-// published to an UNLISTED URL (/preview/<slug>/) you can hand to a client —
+// published to an UNLISTED URL (/preview/<slug>/) you can hand to a client, 
 // nothing links to it and it's flagged noindex, but anyone with the URL can
 // open it. "Lock" flips a page to super-admin-only (a locked URL 404s for
 // everyone else). Every page's URL is listed here with a copy button so you
@@ -156,7 +156,7 @@ export default function PrivatePagesConsole() {
       setCopied(page.id);
       setTimeout(() => setCopied((c) => (c === page.id ? null : c)), 1500);
     } catch {
-      setMessage({ tone: 'err', text: 'Clipboard blocked — select the URL and copy manually.' });
+      setMessage({ tone: 'err', text: 'Clipboard blocked, select the URL and copy manually.' });
     }
   }
 
@@ -184,7 +184,7 @@ export default function PrivatePagesConsole() {
       >
         Upload a self-contained <code>.html</code> file or a <code>.zip</code>{' '}
         of a static site (must contain an <code>index.html</code>). Each gets
-        an unlisted URL at <code>/preview/&lt;slug&gt;/</code> — nothing links
+        an unlisted URL at <code>/preview/&lt;slug&gt;/</code>, nothing links
         to it and it's marked noindex, so you can hand the link to a client.
         Every URL is listed below so you never lose one.{' '}
         <strong style={{ color: colors.text }}>Lock</strong> makes a page
@@ -214,17 +214,17 @@ export default function PrivatePagesConsole() {
 
       <div style={{ display: 'grid', gap: space.sm, marginBottom: space.md }}>
         <label style={fieldLabelStyle}>
-          Title (optional — defaults to the page&apos;s &lt;title&gt; or filename)
+          Title (optional, defaults to the page&apos;s &lt;title&gt; or filename)
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={fieldInputStyle}
-            placeholder="Luminous Vibrations — client preview"
+            placeholder="Luminous Vibrations, client preview"
           />
         </label>
         <label style={fieldLabelStyle}>
-          Slug — /preview/{slug || '…'}/
+          Slug, /preview/{slug || '…'}/
           <input
             type="text"
             value={slug}
@@ -286,7 +286,7 @@ export default function PrivatePagesConsole() {
         )}
         {pages && pages.length === 0 && (
           <span style={{ color: colors.textMuted, fontSize: fontSizes.sm }}>
-            No private pages yet — upload one above.
+            No private pages yet, upload one above.
           </span>
         )}
         {pages &&

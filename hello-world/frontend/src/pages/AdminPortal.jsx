@@ -56,7 +56,7 @@ export default function AdminPortal() {
   // since `isSuperAdmin` isn't derived until after the guards.
   //
   // apiFetch semantics: it prefixes /api itself and returns the PARSED
-  // body (throwing on non-2xx) — do not pass /api/... paths or expect a
+  // body (throwing on non-2xx), do not pass /api/... paths or expect a
   // Response object. The first version of this card did both and showed
   // a permanent "Stats unavailable".
   useEffect(() => {
@@ -192,7 +192,7 @@ export default function AdminPortal() {
 
   async function handleDeleteCrashes() {
     const confirmed = window.confirm(
-      'Delete every crash bundle on the server? This is irreversible — make sure you have already downloaded any logs you need.'
+      'Delete every crash bundle on the server? This is irreversible, make sure you have already downloaded any logs you need.'
     )
     if (!confirmed) return
 
@@ -252,7 +252,7 @@ export default function AdminPortal() {
 
       <section style={{ paddingTop: space['2xl'], paddingBottom: space['3xl'] }}>
         <Container narrow>
-          {/* Diagnostics jump card — super_admin only */}
+          {/* Diagnostics jump card, super_admin only */}
           {isSuperAdmin && (
             <Card
               variant="accent"
@@ -296,7 +296,7 @@ export default function AdminPortal() {
             </Card>
           )}
 
-          {/* M:O crash logs — super_admin only.  The download is a plain
+          {/* M:O crash logs, super_admin only.  The download is a plain
               same-origin anchor so the session cookie rides along and the
               browser handles the streamed tar.gz natively; the delete
               calls the JSON endpoint with a confirm prompt. */}
@@ -392,10 +392,10 @@ export default function AdminPortal() {
             </Card>
           )}
 
-          {/* Blog publishing console — super_admin only */}
+          {/* Blog publishing console, super_admin only */}
           {isSuperAdmin && <BlogConsole />}
 
-          {/* Private preview-pages console — super_admin only */}
+          {/* Private preview-pages console, super_admin only */}
           {isSuperAdmin && <PrivatePagesConsole />}
 
           <SectionTitle>User search</SectionTitle>

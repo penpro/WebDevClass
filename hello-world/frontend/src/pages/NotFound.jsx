@@ -1,7 +1,7 @@
 // 404 page rendered by the React Router catch-all.
 //
 // Without this, any URL that doesn't match a defined route hits the
-// SPA shell and renders an empty Outlet under the Layout — looks like
+// SPA shell and renders an empty Outlet under the Layout, looks like
 // the site is broken on a bad link, and Google indexes 404s as 200.
 // This page renders an actual "not found" message and steers the
 // visitor at the high-value pages.

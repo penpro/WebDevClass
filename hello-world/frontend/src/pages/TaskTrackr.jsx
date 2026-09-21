@@ -160,7 +160,7 @@ export default function TaskTrackr() {
   // "Due soon" = not completed + has a due date + due date <= 7 days from
   // now. Naturally includes overdue (date in the past is also <= cutoff)
   // because overdue tasks need attention even more than "due soon" ones.
-  // Same predicate is used in the filteredTasks logic below — keep them
+  // Same predicate is used in the filteredTasks logic below, keep them
   // in sync so the badge count and the visible list match.
   const dueSoonCount = useMemo(() => {
     const cutoff = daysFromNow(7)
@@ -307,7 +307,7 @@ export default function TaskTrackr() {
     setError(null)
     setPostingUpdate(true)
     try {
-      // Multipart upload — bypass apiFetch since it forces JSON.
+      // Multipart upload, bypass apiFetch since it forces JSON.
       const form = new FormData()
       if (body) form.append('body', body)
       if (updateImage) form.append('media', updateImage)
@@ -979,7 +979,7 @@ function TaskRow({
                   type="file"
                   accept={acceptedTypes}
                   title={`Max ${sizeLimitLabel}${
-                    canUploadVideo ? ' — image or video' : ' — image only'
+                    canUploadVideo ? ', image or video' : ', image only'
                   }`}
                   onChange={(e) =>
                     setUpdateImage(e.target.files?.[0] || null)

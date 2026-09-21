@@ -1,9 +1,9 @@
-// Trigonometry Tools — Steam-released case study.
+// Trigonometry Tools, Steam-released case study.
 //
 // Published April 2025 under the Penumbra Productions name (one of the
 // operator-history entities listed in the About proof strip). Free,
 // tagged Education / Strategy / Utilities. The case study positions it
-// as "shipped software, not a side-project demo" — the bar for the
+// as "shipped software, not a side-project demo", the bar for the
 // Steam release process is much higher than for a self-hosted web app,
 // and that's the credibility signal worth keeping in front of clients.
 
@@ -39,7 +39,7 @@ const STEAM_HEADER =
 
 export default function TrigonometryToolsCase() {
   useDocumentMeta({
-    title: 'Trigonometry Tools — Steam-published math game | Penumbra Tech',
+    title: 'Trigonometry Tools, Steam-published math game | Penumbra Tech',
     description:
       "Educational game published to Steam in April 2025 under Penumbra Productions. Gamifies the unit-circle drill for precalculus students. Small on purpose; went through the full Steam release process. Free.",
     canonical: 'https://penumbra-tech.com/projects/trigonometry-tools'
@@ -92,8 +92,8 @@ export default function TrigonometryToolsCase() {
             A free educational title published to Steam in April 2025
             under the Penumbra Productions name. The pitch is direct:
             precalculus students need a reflexive grip on the unit
-            circle — angles, radians, sine and cosine at the standard
-            positions — and the usual way they get there is by grinding
+            circle, angles, radians, sine and cosine at the standard
+            positions, and the usual way they get there is by grinding
             flashcards until something sticks. Trigonometry Tools turns
             that grind into a game loop you can run for ten minutes a
             day on a Steam-installed PC.
@@ -157,7 +157,7 @@ export default function TrigonometryToolsCase() {
       </section>
 
       {/* ========================== Steam header ========================== */}
-      <SteamHeader src={STEAM_HEADER} alt="Trigonometry Tools — Steam header image" />
+      <SteamHeader src={STEAM_HEADER} alt="Trigonometry Tools, Steam header image" />
 
       {/* ===================== Why this is on the portfolio =================== */}
       <div id="why">
@@ -178,8 +178,8 @@ export default function TrigonometryToolsCase() {
           website.
         </p>
         <p>
-          Trigonometry Tools is small on purpose — it does one
-          educational job and does it well — but it went through the
+          Trigonometry Tools is small on purpose, it does one
+          educational job and does it well, but it went through the
           full Steam release process. It&apos;s a free download, in
           the Education category, and anyone with a Steam account can
           install it right now.
@@ -210,7 +210,7 @@ export default function TrigonometryToolsCase() {
         <p>
           The game ships that loop in a way that respects the learner&apos;s
           time. It doesn&apos;t pretend to teach the concept from
-          first principles — that&apos;s the textbook&apos;s job — and it
+          first principles, that&apos;s the textbook&apos;s job, and it
           doesn&apos;t pad the run with cosmetic progression for its
           own sake. It does the one thing the textbook can&apos;t: drill
           the reflex until the values are cached.
@@ -276,7 +276,7 @@ export default function TrigonometryToolsCase() {
             If you&apos;ve got a precalculus student in the house, or
             you&apos;re prepping a trig refresher yourself, install it
             and run a few sessions. The case study&apos;s value to
-            this site isn&apos;t the game&apos;s mechanics — it&apos;s
+            this site isn&apos;t the game&apos;s mechanics, it&apos;s
             the proof that I take software from idea to public
             release, not just to demo.
           </p>
@@ -368,7 +368,7 @@ function SteamHeader({ src, alt }) {
                 fontFamily: fonts.mono
               }}
             >
-              Steam store header — image served from Valve&apos;s CDN
+              Steam store header, image served from Valve&apos;s CDN
             </div>
           </Card>
         </a>

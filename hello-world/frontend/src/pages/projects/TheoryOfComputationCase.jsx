@@ -1,4 +1,4 @@
-// Theory of Computation review tool — case study.
+// Theory of Computation review tool, case study.
 //
 // Credibility piece. Built as a study aid for a graduate-level theory
 // course using Sipser's "Introduction to the Theory of Computation."
@@ -35,7 +35,7 @@ const SECTIONS = [
   { id: 'cta',      num: '06', label: 'Book a Call' }
 ];
 
-// Coverage table — mirrors the README. Real numbers, not invented.
+// Coverage table, mirrors the README. Real numbers, not invented.
 const CHAPTERS = [
   { ch: '0', topic: 'Mathematical preliminaries', q: 25 },
   { ch: '1', topic: 'Regular languages (DFAs/NFAs, ripping, pumping)', q: 89 },
@@ -51,12 +51,12 @@ const CHAPTERS = [
   { ch: 'Ω', topic: 'Final checkpoint (Ch 6–8)', q: 32 }
 ];
 
-// Real snippet from the scheduler — a stripped-down version of the
+// Real snippet from the scheduler, a stripped-down version of the
 // weighting function. Shows the kind of code involved in the project.
 const SCHEDULER_CODE = `// Question weight blends three signals:
-//   * Leitner box  — lower boxes (more wrong) weighted higher
-//   * Recency      — never-seen and recently-missed weighted higher
-//   * Mastery gap  — chapters below 90% mastery weighted higher
+//   * Leitner box, lower boxes (more wrong) weighted higher
+//   * Recency, never-seen and recently-missed weighted higher
+//   * Mastery gap, chapters below 90% mastery weighted higher
 function weight(question, now) {
   const box = question.leitnerBox;           // 1..5
   const lastSeen = question.lastSeenAt;
@@ -129,7 +129,7 @@ export default function TheoryOfComputationCase() {
             questions</strong> across Chapters 0–8 and three exam
             checkpoints, a custom spaced-repetition scheduler, full
             concept explainers, state-diagram practice for DFAs and NFAs,
-            and KaTeX-rendered math — all in static HTML you double-click
+            and KaTeX-rendered math, all in static HTML you double-click
             to launch. No install, no server, no telemetry.
           </p>
           <div
@@ -208,7 +208,7 @@ export default function TheoryOfComputationCase() {
             >
               GitHub repo
             </a>{' '}
-            is the canonical offline build — clone it, double-click{' '}
+            is the canonical offline build, clone it, double-click{' '}
             <code style={inlineCodeStyle}>index.html</code>, and study
             on a plane.
           </p>
@@ -239,7 +239,7 @@ export default function TheoryOfComputationCase() {
                 <em> efficient</em>, and what the polynomial-time hierarchy
                 says about the limits of both. Most of the working
                 software industry doesn&apos;t need that distinction to
-                matter every day — but when it does, it matters a lot:
+                matter every day, but when it does, it matters a lot:
                 when you have to reason about an unfamiliar algorithm,
                 bound the worst-case behaviour of a system under load,
                 or know whether the problem in front of you is actually
@@ -249,7 +249,7 @@ export default function TheoryOfComputationCase() {
                 I came up through a formal computer-science program, not a
                 twelve-week bootcamp. The questions in this tool cover
                 Turing machines, decidability, the recursion theorem,
-                Cook–Levin, NP-completeness, PSPACE, L vs NL — the
+                Cook–Levin, NP-completeness, PSPACE, L vs NL, the
                 material a CS graduate is supposed to be able to think
                 about, not just have heard of.
               </p>
@@ -257,8 +257,8 @@ export default function TheoryOfComputationCase() {
                 I&apos;m not putting it on the portfolio to brag about
                 book learning. I&apos;m putting it here so the kind of
                 client who needs an engineer who can reason about
-                correctness, complexity, and system design — not just
-                stitch libraries — has a concrete sample of what that
+                correctness, complexity, and system design, not just
+                stitch libraries, has a concrete sample of what that
                 looks like in my hands.
               </p>
             </Prose>
@@ -391,7 +391,7 @@ export default function TheoryOfComputationCase() {
             fill-in-the-blank, and put-in-order. Distractors are pulled
             from a larger wrong-answer pool than the displayed options
             and reshuffled each repetition, so pattern-gaming doesn&apos;t
-            help — you actually have to read every option every time.
+            help, you actually have to read every option every time.
           </p>
         </Container>
       </section>
@@ -427,22 +427,22 @@ export default function TheoryOfComputationCase() {
                 </p>
                 <ul style={proseListStyle}>
                   <li>
-                    <strong style={{ color: colors.text }}>Leitner boxes</strong>{' '}
-                    — each question lives in one of five boxes; correct
+                    <strong style={{ color: colors.text }}>Leitner boxes</strong>,
+each question lives in one of five boxes; correct
                     answers promote it to a longer interval, a wrong
                     answer drops it back to box 1 so it returns quickly.
                   </li>
                   <li>
-                    <strong style={{ color: colors.text }}>Streak mastery</strong>{' '}
-                    — a question is only mastered after three correct
+                    <strong style={{ color: colors.text }}>Streak mastery</strong>,
+a question is only mastered after three correct
                     answers in a row. One wrong answer resets the streak,
                     so a lucky guess never sticks.
                   </li>
                   <li>
                     <strong style={{ color: colors.text }}>
                       Mastery-gated progression
-                    </strong>{' '}
-                    — the next chapter unlocks when the current one hits
+                    </strong>,
+the next chapter unlocks when the current one hits
                     ~90% mastery. Earlier chapters keep mixing in
                     afterward, weighted toward questions you&apos;ve
                     missed.
@@ -453,7 +453,7 @@ export default function TheoryOfComputationCase() {
                   never-seen, and previously-missed questions, while
                   interleaving review from earlier chapters. The snippet
                   to the right is the weighting function that drives all
-                  of that — stripped down for display, but the real one
+                  of that, stripped down for display, but the real one
                   has unit tests under <code style={inlineCodeStyle}>tools/sim.js</code>.
                 </p>
               </Prose>
@@ -497,7 +497,7 @@ export default function TheoryOfComputationCase() {
             <Prose>
               <p>
                 Chapter 1 alone has 89 questions and many of them render
-                actual state diagrams — DFAs and NFAs — and ask you to
+                actual state diagrams, DFAs and NFAs, and ask you to
                 trace inputs, run the NFA→DFA subset construction one
                 step at a time, apply GNFA &ldquo;ripping&rdquo; to
                 eliminate states, or plug numbers into the pumping lemma.
@@ -549,7 +549,7 @@ export default function TheoryOfComputationCase() {
                 lineHeight: 1.65
               }}
             >
-              The tool itself is one codebase — vanilla JS, KaTeX, a
+              The tool itself is one codebase, vanilla JS, KaTeX, a
               single <code style={inlineCodeStyle}>index.html</code>{' '}
               you can double-click. There are two builds because the
               right deployment depends on what you want to do with it.
@@ -584,7 +584,7 @@ export default function TheoryOfComputationCase() {
                   lineHeight: 1.6
                 }}
               >
-                Same tool with a Penumbra-Tech makeover — corona
+                Same tool with a Penumbra-Tech makeover, corona
                 palette, brand strip up top, dark mode by default.
                 Progress saves locally to this domain. Good for a
                 quick demo, not for studying on a flight.
@@ -617,7 +617,7 @@ export default function TheoryOfComputationCase() {
                   lineHeight: 1.6
                 }}
               >
-                The canonical offline build — no Penumbra theming,
+                The canonical offline build, no Penumbra theming,
                 light/dark toggle, fully self-contained. Clone the
                 repo, double-click{' '}
                 <code style={inlineCodeStyle}>index.html</code>, your

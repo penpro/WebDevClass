@@ -242,7 +242,7 @@ function UL({ children }) {
 
 export default function Guide() {
   useDocumentMeta({
-    title: 'The DIY playbook — Penumbra Tech',
+    title: 'The DIY playbook | Penumbra Tech',
     description:
       "13-chapter, ~8,000-word DIY playbook for building a small production web app on AWS yourself: IAM, EC2, MySQL, nginx, PM2, Let's Encrypt, security headers, backups, and the operational patterns that survive contact with users. Free.",
     canonical: 'https://penumbra-tech.com/guide'
@@ -503,7 +503,7 @@ export default function Guide() {
             maxWidth: '70ch'
           }}
         >
-          {/* =========================== Chapter 0 — Foreword =========================== */}
+          {/* =========================== Chapter 0, Foreword =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="0" id="foreword" title="Yes, you can. Here is the catch." />
             <P>
@@ -573,7 +573,7 @@ export default function Guide() {
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 1 — AWS account =========================== */}
+          {/* =========================== Chapter 1, AWS account =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="1" id="aws-account" title="AWS account, IAM, billing alarm" />
             <P>
@@ -668,7 +668,7 @@ export default function Guide() {
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 2 — Launch EC2 =========================== */}
+          {/* =========================== Chapter 2, Launch EC2 =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="2" id="ec2-launch" title="Launch an EC2 instance" />
             <P>
@@ -741,7 +741,7 @@ Launch.`}
             <CodeBlock label="From your local machine">
 {`ssh -i ~/.ssh/penumbra-prod.pem ubuntu@<your-elastic-ip>
 
-# First connection asks "are you sure" — type yes.
+# First connection asks "are you sure", type yes.
 # You should land at:
 ubuntu@ip-xx-xx-xx-xx:~$`}
             </CodeBlock>
@@ -763,7 +763,7 @@ ubuntu@ip-xx-xx-xx-xx:~$`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 3 — First server setup =========================== */}
+          {/* =========================== Chapter 3, First server setup =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="3" id="server-setup" title="First server setup" />
             <P>
@@ -836,7 +836,7 @@ sudo dpkg-reconfigure -plow unattended-upgrades
             <P>
               You already have key-only access (you SSHed in with the
               .pem file). Verify password authentication is actually
-              off — many cloud images already disable it via cloud-init,
+              off, many cloud images already disable it via cloud-init,
               but do not assume. Check the effective sshd config:
             </P>
             <CodeBlock>
@@ -885,7 +885,7 @@ sudo systemctl restart ssh`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 4 — Swap =========================== */}
+          {/* =========================== Chapter 4, Swap =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="4" id="swap" title="Swap and the t3.micro reality" />
             <P>
@@ -939,7 +939,7 @@ free -h`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 5 — MySQL =========================== */}
+          {/* =========================== Chapter 5, MySQL =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="5" id="mysql" title="MySQL" />
             <P>
@@ -1014,7 +1014,7 @@ mysql -u hello_user -p hello_app -e "SELECT 'ok';"`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 6 — Node + nginx + PM2 =========================== */}
+          {/* =========================== Chapter 6, Node + nginx + PM2 =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="6" id="node-nginx" title="Node, nginx, PM2" />
             <P>
@@ -1055,7 +1055,7 @@ npm --version`}
             <CodeBlock>
 {`sudo apt install -y nginx
 sudo systemctl status nginx
-# Visit http://<your-elastic-ip> — should see the default nginx page.`}
+# Visit http://<your-elastic-ip>, should see the default nginx page.`}
             </CodeBlock>
 
             <H3>PM2</H3>
@@ -1084,7 +1084,7 @@ pm2 startup systemd -u $USER --hp $HOME
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 7 — DNS =========================== */}
+          {/* =========================== Chapter 7, DNS =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="7" id="dns" title="DNS and Route 53" />
             <P>
@@ -1146,7 +1146,7 @@ nslookup www.yourdomain.com
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 8 — TLS =========================== */}
+          {/* =========================== Chapter 8, TLS =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="8" id="tls" title="Let’s Encrypt and HTTPS" />
             <P>
@@ -1206,7 +1206,7 @@ sudo certbot renew --dry-run`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 9 — Express =========================== */}
+          {/* =========================== Chapter 9, Express =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="9" id="express" title="The Express backend patterns that matter" />
             <P>
@@ -1273,7 +1273,7 @@ if (!user || !ok) {
               bytes change (whitespace, key order), and signature
               verification silently fails forever.
             </P>
-            <CodeBlock label="server.js — order matters">
+            <CodeBlock label="server.js, order matters">
 {`// Stripe webhook MUST be mounted BEFORE express.json():
 app.post(
   '/api/payments/webhook',
@@ -1365,7 +1365,7 @@ process.on('unhandledRejection', (reason) => {
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 10 — React frontend =========================== */}
+          {/* =========================== Chapter 10, React frontend =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="10" id="react" title="The React frontend and the deploy script" />
             <P>
@@ -1484,7 +1484,7 @@ echo "Frontend deployed."`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 11 — Security headers =========================== */}
+          {/* =========================== Chapter 11, Security headers =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="11" id="headers" title="Security headers, CSP, compression" />
             <P>
@@ -1509,7 +1509,7 @@ add_header X-Frame-Options "DENY" always;
 # for cross-origin; nothing for HTTPS-to-HTTP downgrades.
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
-# Content Security Policy — the big one. Restrict what scripts, styles,
+# Content Security Policy, the big one. Restrict what scripts, styles,
 # fonts, etc. the browser will load. Start strict ('self' for everything)
 # and add explicit origins as you discover what your app actually needs.
 add_header Content-Security-Policy "default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self' https://api.stripe.com; frame-src 'self' https://js.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;`}
@@ -1565,7 +1565,7 @@ location = /index.html {
                 The CSP also breaks any third-party widget you embed
                 without updating the relevant directive. When you add
                 a chat widget, an analytics script, an embed from
-                another domain — expect to update CSP. The blocked
+                another domain, expect to update CSP. The blocked
                 request shows up in DevTools &gt; Console with a
                 specific origin name. Add that origin to the matching
                 directive.
@@ -1573,7 +1573,7 @@ location = /index.html {
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 12 — Operations =========================== */}
+          {/* =========================== Chapter 12, Operations =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="12" id="ops" title="Operations: backups, monitoring, recovery" />
             <P>
@@ -1682,7 +1682,7 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
               <li>
                 <strong>Site returns 502 from nginx</strong>: backend is
                 down (see above) or stopped responding (PM2 says
-                online but the process is wedged — restart it).
+                online but the process is wedged, restart it).
               </li>
               <li>
                 <strong>Site returns 503 with{' '}
@@ -1711,7 +1711,7 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
             <Gotcha>
               <P>
                 Two things will catch you. First, the UptimeRobot
-                mistake above — pointing at the static homepage means
+                mistake above, pointing at the static homepage means
                 you never get paged about backend failures. Second,
                 the backup that runs every night but has never been
                 <em> restored</em>. Pick a weekend and actually
@@ -1722,7 +1722,7 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
             </Gotcha>
           </section>
 
-          {/* =========================== Chapter 13 — Honest chapter =========================== */}
+          {/* =========================== Chapter 13, Honest chapter =========================== */}
           <section className="guide-chapter">
             <ChapterTitle num="13" id="honest" title="The honest chapter" />
             <P>
@@ -1739,7 +1739,7 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
               error messages, googling those error messages, trying a
               fix, watching it not work, trying a different fix,
               eventually getting the right one. Most of that time is
-              not skill acquisition you can keep — it is one-time
+              not skill acquisition you can keep, it is one-time
               friction with this specific stack on this specific day.
             </P>
             <P>
@@ -1761,7 +1761,7 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
               unattended-upgrades will install a kernel update that
               requires a reboot, which will surface a thing you forgot
               to make persistent. Once a year, your TLS cert renews
-              automatically — usually. The one time it does not,
+              automatically, usually. The one time it does not,
               you find out from UptimeRobot at midnight.
             </P>
             <P>
@@ -1868,9 +1868,9 @@ pm2 set pm2-logrotate:rotateInterval '0 0 * * *'`}
                 lineHeight: 1.65
               }}
             >
-              If you want a 30-minute conversation about either path —
+              If you want a 30-minute conversation about either path, 
               building it yourself with sanity-saving advice, or having
-              me build it for you on a fixed-scope sprint — book a slot.
+              me build it for you on a fixed-scope sprint, book a slot.
               The call is genuinely free of pitch.
             </p>
             <div

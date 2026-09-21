@@ -1,11 +1,11 @@
-// Aphelion — Penumbra product case study.
+// Aphelion, Penumbra product case study.
 //
 // Aphelion has its own marketing site at https://penpro.github.io/Aphelion/
-// — that's the canonical product page (features, models, FAQ, safety
+//, that's the canonical product page (features, models, FAQ, safety
 // framing, screenshots, download CTAs).  Rather than fork that content
 // here and drift, this page is a thin consulting-side wrapper:
 //
-//   1. A short "why this matters for a Penumbra client" framing — the
+//   1. A short "why this matters for a Penumbra client" framing, the
 //      part that belongs on the consulting site, not the product site.
 //   2. The live product page embedded inline via iframe, so visitors
 //      see the same marketing the GitHub release does without us
@@ -13,7 +13,7 @@
 //   3. A closing CTA: download + book-a-call.
 //
 // Updating the product page on the Aphelion repo's docs/index.html
-// automatically reflects here — there is no sync step.  Required
+// automatically reflects here, there is no sync step.  Required
 // nginx config: frame-src must include https://penpro.github.io
 // (added in security-headers-snippet.conf).
 
@@ -50,7 +50,7 @@ const PRODUCT_SITE = 'https://penpro.github.io/Aphelion/';
 
 export default function AphelionCase() {
   useDocumentMeta({
-    title: 'Aphelion — local AI desktop app by Penumbra | Penumbra Tech',
+    title: 'Aphelion, local AI desktop app by Penumbra | Penumbra Tech',
     description:
       "Aphelion is a free, open-source Windows desktop app that runs powerful AI models entirely on the user's own machine. No cloud, no account, no telemetry. Tauri + Rust + bundled llama.cpp engine; auto-fits the best GGUF model to the GPU. MIT licensed.",
     canonical: 'https://penumbra-tech.com/projects/aphelion'
@@ -59,7 +59,7 @@ export default function AphelionCase() {
   // GitHub Pages serves the landing page with Cache-Control: max-age=600,
   // so without a cache buster the browser would serve a stale iframe copy
   // for up to 10 minutes after an upstream update. A timestamp computed
-  // once per mount (lazy useState — not regenerated on re-render) gives
+  // once per mount (lazy useState, not regenerated on re-render) gives
   // every fresh visit a unique URL that busts the browser cache, while
   // hydration replaces the prerendered URL before `loading="lazy"` lets
   // the browser actually fetch the frame.
@@ -69,7 +69,7 @@ export default function AphelionCase() {
   // The embedded GH Pages doc postMessages its scrollHeight to us on
   // load, resize, and every ResizeObserver tick (accordion expands,
   // late image loads, changelog tile toggles).  Adopt whatever it
-  // reports so the iframe height matches its content exactly — no
+  // reports so the iframe height matches its content exactly, no
   // inner scrollbar, no wheel trap, no mid-line slice at the bottom.
   // 4200 is the pre-message fallback: a Fable measurement of the
   // current live content (~6889px) minus the trailing footer that
@@ -170,7 +170,7 @@ export default function AphelionCase() {
           >
             A free, open-source Windows desktop app that runs powerful
             AI models entirely on the user&apos;s own machine. The
-            product page is embedded below — the consulting-side note
+            product page is embedded below, the consulting-side note
             on why a Penumbra customer should care lives right here.
           </p>
 
@@ -243,19 +243,19 @@ export default function AphelionCase() {
               <p>
                 Most consulting sites show a list of past employers
                 and ask you to trust the resume. Aphelion is a
-                different kind of evidence: an end-to-end product —
+                different kind of evidence: an end-to-end product, 
                 Tauri shell, bundled inference engine, auto-fit model
                 pipeline, branded installer, GitHub Pages landing
-                site, MIT license — released to the public under the
+                site, MIT license, released to the public under the
                 Penumbra name. Anyone can download it, run it, and
                 form their own opinion on the engineering quality.
               </p>
               <p>
-                If your work needs a similar shape — a one-installer
+                If your work needs a similar shape, a one-installer
                 desktop tool that runs locally and doesn&apos;t depend
                 on a cloud account, a domain-specific local-LLM
                 assistant for a regulated industry, a small Tauri
-                + Rust app wrapping an existing engine —{' '}
+                + Rust app wrapping an existing engine, {' '}
                 <strong style={{ color: colors.text }}>that&apos;s a
                 real engagement shape I can take on</strong>. The
                 product below is the proof I&apos;ve done the work
@@ -300,7 +300,7 @@ export default function AphelionCase() {
           >
             The frame below is the canonical Aphelion landing page,
             served live from GitHub Pages. Updates to the product page
-            appear here automatically — there is no duplicate copy of
+            appear here automatically, there is no duplicate copy of
             the marketing to keep in sync.
           </p>
           <div
@@ -361,7 +361,7 @@ export default function AphelionCase() {
         <Container>
           <div style={{ maxWidth: '64ch' }}>
             <HudLabel tone="corona">Support</HudLabel>
-            <h2 style={sectionTitleStyle}>Free — and staying that way.</h2>
+            <h2 style={sectionTitleStyle}>Free, and staying that way.</h2>
             <p
               style={{
                 margin: `${space.md} 0 ${space.lg}`,
@@ -371,15 +371,15 @@ export default function AphelionCase() {
               }}
             >
               Aphelion is free and open source. It&apos;s also{' '}
-              <em>unsigned</em> — the only reason Windows shows that
-              &ldquo;unknown publisher&rdquo; warning — because a
+              <em>unsigned</em>, the only reason Windows shows that
+              &ldquo;unknown publisher&rdquo; warning, because a
               code-signing certificate is a recurring monthly cost,
               and I haven&apos;t paid for one. If donations start
               coming in, that&apos;s the first thing they&apos;ll go
               toward. They also help keep Aphelion free: the more
               they offset what it costs to build and ship, the less
-              chance I&apos;d ever have to charge for it. No pressure
-              — if it&apos;s useful to you, anything helps.
+              chance I&apos;d ever have to charge for it. No pressure,
+if it&apos;s useful to you, anything helps.
             </p>
 
             <div
@@ -517,7 +517,7 @@ export default function AphelionCase() {
                 fontFamily: fonts.mono
               }}
             >
-              No pressure, ever — the app stays free either way.
+              No pressure, ever, the app stays free either way.
               Donations just decide how fast the rough edges (like
               that signing warning) get smoothed out.
             </p>
@@ -553,8 +553,8 @@ export default function AphelionCase() {
               Penumbra.tech (Metaverse: Origins on Steam). The name
               is the pitch: <em>aphelion</em> is the orbital point
               farthest from the sun, and the product is the point
-              farthest from the cloud. The visual language — corona
-              teal, void purple-black, HUD brackets — is shared on
+              farthest from the cloud. The visual language, corona
+              teal, void purple-black, HUD brackets, is shared on
               purpose, so that anyone landing on any Penumbra surface
               sees the same operator behind it.
             </p>

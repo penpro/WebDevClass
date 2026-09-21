@@ -1,15 +1,15 @@
 // Diagnostics & load-testing case study.
 //
 // Public marketing page at /projects/diagnostics. Replaces the previous
-// home-page link that pointed at /admin-portal/diagnostics — the live
+// home-page link that pointed at /admin-portal/diagnostics, the live
 // dashboard is super-admin-only and shouldn't be exposed to visitors.
 // This page shows the same look (the LineChart component is shared)
 // rendered against frozen sample data from one of the actual test runs
 // I made during development.
 //
 // Two charts are reproduced:
-//   * api-overload — graceful degradation: req/s plateaus, latency climbs
-//   * api-block    — hard failure: throughput pinned at 10 req/s by Node
+//   * api-overload, graceful degradation: req/s plateaus, latency climbs
+//   * api-block, hard failure: throughput pinned at 10 req/s by Node
 //                    single-thread, latency climbs into seconds
 //
 // All numbers in the summary cards are from real measurements, not made up.
@@ -286,7 +286,7 @@ slow, not broken.`}
         eyebrow="Run 2: Event-loop block"
         tone="magenta"
         title="Hard failure"
-        body={`Same client load, different endpoint — one that synchronously
+        body={`Same client load, different endpoint, one that synchronously
 busy-waits 100 ms per request. Node is single-threaded, so requests
 queue head-of-line behind the blocked handler. Throughput pins at exactly
 1 / 100 ms = ~10 req/s regardless of how many VUs we add; latency climbs
@@ -317,7 +317,7 @@ linearly with the queue depth and reaches ~12 seconds.`}
           >
             <PitchCard
               title="Why this matters"
-              body="Most stacks have two different failure modes — CPU saturation looks graceful, event-loop blocking looks catastrophic. A dashboard that surfaces both makes it possible to know which one your service is in BEFORE pager fatigue sets in."
+              body="Most stacks have two different failure modes, CPU saturation looks graceful, event-loop blocking looks catastrophic. A dashboard that surfaces both makes it possible to know which one your service is in BEFORE pager fatigue sets in."
             />
             <PitchCard
               title="What I built into it"

@@ -112,7 +112,7 @@ export default function MoodBoards() {
             }}
           >
             Create a board, paste image URLs, share the link. No photos
-            are uploaded or stored on the server — tiles load directly
+            are uploaded or stored on the server, tiles load directly
             from their original hosts.
           </p>
         </Container>

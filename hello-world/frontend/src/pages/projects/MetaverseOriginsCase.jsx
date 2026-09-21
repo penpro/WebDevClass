@@ -1,7 +1,7 @@
-// Metaverse: Origins — Steam Early Access case study.
+// Metaverse: Origins, Steam Early Access case study.
 //
 // Published May 2021 under the Penumbra.tech studio name (same brand
-// as the consulting practice — these aren't separate identities). The
+// as the consulting practice, these aren't separate identities). The
 // game is in pre-alpha and the case study is honest about that: the
 // portfolio value is "I've been doing this since 2021, in public, on
 // Steam, with paying customers," not "buy it for the gameplay today."
@@ -39,7 +39,7 @@ const STEAM_HEADER =
 
 export default function MetaverseOriginsCase() {
   useDocumentMeta({
-    title: 'Metaverse: Origins case study — Unreal Engine multiplayer | Penumbra Tech',
+    title: 'Metaverse: Origins case study, Unreal Engine multiplayer | Penumbra Tech',
     description:
       "Steam Early Access since May 2021. 150K+ lines across 500+ files and 15 subsystems. The interesting story: agent-driven content pipeline with adversarial verification (last pass: 9 critical + 48 high-severity defects).",
     canonical: 'https://penumbra-tech.com/projects/metaverse-origins'
@@ -94,7 +94,7 @@ export default function MetaverseOriginsCase() {
             Penumbra.tech studio name. Voxel terrain you can dig and
             build, a medical and metabolism simulation, AI companions
             on skill trees, save/load that has to survive years of
-            schema changes — a studio-sized codebase being run on
+            schema changes, a studio-sized codebase being run on
             indie headcount. The interesting story isn&apos;t the game;
             it&apos;s the pipeline I built around it to make that
             possible.
@@ -159,7 +159,7 @@ export default function MetaverseOriginsCase() {
       </section>
 
       {/* ========================== Steam header ========================== */}
-      <SteamHeader src={STEAM_HEADER} alt="Metaverse: Origins — Steam header image" />
+      <SteamHeader src={STEAM_HEADER} alt="Metaverse: Origins, Steam header image" />
 
       {/* =========================== Honest status =========================== */}
       <div id="status">
@@ -171,9 +171,9 @@ export default function MetaverseOriginsCase() {
         <p>
           Metaverse: Origins is on Steam, but it&apos;s on Steam in{' '}
           <em>early access pre-alpha</em>. Functionality is limited,
-          systems are partial, and the bigger pieces of the design —
+          systems are partial, and the bigger pieces of the design, 
           the multi-character AI skill trees, the cooperative
-          civilisation loop, the multiplayer hosting — are in active
+          civilisation loop, the multiplayer hosting, are in active
           development, not finished features.
         </p>
         <p>
@@ -201,19 +201,19 @@ export default function MetaverseOriginsCase() {
           Origins is bigger than it looks from the store page. Voxel
           terrain you can dig and build, a medical and metabolism
           simulation, AI companions on skill trees, save/load that has
-          to survive years of schema changes — that adds up to{' '}
+          to survive years of schema changes, that adds up to{' '}
           <strong style={{ color: colors.text }}>
             more than 150,000 lines across 500-plus files and fifteen
             interlocking subsystems
           </strong>
           . The honest problem for a solo developer isn&apos;t writing
           any one feature. It&apos;s that the infrastructure a studio
-          takes for granted — a QA team, an automation engineer, a
-          tools team, a release process — doesn&apos;t exist when
+          takes for granted, a QA team, an automation engineer, a
+          tools team, a release process, doesn&apos;t exist when
           there&apos;s one of you.
         </p>
         <p>
-          So I built that part too. Not just the game&apos;s features —
+          So I built that part too. Not just the game&apos;s features, 
           the apparatus around them. Over the last stretch I&apos;ve
           been using Claude Code less as an autocomplete and more as
           an engineering org I direct: a fleet of agents pointed at
@@ -251,8 +251,8 @@ export default function MetaverseOriginsCase() {
           >
             <ToolEntry title="An agent that drives the live engine.">
               <p>
-                Most game bugs only exist at runtime — in the editor,
-                with the game actually playing — so verifying a fix
+                Most game bugs only exist at runtime, in the editor,
+                with the game actually playing, so verifying a fix
                 usually means a human booting the build and clicking
                 through it. I built a file-driven bridge that lets an
                 agent drive the running engine directly: boot a fresh
@@ -275,7 +275,7 @@ export default function MetaverseOriginsCase() {
                 announce themselves: memory-safety crashes,
                 use-after-frees, save/load data-loss holes, places
                 where the server trusts a client it shouldn&apos;t.
-                The catch with machine-found bugs is false positives —
+                The catch with machine-found bugs is false positives, 
                 so nothing is trusted on the first pass. Each finding
                 is handed to independent agents whose only job is to
                 try to <em>refute</em> it, and only the survivors get
@@ -290,7 +290,7 @@ export default function MetaverseOriginsCase() {
                   nine critical and forty-eight high-severity defects
                 </strong>
                 . A studio calls that QA plus a security review plus a
-                tools team. Here it&apos;s a repeatable afternoon —
+                tools team. Here it&apos;s a repeatable afternoon, 
                 and every critical it found has since been fixed and
                 verified through the harness above.
               </p>
@@ -299,14 +299,14 @@ export default function MetaverseOriginsCase() {
             <ToolEntry title="The unglamorous tooling underneath.">
               <p>
                 The same instinct shows up in the boring places. Game
-                data — a couple of hundred items, recipes, skill
-                curves — lives in spreadsheet-shaped tables that are
+                data, a couple of hundred items, recipes, skill
+                curves, lives in spreadsheet-shaped tables that are
                 miserable to hand-edit safely, so I built a
                 SQLite-backed utility that queries, transforms,
                 validates and round-trips them with schema migration
-                and drift detection. Project knowledge — engineering
+                and drift detection. Project knowledge, engineering
                 standards, architecture decisions, the running list of
-                known defects — lives in a structured memory the
+                known defects, lives in a structured memory the
                 agents read every session, so the reasoning behind a
                 decision survives across months and the work stays
                 coherent instead of drifting. None of it is glamorous.
@@ -331,7 +331,7 @@ export default function MetaverseOriginsCase() {
           stops, because that line is the whole point. The agents
           don&apos;t decide anything. Architecture, scope, the call on
           whether a reported bug is even real, the gate where nothing
-          gets committed until it builds and verifies — that&apos;s
+          gets committed until it builds and verifies, that&apos;s
           mine, and it has to be.
         </p>
         <p>
@@ -347,7 +347,7 @@ export default function MetaverseOriginsCase() {
           model into producing code.{' '}
           <strong style={{ color: colors.text }}>
             The discipline worth paying for is knowing which output
-            you&apos;re not yet allowed to trust — and building the
+            you&apos;re not yet allowed to trust, and building the
             verification that decides.
           </strong>
         </p>
@@ -386,12 +386,12 @@ export default function MetaverseOriginsCase() {
             }}
           >
             If your team is interested in agent-assisted development
-            but wary — for good reason — about the carelessness it
+            but wary, for good reason, about the carelessness it
             can produce, this is the engagement to ask about. The
             harness, the audit pipeline, the verification discipline
             all generalise; they aren&apos;t game-specific. The Steam
             page is the canonical source of truth for the game&apos;s
-            current state — roadmap, patch notes, reviews — and a
+            current state, roadmap, patch notes, reviews, and a
             useful reference for how long this project has actually
             been live in public.
           </p>
@@ -483,7 +483,7 @@ function SteamHeader({ src, alt }) {
                 fontFamily: fonts.mono
               }}
             >
-              Steam store header — image served from Valve&apos;s CDN
+              Steam store header, image served from Valve&apos;s CDN
             </div>
           </Card>
         </a>

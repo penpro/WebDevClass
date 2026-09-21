@@ -470,8 +470,8 @@ export default function Diagnostics() {
               Rate limiter is DISABLED.
             </strong>{' '}
             All API endpoints are currently unprotected from request
-            flooding. Toggle back to ON when you&apos;re done load testing
-            — this state persists until you flip it back or the backend is
+            flooding. Toggle back to ON when you&apos;re done load testing,
+this state persists until you flip it back or the backend is
             restarted.
           </div>
         )}
@@ -956,7 +956,7 @@ function SummaryStat({ label, value }) {
   )
 }
 
-// ToggleBlock — green pill when "on", warning-tinted when "off". `alertWhenOff`
+// ToggleBlock, green pill when "on", warning-tinted when "off". `alertWhenOff`
 // is for the rate limiter (off = danger). `alertWhenOn` is for maintenance
 // mode (on = warning visible to all users). The `on`/`off` semantics flip
 // between the two so we can keep the green = good convention.
@@ -1015,7 +1015,7 @@ function ToggleBlock({
           opacity: disabledClick ? 0.65 : 1
         }}
       >
-        {loading ? '…' : on ? 'ON — click to disable' : 'OFF — click to enable'}
+        {loading ? '…' : on ? 'ON, click to disable' : 'OFF, click to enable'}
       </button>
     </div>
   )
@@ -1047,7 +1047,7 @@ function RunStatusBanner({ runStatus, runLabel, elapsed, expectedDuration }) {
     >
       <div style={{ fontFamily: fonts.heading, fontSize: fontSizes.md }}>
         <strong>{labelForStatus(runStatus)}</strong>
-        {runLabel && <> — {runLabel}</>}
+        {runLabel && <>, {runLabel}</>}
       </div>
       <div
         style={{

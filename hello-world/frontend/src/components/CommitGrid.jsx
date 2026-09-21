@@ -1,7 +1,7 @@
 // Thin wrapper around the standalone hex-commit-grid package
 // (https://github.com/penpro/hex-commit-grid). The original local
 // CommitGrid + HexCell.jsx were extracted into that package so the
-// component has one source of truth — bug fixes and feature work
+// component has one source of truth, bug fixes and feature work
 // ship by bumping the dependency, not by editing two places.
 //
 // The package's .hcg-flower hides itself below 760px viewport (radial
