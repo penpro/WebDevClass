@@ -99,8 +99,18 @@ export default function Footer() {
             <FooterHeading>Site</FooterHeading>
             <FooterLink to="/services">Services</FooterLink>
             <FooterLink to="/projects">Projects</FooterLink>
+            <FooterLink to="/metaverse">Metaverse: Origins (game)</FooterLink>
+            <FooterLink to="/blog">Blog</FooterLink>
             <FooterLink to="/about">About</FooterLink>
             <FooterLink to="/contact">Contact</FooterLink>
+          </div>
+
+          <div>
+            <FooterHeading>Free resources</FooterHeading>
+            <FooterLink to="/guide">Build it yourself: the free playbook</FooterLink>
+            <FooterLink to="/saas-rescue">The 6-week SaaS-rescue playbook</FooterLink>
+            <FooterLink to="/judgment">Why not just use an LLM?</FooterLink>
+            <FooterLink to="/stack">What this site costs to run</FooterLink>
           </div>
 
           <div>

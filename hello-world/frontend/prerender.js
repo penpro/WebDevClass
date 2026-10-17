@@ -42,6 +42,7 @@ const ROUTES = [
   '/judgment',
   '/guide',
   '/saas-rescue',
+  '/metaverse',
   '/projects',
   '/projects/diagnostics',
   '/projects/theory-of-computation',

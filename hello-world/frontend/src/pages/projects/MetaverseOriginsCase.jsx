@@ -151,7 +151,10 @@ export default function MetaverseOriginsCase() {
             >
               View on Steam ↗
             </Button>
-            <Button as={Link} to="/contact" variant="secondary" size="lg">
+            <Button as={Link} to="/metaverse" variant="secondary" size="lg">
+              The game page →
+            </Button>
+            <Button as={Link} to="/contact" variant="ghost" size="lg">
               Discuss a similar build
             </Button>
           </div>

@@ -42,6 +42,7 @@ const Blog = lazy(() => import('./pages/Blog.jsx'))
 const BlogPost = lazy(() => import('./pages/BlogPost.jsx'))
 const Judgment = lazy(() => import('./pages/Judgment.jsx'))
 const Guide = lazy(() => import('./pages/Guide.jsx'))
+const MetaverseGame = lazy(() => import('./pages/MetaverseGame.jsx'))
 const SaasRescue = lazy(() => import('./pages/SaasRescue.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
@@ -111,6 +112,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="stack" element={<Stack />} />
             <Route path="judgment" element={<Judgment />} />
             <Route path="guide" element={<Guide />} />
+            <Route path="metaverse" element={<MetaverseGame />} />
             <Route path="saas-rescue" element={<SaasRescue />} />
 
             {/* Auth pages */}
