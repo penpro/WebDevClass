@@ -29,8 +29,10 @@ const SECTIONS = [
   { id: 'about',     num: '01', label: 'What it is' },
   { id: 'features',  num: '02', label: 'What you do' },
   { id: 'gallery',   num: '03', label: 'Screens' },
-  { id: 'honest',    num: '04', label: 'Early Access' },
-  { id: 'play',      num: '05', label: 'Play it' }
+  { id: 'tech',      num: '04', label: 'Tech tree' },
+  { id: 'roadmap',   num: '05', label: 'Roadmap' },
+  { id: 'honest',    num: '06', label: 'Early Access' },
+  { id: 'play',      num: '07', label: 'Play it' }
 ];
 
 const STEAM_URL = 'https://store.steampowered.com/app/1602810/';
@@ -76,6 +78,124 @@ const SHOTS = [
   {
     src: '/metaverse/metaverse-vertical.jpg',
     caption: 'Backlit treeline. All screenshots are in-engine, from the game itself.'
+  }
+];
+
+// The tech tree, era by era, from the game's progression roadmap (MO57
+// Docs/PROGRESSION_ROADMAP.md, the design authority). Status is what a
+// player can actually do in the current build, not what is planned.
+const STATUS = {
+  in: { label: 'In the game', color: colors.accent, bg: colors.accentMuted },
+  partly: { label: 'Partly in', color: colors.warning, bg: 'rgba(251, 191, 36, 0.12)' },
+  later: { label: 'Later', color: colors.textMuted, bg: colors.surfaceMuted }
+};
+
+const ERAS = [
+  {
+    num: '0',
+    name: 'The first hour',
+    status: 'in',
+    body:
+      'Drink from a lake or a river and maybe get sick, or boil the water first. Twirl a dry stick in a notch until it smokes, carry fire on a torch, forage roots and berries, and get a lean-to up before dark.'
+  },
+  {
+    num: '1',
+    name: 'Stone and fibre',
+    status: 'in',
+    body:
+      'Knap flint into flakes, knives and hand axes. Strip bark and twist it into cord, weave baskets, haft a spear, string a simple bow. Scrape and tan hides, set a splint, cook birch-bark tar. Arrows are waiting on birds, because no birds means no feathers.'
+  },
+  {
+    num: '2',
+    name: 'Wood, hide and clay',
+    status: 'in',
+    body:
+      'Rive planks with an axe and a hammer, build a workbench, burn out a dugout canoe. Leather clothing, pottery fired in the campfire, cooking pots, storage jars, charcoal, snares, deadfalls, the bow drill.'
+  },
+  {
+    num: '3',
+    name: 'Settlement',
+    status: 'partly',
+    body:
+      'Looms, hoes, sickles, schools and storage are in. Farming is not: no seeds, crops or fields yet, no flax or sheep, so no cloth, and no lime kiln. This era is the biggest hole in the tree right now.'
+  },
+  {
+    num: '4',
+    name: 'Copper',
+    status: 'in',
+    body:
+      'Hammer native copper cold first. Then paint a pot with ground malachite and fire it: sometimes it leaves little copper beads, and looking at them is how your survivor works out smelting. Bellows, a forge, cast copper, lead glaze, glass.'
+  },
+  {
+    num: '5',
+    name: 'Bronze',
+    status: 'in',
+    body:
+      'Tin from granite veins, melted into copper. Cast bronze axes, knives, spearheads, swords, helmets, shields and scale armour.'
+  },
+  {
+    num: '6',
+    name: 'Iron',
+    status: 'in',
+    body:
+      'Hematite from the cave walls and bog iron from the wetlands go into a bloomery. What comes out is a spongy bloom, not iron yet; you hammer it at welding heat until it is. Then nails, tongs, an anvil, iron tools and chain mail.'
+  },
+  {
+    num: '7',
+    name: 'Steel and after',
+    status: 'partly',
+    body:
+      'Iron packed in glowing charcoal and quenched comes out as steel, and that is in. Cast iron, the blast furnace and everything past the Iron Age come later.'
+  }
+];
+
+// The roadmap. Deliberately no dates: one person builds this, and the
+// order moves when playtests show what matters most.
+const ROADMAP = [
+  {
+    title: 'In the game now',
+    tone: 'corona',
+    items: [
+      'A generated world: biomes, mountains, coasts, rivers, lakes, caves with real rock and ore in them',
+      'Weather and a day/night clock over all of it',
+      'A body that gets hurt, sick, thirsty and cold, and wounds that need treating',
+      'Crafting from knapped flint to steel, about 130 recipes, learned by studying what you find',
+      'Buildings you plan as a ghost and then actually build',
+      'Survivors you recruit and give jobs',
+      'Co-op over Steam and LAN'
+    ]
+  },
+  {
+    title: 'Working on now',
+    tone: 'cyan',
+    items: [
+      'The look of the world: big rock formations and cliffs you can see kilometres out, highland crags, granite summits',
+      'The start: waking up beside the clone egg you grew in',
+      'Building feel: dimmer ghosts, nothing solid until it is finished',
+      'A creative mode where building and crafting cost nothing',
+      'Fixing what players report'
+    ]
+  },
+  {
+    title: 'Next',
+    tone: 'magenta',
+    items: [
+      'Farming: seeds, fields, crops and seasons',
+      'Animals to keep: sheep for wool, horses to pull a cart, birds for feathers (and arrows)',
+      'Cloth, a kiln for lime and better pottery, real furnace temperatures',
+      'A proper colony screen for running your survivors',
+      'Combat that feels better, and ranged weapons'
+    ]
+  },
+  {
+    title: 'Later',
+    tone: 'cyan',
+    items: [
+      'Villages that grow: houses, workplaces, schools, families',
+      'Settlements that trade, ally or go to war with each other',
+      'Medieval engineering, then the eras after it',
+      'Mod support'
+    ]
   }
 ];
 
@@ -333,6 +453,185 @@ export default function MetaverseGame() {
                   </div>
                 </Card>
               </a>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ============================== Tech tree ============================== */}
+      <section
+        id="tech"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`
+        }}
+      >
+        <Container>
+          <HudLabel tone="cyan">Tech tree</HudLabel>
+          <h2
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
+              fontWeight: fontWeights.bold,
+              lineHeight: 1.15,
+              letterSpacing: '-0.015em',
+              margin: `${space.md} 0 0`,
+              color: colors.text
+            }}
+          >
+            From a sharp rock to a steel sword.
+          </h2>
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              maxWidth: '68ch',
+              fontSize: fontSizes.md,
+              color: colors.textSecondary,
+              lineHeight: 1.75
+            }}
+          >
+            The tree follows how people really got from stone to metal, in
+            order. Nothing is hard-locked, but you need what they needed: you
+            cannot smelt without a furnace, and you cannot build the furnace
+            without bellows. You learn a technique by studying the thing it
+            comes from, so looking closely at a flint flake teaches you how to
+            scrape a hide with one. Each era below says honestly whether it is
+            in the current build.
+          </p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: space.lg,
+              marginTop: space['2xl']
+            }}
+          >
+            {ERAS.map((era) => {
+              const s = STATUS[era.status];
+              return (
+                <Card key={era.num} padding={space.lg}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      justifyContent: 'space-between',
+                      gap: space.sm,
+                      flexWrap: 'wrap'
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontFamily: fonts.heading,
+                        fontSize: fontSizes.lg,
+                        fontWeight: fontWeights.semibold,
+                        color: colors.text
+                      }}
+                    >
+                      <span style={{ fontFamily: fonts.mono, color: colors.textMuted, marginRight: space.sm }}>
+                        {era.num}
+                      </span>
+                      {era.name}
+                    </h3>
+                    <span
+                      style={{
+                        fontFamily: fonts.mono,
+                        fontSize: fontSizes.xs,
+                        color: s.color,
+                        background: s.bg,
+                        border: `1px solid ${s.color}`,
+                        borderRadius: radii.sm,
+                        padding: '2px 8px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {s.label}
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      margin: `${space.sm} 0 0`,
+                      fontSize: fontSizes.sm,
+                      lineHeight: 1.65,
+                      color: colors.textSecondary
+                    }}
+                  >
+                    {era.body}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
+        </Container>
+      </section>
+
+      {/* ============================== Roadmap ============================== */}
+      <section
+        id="roadmap"
+        style={{
+          paddingTop: space['3xl'],
+          paddingBottom: space['3xl'],
+          borderBottom: `1px solid ${colors.borderSubtle}`,
+          background: colors.surface
+        }}
+      >
+        <Container>
+          <HudLabel tone="corona">Roadmap</HudLabel>
+          <h2
+            style={{
+              fontFamily: fonts.heading,
+              fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
+              fontWeight: fontWeights.bold,
+              lineHeight: 1.15,
+              letterSpacing: '-0.015em',
+              margin: `${space.md} 0 0`,
+              color: colors.text
+            }}
+          >
+            Where it is and where it is going.
+          </h2>
+          <p
+            style={{
+              margin: `${space.md} 0 0`,
+              maxWidth: '68ch',
+              fontSize: fontSizes.md,
+              color: colors.textSecondary,
+              lineHeight: 1.75
+            }}
+          >
+            No dates. I build this alone, and the order changes when a
+            playtest shows me something matters more than I thought. What is
+            in the next column is what I am actually working toward, not a
+            wish list.
+          </p>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: space.lg,
+              marginTop: space['2xl']
+            }}
+          >
+            {ROADMAP.map((col) => (
+              <Card key={col.title} variant="accent" padding={space.lg}>
+                <HudLabel tone={col.tone}>{col.title}</HudLabel>
+                <ul
+                  style={{
+                    margin: `${space.md} 0 0`,
+                    paddingLeft: '1.1rem',
+                    fontSize: fontSizes.sm,
+                    lineHeight: 1.65,
+                    color: colors.textSecondary
+                  }}
+                >
+                  {col.items.map((item) => (
+                    <li key={item} style={{ marginBottom: space.xs }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </Card>
             ))}
           </div>
         </Container>
