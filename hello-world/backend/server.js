@@ -408,6 +408,9 @@ process.on('unhandledRejection', (reason) => {
   process.exit(1);
 });
 
-app.listen(port, () => {
-  console.log(`Backend listening on http://127.0.0.1:${port}`);
+// Loopback only: nginx is the sole client. Binding to all interfaces left the
+// app reachable on :3000 to anything the firewall let through.
+const host = process.env.HOST || '127.0.0.1';
+app.listen(port, host, () => {
+  console.log(`Backend listening on http://${host}:${port}`);
 });
