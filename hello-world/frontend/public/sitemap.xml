@@ -56,6 +56,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://penumbra-tech.com/projects/databases-review</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://penumbra-tech.com/projects/repair360-auto</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -87,6 +92,11 @@
   </url>
   <url>
     <loc>https://penumbra-tech.com/toc/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://penumbra-tech.com/cs330/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

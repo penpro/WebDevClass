@@ -46,6 +46,7 @@ const ROUTES = [
   '/projects',
   '/projects/diagnostics',
   '/projects/theory-of-computation',
+  '/projects/databases-review',
   '/projects/repair360-auto',
   '/projects/yuki',
   '/projects/ata-202',

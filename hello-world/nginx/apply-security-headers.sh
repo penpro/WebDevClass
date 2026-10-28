@@ -6,8 +6,8 @@ set -euo pipefail
 #
 # Despite the name, the include file now carries more than just headers:
 # it also defines compression, immutable-cache rules for /assets/,
-# no-cache for the SPA shell, and a /toc/ location block for the
-# statically-hosted Theory of Computation tool. Re-run after pulling
+# no-cache for the SPA shell, and /toc/ and /cs330/ location blocks for the
+# statically-hosted Theory of Computation and CS 330 review tools. Re-run after pulling
 # changes to security-headers.conf so the new rules take effect.
 #
 # Safe to re-run: the grep guard means the include line is only added once.

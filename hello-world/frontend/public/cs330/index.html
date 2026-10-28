@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CS 330 Databases Review | Penumbra Tech</title>
+  <meta name="description" content="Free spaced-repetition review for a databases course: 280 questions on SQL, joins, normalization, NoSQL and graph databases. Auto-graded multiple choice and write-it-out SQL practice, with mock exams. Penumbra Tech." />
+  <meta name="theme-color" content="#07021a" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2307021a'/%3E%3Cg stroke='%235eead4' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='32' cy='32' r='24'/%3E%3Cpath d='M24 18 L24 48 M24 18 L38 18 a8 8 0 0 1 0 16 L24 34'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Penumbra Tech brand strip: links back to the parent site, sits above the tool's own topbar. -->
+  <div class="pt-strip">
+    <a class="pt-strip-link" href="/projects/databases-review" title="Back to the Penumbra Tech case study">
+      <svg width="20" height="20" viewBox="0 0 64 64" fill="none" aria-hidden="true"><g stroke="#5eead4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="24"></circle><path d="M24 18 L24 48 M24 18 L38 18 a8 8 0 0 1 0 16 L24 34"></path></g></svg>
+      <span class="pt-strip-name">Penumbra Tech</span>
+    </a>
+    <span class="pt-strip-tag"><span class="pt-strip-dot"></span>Live themed build &middot; progress saves in your browser</span>
+  </div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">DB</span>
+      <div>
+        <div class="brand-title">CS 330 Databases</div>
+        <div class="brand-sub" id="brand-sub">Question bank review</div>
+      </div>
+    </div>
+
+    <div class="overall" id="overall-summary" title="Overall mastery across all 13 units">
+      <svg class="ring" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true">
+        <circle class="ring-bg" cx="23" cy="23" r="19" />
+        <circle class="ring-fg" id="overall-ring" cx="23" cy="23" r="19" />
+      </svg>
+      <div class="overall-text">
+        <div class="overall-pct" id="overall-pct">0%</div>
+        <div class="overall-sub" id="overall-mastered">0 / 0 mastered</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-view="study">Study</button>
+      <button class="nav-btn" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="reference">Reference</button>
+      <button class="nav-btn" data-view="settings">Settings</button>
+      <button class="icon-btn" id="theme-toggle" title="Toggle light/dark">◐</button>
+    </nav>
+  </header>
+
+  <main class="main">
+    <!-- STUDY -->
+    <section id="view-study" class="view">
+      <div class="study-controls">
+        <label class="field">
+          <span>Focus</span>
+          <select id="focus-select"></select>
+        </label>
+        <label class="field">
+          <span>Go&nbsp;to</span>
+          <input id="goto-num" class="goto-input" type="text" placeholder="# or c06-4" title="Jump to a question by its number (#142) or id (c06-4)" />
+        </label>
+        <button class="btn ghost small" id="mock-btn" type="button" title="Timed, written exam with a self-graded report">🎓 Mock exam</button>
+        <div class="chips">
+          <span class="chip" id="chip-unit">—</span>
+          <span class="chip" id="chip-streak">streak 0</span>
+          <span class="chip" id="chip-due">0 due</span>
+        </div>
+      </div>
+
+      <div id="question-area"><!-- question card injected here --></div>
+
+      <p class="empty" id="study-empty" hidden>
+        Nothing to study here yet. Pick a different focus.
+      </p>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view" hidden>
+      <div class="dash-head">
+        <h2>Your progress</h2>
+        <div class="dash-stats" id="dash-stats"></div>
+      </div>
+      <div class="chapter-grid" id="chapter-grid"></div>
+      <div class="flag-wrap">
+        <h3>🚩 Flagged for help <span class="muted" id="flag-count"></span></h3>
+        <ul class="flag-list" id="flag-list"></ul>
+      </div>
+      <div class="weak-wrap">
+        <h3>Weakest topics <span class="muted">(click to drill)</span></h3>
+        <ul class="weak-list" id="weak-list"></ul>
+      </div>
+      <div class="weak-wrap">
+        <h3>Mock exam history</h3>
+        <ul class="weak-list" id="exam-history"></ul>
+      </div>
+    </section>
+
+    <!-- REFERENCE -->
+    <section id="view-reference" class="view" hidden>
+      <div class="dash-head">
+        <h2>Quick reference <span class="muted small">— the patterns to have in your head</span></h2>
+        <button class="btn ghost small" id="ref-print" type="button">🖨 Print</button>
+      </div>
+      <div id="reference-body"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view" hidden>
+      <h2>Settings</h2>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Progression mode</strong>
+          <p class="muted">Guided gates each unit behind the previous one's mastery (the course's own card order). Free practice opens everything.</p>
+        </div>
+        <div class="seg" id="mode-seg">
+          <button data-mode="guided">Guided (gated)</button>
+          <button data-mode="free">Free practice</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Ease-in difficulty ramp</strong>
+          <p class="muted">Within a unit, start with concept questions, then syntax patterns, tracing, writing, debugging, and design. A tier opens once you've recalled most of the tier below. Turn off to see every type at once.</p>
+        </div>
+        <div class="seg" id="ramp-seg">
+          <button data-ramp="on">On</button>
+          <button data-ramp="off">Off</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Recalls to master a question</strong>
+          <p class="muted">A question only counts as mastered after this many "got it" grades in a row. <code id="ms-val"></code></p>
+        </div>
+        <input type="range" id="master-streak" min="2" max="5" step="1" />
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Mastery needed to unlock the next unit</strong>
+          <p class="muted">Earlier units keep mixing in afterward, especially questions you've missed. <code id="ut-val"></code></p>
+        </div>
+        <input type="range" id="unlock-threshold" min="0.5" max="0.98" step="0.01" />
+      </div>
+
+      <div class="setting">
+        <div class="setting-label">
+          <strong>Save / restore progress</strong>
+          <p class="muted">Progress lives in this browser. Export a backup, or move it to another machine.</p>
+        </div>
+        <div class="btn-row">
+          <button class="btn" id="export-btn">Export backup</button>
+          <button class="btn" id="import-btn">Import backup</button>
+          <input type="file" id="import-file" accept="application/json" hidden />
+          <button class="btn danger" id="reset-btn">Reset all progress</button>
+        </div>
+      </div>
+
+      <p class="muted small">Built for offline use — no internet required. Questions come from the course's own question bank (data/yaml).</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="footer-hint">Choice questions: <kbd>1</kbd>–<kbd>9</kbd> pick &middot; <kbd>Enter</kbd> check &middot; Written: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> show answer, <kbd>1</kbd> got it / <kbd>2</kbd> missed &middot; <kbd>Enter</kbd> next</span>
+    <div class="credit">Questions are from the CS 330 course's own question bank, published by the instructor, Dr. Stephen Foster, and used here as a personal study aid. Not affiliated with or endorsed by the course or its instructor.
+      <a href="https://srfoster.github.io/oc-classes/page.html?class=cs330&amp;page=homepage" target="_blank" rel="noopener noreferrer">Course site &#8599;</a></div>
+  </footer>
+
+  <script src="vendor/marked.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/highlight.js"></script>
+  <script src="js/questions/bank.js"></script>
+  <script src="js/questions/choices-01-16.js"></script>
+  <script src="js/questions/choices-17-32.js"></script>
+  <script src="js/questions/choices-33-52.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -27,6 +27,7 @@ The site is a React SPA with server-side pre-rendering, every public route retur
 
 - [Diagnostics](https://penumbra-tech.com/projects/diagnostics): Live load-testing dashboard with k6 + EventSource streaming, head-to-head EC2 vs Lambda+DynamoDB+S3 comparison.
 - [Theory of Computation Review](https://penumbra-tech.com/projects/theory-of-computation): Interactive exam-review tool for an upper-division CS course.
+- [CS 330 Databases Review](https://penumbra-tech.com/projects/databases-review): Free spaced-repetition study tool for a databases course. 280 questions on SQL, joins, normalization, NoSQL and graph databases, auto-graded multiple choice plus write-it-out SQL practice, checked against MySQL 8.4.
 - [Repair360 Auto](https://penumbra-tech.com/projects/repair360-auto): Real-world rescue of an automotive shop's broken booking system, what the actual technical challenges were, not a sanitized PR version.
 - [Trigonometry Tools](https://penumbra-tech.com/projects/trigonometry-tools): Interactive math learning tool with live geometry rendering.
 - [Metaverse Origins](https://penumbra-tech.com/projects/metaverse-origins): Unreal Engine 5 multiplayer game systems, Steam OnlineSubsystem integration, agent-driven content pipeline.

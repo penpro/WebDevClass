@@ -48,6 +48,7 @@ const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 
 const DiagnosticsCase = lazy(() => import('./pages/projects/DiagnosticsCase.jsx'))
 const TheoryOfComputationCase = lazy(() => import('./pages/projects/TheoryOfComputationCase.jsx'))
+const DatabasesReviewCase = lazy(() => import('./pages/projects/DatabasesReviewCase.jsx'))
 const Repair360Case = lazy(() => import('./pages/projects/Repair360Case.jsx'))
 const YukiCase = lazy(() => import('./pages/projects/YukiCase.jsx'))
 const Ata202Case = lazy(() => import('./pages/projects/Ata202Case.jsx'))
@@ -85,6 +86,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route
               path="projects/theory-of-computation"
               element={<TheoryOfComputationCase />}
+            />
+            <Route
+              path="projects/databases-review"
+              element={<DatabasesReviewCase />}
             />
             <Route path="projects/repair360-auto" element={<Repair360Case />} />
             <Route path="projects/yuki" element={<YukiCase />} />

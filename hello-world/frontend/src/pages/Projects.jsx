@@ -68,7 +68,7 @@ const CATEGORIES = [
     id: 'cat-study',
     label: 'Study tools',
     intro:
-      'Two free, open-source study apps I built and gave away, no signup, no backend, fully offline, progress saved in your browser. A beginner on-ramp into discrete math, and its advanced follow-up for a theory-of-computation course. Launch either in the browser or read the source.'
+      'Free study apps I built and gave away, no signup, no backend, progress saved in your browser. A beginner on-ramp into discrete math, its advanced follow-up for a theory-of-computation course, and a review tool for a databases course. Launch any of them in the browser. The first two are also open source.'
   },
   {
     id: 'cat-csgames',
@@ -170,6 +170,21 @@ const PROJECTS = [
     summary:
       'The advanced follow-up: comprehensive final-exam prep covering Sipser Chapters 0–8 plus exam checkpoints, regular & context-free languages, Turing machines, decidability, reducibility, and time & space complexity. Auto-graded questions on a custom Leitner + streak + mastery-gated scheduler, real-world discussion questions, DFA / NFA / TM state-diagram practice, a timed mock-exam mode, and a reference cheat sheet. Built to prove I can reason about computability and complexity, not just stitch libraries. A themed build also runs on this site at /toc/.',
     stack: ['Vanilla JS', 'KaTeX', '859 questions', 'Mastery-gated SRS', 'Mock-exam mode', 'DFA / NFA / TM diagrams']
+  },
+  {
+    category: 'cat-study',
+    tool: true,
+    order: 3,
+    pill: 'Databases course',
+    launch: '/cs330/',
+    caseStudy: '/projects/databases-review',
+    badge: 'Free · No signup · Offline-capable · CS 330',
+    title: 'CS 330 Databases Review',
+    tagline:
+      '280 questions over 52 cards: SQL, joins, normalization, NoSQL, and graph databases.',
+    summary:
+      'A review tool for a databases course. The course publishes its own question bank, so I turned all 280 questions into practice: auto-graded multiple choice and select-all for concepts, tracing and debugging, and write-it-from-memory for SQL and other code, with a keyword check that flags the clause you forgot. It runs on the same spaced-repetition engine as the Theory of Computation tool, plus mock exams and a reference sheet. I also ran the course answers against MySQL 8.4 and wrote down where they differ. A themed build runs on this site at /cs330/.',
+    stack: ['Vanilla JS', '280 questions', 'Spaced repetition', 'Mock exams', 'SQL practice', 'Tested on MySQL 8.4']
   },
   {
     category: 'cat-csgames',
@@ -666,7 +681,7 @@ function ToolCard({ project }) {
             color: project.beginner ? colors.cyan : colors.textMuted
           }}
         >
-          {project.beginner ? '① Start here' : '② Follow-up'}
+          {project.pill || (project.beginner ? '① Start here' : '② Follow-up')}
         </span>
       </div>
 
@@ -765,14 +780,16 @@ function ToolCard({ project }) {
         >
           Launch ↗
         </Button>
-        <a
-          href={project.source}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={linkStyle}
-        >
-          Source ↗
-        </a>
+        {project.source && (
+          <a
+            href={project.source}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={linkStyle}
+          >
+            Source ↗
+          </a>
+        )}
         {project.caseStudy && (
           <Link to={project.caseStudy} style={linkStyle}>
             Read the write-up →
