@@ -235,7 +235,7 @@ export default function DatabasesReviewCase() {
               rel="noopener noreferrer"
               style={{ color: colors.accent, textDecoration: 'none' }}
             >
-              course site
+              CS 330 course homepage
             </a>
             . I did not write them. This is an independent study aid and is
             not affiliated with or endorsed by the course or its instructor.
@@ -412,6 +412,26 @@ export default function DatabasesReviewCase() {
               </table>
             </div>
           </Card>
+
+          <p
+            style={{
+              marginTop: space.lg,
+              color: colors.textMuted,
+              fontSize: fontSizes.sm,
+              lineHeight: 1.55
+            }}
+          >
+            Questions and reference answers: the{' '}
+            <a
+              href={COURSE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: colors.accent, textDecoration: 'none' }}
+            >
+              CS 330 homepage
+            </a>{' '}
+            by Dr. Stephen Foster.
+          </p>
         </Container>
       </section>
 
