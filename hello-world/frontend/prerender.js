@@ -54,6 +54,9 @@ const ROUTES = [
   '/projects/metaverse-origins',
   '/projects/music-visualizer',
   '/projects/aphelion',
+  '/syzygy',
+  '/syzygy/privacy',
+  '/syzygy/terms',
   '/api-guide'
 ];
 

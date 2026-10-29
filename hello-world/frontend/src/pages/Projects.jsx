@@ -116,6 +116,16 @@ const PROJECTS = [
   },
   {
     category: 'cat-products',
+    to: '/syzygy',
+    badge: 'Penumbra product · Open source · Windows',
+    title: 'Syzygy: collaborative research workspace',
+    summary:
+      "Aphelion's sister app: a local-first desktop workspace for collaborative research. Research projects, an Ask mode that puts a locally running AI engine to work on your own sources, and opt-in Google Drive folder collaboration using Google's narrowest drive.file scope. Forked from the Aphelion shell and re-skinned into its own warm-paper research identity. Syzygy (n.), the alignment of celestial bodies; research together, in alignment.",
+    stack: ['Tauri v2', 'Rust', 'React + TypeScript + Vite', 'Yjs collaboration', 'Google Drive (drive.file)', 'llama.cpp'],
+    auth: 'Free download · Windows installer · MIT'
+  },
+  {
+    category: 'cat-products',
     to: '/projects/metaverse-origins',
     badge: 'Published software · Steam Early Access',
     title: 'Metaverse: Origins',

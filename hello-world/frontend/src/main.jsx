@@ -57,6 +57,12 @@ const MetaverseOriginsCase = lazy(() => import('./pages/projects/MetaverseOrigin
 const MusicVisualizerCase = lazy(() => import('./pages/projects/MusicVisualizerCase.jsx'))
 const AphelionCase = lazy(() => import('./pages/projects/AphelionCase.jsx'))
 
+// Syzygy product portal — its own paper-branded surface (see
+// pages/syzygy/). All three routes share one chunk via SyzygyChrome.
+const SyzygyHome = lazy(() => import('./pages/syzygy/SyzygyHome.jsx'))
+const SyzygyPrivacy = lazy(() => import('./pages/syzygy/SyzygyPrivacy.jsx'))
+const SyzygyTerms = lazy(() => import('./pages/syzygy/SyzygyTerms.jsx'))
+
 const Login = lazy(() => import('./pages/Login.jsx'))
 const Register = lazy(() => import('./pages/Register.jsx'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword.jsx'))
@@ -110,6 +116,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               path="projects/aphelion"
               element={<AphelionCase />}
             />
+            {/* Syzygy product portal (registered as the app's home /
+                privacy / terms URLs on the Google Auth Platform) */}
+            <Route path="syzygy" element={<SyzygyHome />} />
+            <Route path="syzygy/privacy" element={<SyzygyPrivacy />} />
+            <Route path="syzygy/terms" element={<SyzygyTerms />} />
             <Route path="about" element={<About />} />
             <Route path="blog" element={<Blog />} />
             <Route path="blog/:slug" element={<BlogPost />} />
